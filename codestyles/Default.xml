@@ -1,0 +1,11 @@
+<code_scheme name="Default" version="173">
+  <ScalaCodeStyleSettings>
+    <option name="alwaysUsedImports">
+      <array>
+        <option value="de.swsnr.refined.play.json._" />
+        <option value="finnova.bpf.utils.entity.DateUtils.offsetDateTimeFormat" />
+        <option value="refined.auto._" />
+      </array>
+    </option>
+  </ScalaCodeStyleSettings>
+</code_scheme>
