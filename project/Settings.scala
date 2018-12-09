@@ -63,6 +63,7 @@ object Settings {
     "org.apache.poi" % "poi-ooxml" % "3.17",
     // scalajs for server
     "com.vmunier" %% "scalajs-scripts" % "1.1.1",
+    "org.julienrf" %% "play-jsmessages" % "3.0.0",
     //Silhouette
     "com.mohiva" %% "play-silhouette-password-bcrypt" % silhouetteV,
     "com.mohiva" %% "play-silhouette-crypto-jca" % silhouetteV,

@@ -2,9 +2,7 @@ package pme123.form.client
 
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
-import pme123.form.client.FormUIStore.UIFormElem
 import pme123.form.client.services.SemanticUI
-import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.PropTabType.PROPERTIES
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared._
@@ -59,6 +57,7 @@ object FormUIStore extends Logging {
     info(s"FormUIStore: changeLanguage $language")
     uiState.activeLanguage.value = Language.withNameInsensitive(language)
     SemanticUI.initPlaceholders()
+    SemanticUI.initDropdowns()
   }
 
   case class UIState(formElements: Vars[Var[UIFormElem]],
@@ -81,9 +80,6 @@ object FormUIStore extends Logging {
     }
   }
 
-  case class UIFormElem(elem: BaseElement = BaseElement(TEXTFIELD, supportedLangs, None)) {
-    lazy val wideClass: String = elem.layoutWide.entryName.toLowerCase
-  }
 
 }
 
@@ -104,7 +100,7 @@ object PropertyUIStore extends Logging {
     info(s"PropertyUIStore: changeDefaultValue $defaultValue")
     val uiElem = uiState.selectedElement.value.value
     changeUIFormElem(
-      uiElem.modify(_.elem.defaultValue)
+      uiElem.modify(_.elem.value)
         .setTo(defaultValue)
     )
   }
@@ -114,11 +110,11 @@ object PropertyUIStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     val elementType = ElementType.withNameInsensitive(elementTypeStr)
     changeUIFormElem(
-      uiElem.modify(_.elem.elementType)
-        .setTo(elementType)
-        .modify(_.elem.extras)
-        .setTo(BaseElement.extras(elementType, FormUIStore.supportedLangs, Some(changeExtraProp))
-        ))
+      UIFormElem(
+        BaseElement(elementType, FormUIStore.supportedLangs),
+        uiElem.changeEvent
+      )
+    )
   }
 
   def changeLayoutWide(layoutWide: String): Unit = {
@@ -131,7 +127,7 @@ object PropertyUIStore extends Logging {
   }
 
 
-  def changeText(language: Language, textType: TextType, text: String): Unit = {
+  def changeText(language: Language, textType: TextType)(text: String): Unit = {
     info(s"PropertyUIStore: changeText $language $textType $text")
     val uiElem = uiState.selectedElement.value.value
     val newElem = textType match {
@@ -151,16 +147,20 @@ object PropertyUIStore extends Logging {
 
   private def changeUIFormElem(uiFormElem: UIFormElem): Unit = {
     uiState.selectedElement.value.value = uiFormElem
+
   }
 
-  def changeExtraProp(extraProp: ExtraProp, text: String): Unit = {
+  def changeExtraProp(extraProp: ExtraProp)(text: String): Unit = {
     info(s"PropertyUIStore: changeExtraProp $extraProp $text")
     val uiElem = uiState.selectedElement.value.value
     val newElem =
-      uiElem.modify(_.elem.extras.at(extraProp).defaultValue)
+      uiElem.elem.modify(_.extras.at(extraProp).value)
         .setTo(text)
 
-    changeUIFormElem(newElem)
+    changeUIFormElem(UIFormElem(
+      newElem,
+      uiElem.changeEvent
+    ))
   }
 
 }

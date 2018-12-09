@@ -15,38 +15,39 @@ case class BaseElement(ident: String,
                        elementType: ElementType,
                        texts: ElementTexts,
                        extras: Map[ExtraProp, BaseElement] = Map.empty,
-                       defaultValue: String = "",
+                       value: String = "",
                        layoutWide: LayoutWide = EIGHT,
-                       changeEvent: Option[(ExtraProp, String) => Unit] = None,
+                       elemEntries: ElementEntries = ElementEntries()
                       ) {
 
 }
 
 object BaseElement {
+
   def apply(elementType: ElementType,
-            supportedLangs: Seq[Language],
-            changeEvent: Option[(ExtraProp, String) => Unit]): BaseElement = {
+            supportedLangs: Seq[Language]): BaseElement = {
     val ident = s"${elementType.entryName}-${Random.nextInt(100000)}"
 
     BaseElement(
       ident,
       elementType,
       ElementTexts(supportedLangs, ident),
-      extras(elementType, supportedLangs, changeEvent),
+      extras(elementType, supportedLangs),
     )
   }
 
-  def extras(elementType: ElementType, supportedLangs: Seq[Language], changeEvent: Option[(ExtraProp, String) => Unit]): Map[ExtraProp, BaseElement] = {
+  def extras(elementType: ElementType, supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
     elementType match {
       case TITLE =>
-        TitleElem.extras(supportedLangs, changeEvent)
+        TitleElem.extras(supportedLangs)
       case _ => Map.empty
     }
   }
 }
 
 object TitleElem {
-  def extras(supportedLangs: Seq[Language], changeEvent: Option[(ExtraProp, String) => Unit]): Map[ExtraProp, BaseElement] = {
+  def extras(supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+
     Map(
       SIZE -> BaseElement(SIZE.entryName,
         TEXTFIELD,
@@ -55,53 +56,13 @@ object TitleElem {
           ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
           ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)"))
         ),
-        defaultValue = "huge",
-        changeEvent = changeEvent
+        value = "huge",
       ))
   }
 }
 
-sealed trait LayoutWide
-  extends EnumEntry
+case class ElementEntries(entries: Seq[ElementEntry] = Nil)
+
+case class ElementEntry(ident: String, label: ElementText)
 
 
-object LayoutWide
-  extends Enum[LayoutWide]
-    with PlayInsensitiveJsonEnum[LayoutWide] {
-
-  val values: IndexedSeq[LayoutWide] = findValues
-
-  case object ONE extends LayoutWide
-
-  case object TWO extends LayoutWide
-
-  case object THREE extends LayoutWide
-
-  case object FOUR extends LayoutWide
-
-  case object FIVE extends LayoutWide
-
-  case object SIX extends LayoutWide
-
-  case object SEVEN extends LayoutWide
-
-  case object EIGHT extends LayoutWide
-
-  case object NINE extends LayoutWide
-
-  case object TEN extends LayoutWide
-
-  case object ELEVEN extends LayoutWide
-
-  case object TWELVE extends LayoutWide
-
-  case object THIRTEEN extends LayoutWide
-
-  case object FOURTEEN extends LayoutWide
-
-  case object FIFTEEN extends LayoutWide
-
-  case object SIXTEEN extends LayoutWide
-
-
-}

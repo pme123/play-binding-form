@@ -11,7 +11,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue}
 import pme123.form.server.boundary.services.SPAComponents
 import pme123.form.shared.services.Logging
-import pme123.form.shared.{PathMsg, FormWebSocketMsg}
+import pme123.form.shared.{FormWebSocketMsg, PathMsg}
 
 import scala.concurrent.{ExecutionContext, Future}
 
