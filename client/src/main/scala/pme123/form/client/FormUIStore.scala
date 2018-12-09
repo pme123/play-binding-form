@@ -57,6 +57,7 @@ object FormUIStore extends Logging {
     info(s"FormUIStore: changeLanguage $language")
     uiState.activeLanguage.value = Language.withNameInsensitive(language)
     SemanticUI.initPlaceholders()
+    SemanticUI.initDropdowns()
   }
 
   case class UIState(formElements: Vars[Var[UIFormElem]],
@@ -99,7 +100,7 @@ object PropertyUIStore extends Logging {
     info(s"PropertyUIStore: changeDefaultValue $defaultValue")
     val uiElem = uiState.selectedElement.value.value
     changeUIFormElem(
-      uiElem.modify(_.elem.defaultValue)
+      uiElem.modify(_.elem.value)
         .setTo(defaultValue)
     )
   }
@@ -126,7 +127,7 @@ object PropertyUIStore extends Logging {
   }
 
 
-  def changeText(language: Language, textType: TextType, text: String): Unit = {
+  def changeText(language: Language, textType: TextType)(text: String): Unit = {
     info(s"PropertyUIStore: changeText $language $textType $text")
     val uiElem = uiState.selectedElement.value.value
     val newElem = textType match {
@@ -146,16 +147,20 @@ object PropertyUIStore extends Logging {
 
   private def changeUIFormElem(uiFormElem: UIFormElem): Unit = {
     uiState.selectedElement.value.value = uiFormElem
+
   }
 
   def changeExtraProp(extraProp: ExtraProp)(text: String): Unit = {
     info(s"PropertyUIStore: changeExtraProp $extraProp $text")
     val uiElem = uiState.selectedElement.value.value
     val newElem =
-      uiElem.modify(_.elem.extras.at(extraProp).defaultValue)
+      uiElem.elem.modify(_.extras.at(extraProp).value)
         .setTo(text)
 
-    changeUIFormElem(newElem)
+    changeUIFormElem(UIFormElem(
+      newElem,
+      uiElem.changeEvent
+    ))
   }
 
 }

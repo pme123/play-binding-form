@@ -4,6 +4,8 @@
 
 # Index file for the JobCockpit.
 GET         /                                      pme123.form.server.boundary.services.HomeController.index()
+GET         /i18nMessages                          pme123.form.server.boundary.services.HomeController.i18nMessages()
+
 # auth stuff
 GET         /auth/login                            pme123.form.server.boundary.services.AuthController.signIn(redirectUrl: Option[String] ?= None)
 POST        /auth/doLogin                          pme123.form.server.boundary.services.AuthController.authenticate(redirectUrl: Option[String] ?= None)

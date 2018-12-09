@@ -19,13 +19,13 @@ object UIFormElem {
 
   def apply(elem: BaseElement,
             changeEvent: ChangeEvent): UIFormElem = {
-
-        UIFormElem(
+     val f =   UIFormElem(
           elem,
           elem.extras
             .map{case (ep, be) => (ep, UIFormElem(be))},
           changeEvent
         )
+    f
   }
 
 }

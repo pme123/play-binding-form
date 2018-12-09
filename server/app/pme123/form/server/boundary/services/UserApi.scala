@@ -2,6 +2,7 @@ package pme123.form.server.boundary.services
 
 import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import javax.inject._
+import jsmessages.{JsMessages, JsMessagesFactory}
 import play.api.libs.json._
 import play.api.mvc._
 import pme123.form.server.control.auth.DefaultEnv
@@ -17,13 +18,13 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class UserApi @Inject()(val spaComps: SPAComponents
-                       ,userDBRepo: UserDBRepo)
-                       (implicit val ec: ExecutionContext)
+                        , userDBRepo: UserDBRepo
+                       )(implicit val ec: ExecutionContext)
   extends SPAController(spaComps) {
 
   def loggedInUser(): Action[AnyContent] = SecuredAction.async { implicit request: SecuredRequest[DefaultEnv, AnyContent] =>
     withUser()
-        .map(u => Ok(Json.toJson(LoggedInUser(u))).as(JSON))
+      .map(u => Ok(Json.toJson(LoggedInUser(u))).as(JSON))
 
   }
 

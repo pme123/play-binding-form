@@ -1,13 +1,13 @@
 package pme123.form.client
 
+import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
-import pme123.form.shared.ElementType.{TEXTAREA, TEXTFIELD, TITLE}
+import pme123.form.shared.ElementType.{DROPDOWN, TEXTAREA, TEXTFIELD, TITLE}
 import pme123.form.shared.ExtraProp.SIZE
 import pme123.form.shared.services.Language
-import pme123.form.shared.{BaseElement, ElementTexts}
-
+import pme123.form.shared.{ElementEntry, ElementTexts}
 sealed abstract class BaseElementDiv {
 
   @dom
@@ -30,17 +30,57 @@ object BaseElementDiv {
     val elem = uiFormElem.elem
     <div class="content">
       {elem.elementType match {
+      case DROPDOWN =>
+        DropdownDiv.create(uiFormElem).bind
       case TEXTFIELD =>
         TextFieldDiv.create(uiFormElem).bind
       case TEXTAREA =>
-        TextAreaDiv(elem).create.bind
+        TextAreaDiv.create(uiFormElem).bind
       case TITLE =>
-        TitleDiv(elem).create.bind
+        TitleDiv.create(uiFormElem).bind
       case _ =>
         <div>
           {elem.ident}
         </div>
     }}
+    </div>
+  }
+
+}
+
+object DropdownDiv extends BaseElementDiv {
+
+  @dom
+  def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
+    val activeLanguage = FormUIStore.uiState.activeLanguage.bind
+    val elem = uiFormElem.elem
+    <div class="field">
+      {label(elem.texts, activeLanguage).bind //
+      }<div class="ui selection dropdown">
+      <input id={elem.ident}
+             name={elem.ident}
+             type="hidden"
+             value={elem.value}
+             onchange={_: Event =>
+               val newText = jQuery(s"#${elem.ident}").value().toString
+               uiFormElem.changeEvent
+                 .foreach(ce =>
+                   ce(newText))}/>
+      <i class="dropdown icon"></i>
+      <div class="default text">
+        {elem.value}
+      </div>
+      <div class="menu">
+        {Constants(elem.elemEntries.entries.map(elementEntry(_, activeLanguage)): _*).map(_.bind)}
+      </div>
+    </div>
+    </div>
+  }
+
+  @dom
+  private def elementEntry(entry: ElementEntry, language: Language): Binding[HTMLElement] = {
+    <div class="item" data:data-value={entry.ident}>
+      {entry.label.textFor(language)}
     </div>
   }
 
@@ -52,15 +92,14 @@ object TextFieldDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = FormUIStore.uiState.activeLanguage.bind
     val elem = uiFormElem.elem
-
     <div class="field">
       {label(elem.texts, activeLanguage).bind //
       }<div class="ui input">
       <input id={elem.ident}
+             name={elem.ident}
              type="text"
-             name="text"
              placeholder={elem.texts.placeholder.textFor(activeLanguage)}
-             value={elem.defaultValue}
+             value={elem.value}
              onblur={_: Event =>
                val newText = jQuery(s"#${elem.ident}").value().toString
                uiFormElem.changeEvent
@@ -72,19 +111,19 @@ object TextFieldDiv extends BaseElementDiv {
 
 }
 
-case class TextAreaDiv(elem: BaseElement) extends BaseElementDiv {
+object TextAreaDiv extends BaseElementDiv {
 
   @dom
-  lazy val create: Binding[HTMLElement] = {
+  def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = FormUIStore.uiState.activeLanguage.bind
-
+    val elem = uiFormElem.elem
     <div class="field">
       {label(elem.texts, activeLanguage).bind //
       }<div class="ui input">
       <textarea id={elem.ident}
                 name={elem.ident}
                 placeholder={elem.texts.placeholder.textFor(activeLanguage)}
-                value={elem.defaultValue}
+                value={elem.value}
                 rows={6}>
       </textarea>
     </div>
@@ -93,14 +132,14 @@ case class TextAreaDiv(elem: BaseElement) extends BaseElementDiv {
 
 }
 
-case class TitleDiv(elem: BaseElement) extends BaseElementDiv {
+object TitleDiv extends BaseElementDiv {
 
   @dom
-  lazy val create: Binding[HTMLElement] = {
+  def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = FormUIStore.uiState.activeLanguage.bind
-
+    val elem = uiFormElem.elem
     <div class="field">
-      <div class={s"ui ${elem.extras(SIZE).defaultValue} header"}>
+      <div class={s"ui ${elem.extras(SIZE).value} header"}>
         {elem.texts.label.textFor(activeLanguage) //
         }
       </div>

@@ -1,17 +1,16 @@
 package pme123.form.client
 
+import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.{Event, HTMLElement}
-import org.scalajs.jquery.jQuery
+import org.scalajs.dom.raw.HTMLElement
+import pme123.form.client.FormUIStore.supportedLangs
+import pme123.form.shared.ElementType.{DROPDOWN, TEXTFIELD}
 import pme123.form.shared.PropTabType.{PROPERTIES, TEXTS}
-import pme123.form.shared.services.Language
-import pme123.form.shared._
-import com.softwaremill.quicklens._
-import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
+import pme123.form.shared._
+import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
-import FormUIStore.supportedLangs
 
 object PropTab {
 
@@ -66,23 +65,25 @@ case object PropertiesTab {
   private lazy val elementTypeSelect: Binding[HTMLElement] = {
     val elem = FormUIStore.uiState.selectedElement.bind
     val elementType = elem.value.elem.elementType
-
     <div class="field">
-      <label>Element Type</label>
-      <div class="ui selection dropdown">
-        <input type="hidden"
-               id="elementTypeId"
-               value={elementType.entryName}
-               onchange={_: Event =>
-                 PropertyUIStore.changeElementType(elementTypeId.value)}/>
-        <i class="dropdown icon"></i>
-        <div class="default text">
-          {elementType.entryName}
-        </div>
-        <div class="menu">
-          {Constants(ElementType.values.map(_.entryName).map(selectItem): _*).map(_.bind)}
-        </div>
-      </div>
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "elementTypeId",
+        DROPDOWN,
+        ElementTexts(
+          ElementText(LABEL, Map(DE -> "Element Typ", EN -> "Element Type")),
+          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element."))
+        ),
+        elemEntries = ElementEntries(
+          ElementType.values.map(et => ElementEntry(et.entryName, ElementText(LABEL, et.labels)))
+        ),
+        value = elementType.entryName
+      ),
+
+        Some(PropertyUIStore.changeElementType _)
+      )
+    ).bind}
     </div>
   }
 
@@ -90,23 +91,25 @@ case object PropertiesTab {
   private lazy val layoutWideSelect: Binding[HTMLElement] = {
     val elem = FormUIStore.uiState.selectedElement.bind
     val layoutWide = elem.value.elem.layoutWide
-
     <div class="field">
-      <label>Layout Wide</label>
-      <div class="ui selection dropdown">
-        <input type="hidden"
-               id="layoutWideId"
-               value={layoutWide.entryName}
-               onchange={_: Event =>
-                 PropertyUIStore.changeLayoutWide(layoutWideId.value)}/>
-        <i class="dropdown icon"></i>
-        <div class="default text">
-          {layoutWide.entryName}
-        </div>
-        <div class="menu">
-          {Constants(LayoutWide.values.map(_.entryName).map(selectItem): _*).map(_.bind)}
-        </div>
-      </div>
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "layoutWideId",
+        DROPDOWN,
+        ElementTexts(
+          ElementText(LABEL, Map(DE -> "Layout Breite", EN -> "Layout Wide")),
+          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen)."))
+        ),
+        elemEntries = ElementEntries(
+          LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText(LABEL, lw.labels)))
+        ),
+        value = layoutWide.entryName
+      ),
+
+        Some(PropertyUIStore.changeLayoutWide _)
+      )
+    ).bind}
     </div>
   }
 
@@ -168,16 +171,23 @@ case object TextsTab {
 
   @dom
   def textDiv(lang: Language, text: String, textType: TextType): Binding[HTMLElement] =
-    <div class="field">
-      <label>
-        {lang.label}
-      </label>
-      <input id={s"${lang.abbreviation}-$textType"}
-             type="text"
-             value={text}
-             onblur={_: Event =>
-               val newText = jQuery(s"#${lang.abbreviation}-$textType").value().toString
-               PropertyUIStore.changeText(lang, textType, newText)}/>
-    </div>
+      <div class="field">
+        {BaseElementDiv(
+        UIFormElem(BaseElement(
+          s"${lang.abbreviation}-$textType",
+          TEXTFIELD,
+          ElementTexts(
+            ElementText(LABEL, Map.empty),
+            ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+            ElementText(TOOLTIP, supportedLangs.map(_ -> "").toMap)),
+          value = text),
+
+          Some(PropertyUIStore.changeText(lang, textType) _)
+        )
+      ).bind}
+      </div>
 
 }
+
+
+

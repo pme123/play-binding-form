@@ -1,6 +1,8 @@
 @import pme123.form.server.entity.PageConfig
+@import pme123.form.server.boundary.services.UserApi
 
 @this(webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder, header: views.html.header)
+
 
 @(pageConfig: PageConfig)(implicit r: Request[_], rh: RequestHeader)
 
@@ -10,31 +12,41 @@
 
         @header(pageConfig)
 
-             <!-- for scalajs routing -->
+        <!-- for scalajs routing -->
         @helper.javascriptRouter("jsRoutes")(routes.javascript.Assets.versioned)
 
         @Html("<script src=" + assets.withUrlPrefix(pageConfig.context).path("assets/javascripts/versioned.js") + " ></script>")
 
-            <!-- additional javascript files -->
-        <script type="text/javascript">
-                (function () {
-                    var oldVersioned = jsRoutes.controllers.Assets.versioned;
-                    jsRoutes.controllers.Assets.versioned = function (path) {
-                        return oldVersioned.apply(jsRoutes.controllers.Assets, [versioned[path] || path]);
-                    };
-                })();
-        </script>
-            <!-- END for scalajs routing -->
+        <!-- additional javascript files -->
+    <script type="text/javascript">
+            (function () {
+                var oldVersioned = jsRoutes.controllers.Assets.versioned;
+                jsRoutes.controllers.Assets.versioned = function (path) {
+                    return oldVersioned.apply(jsRoutes.controllers.Assets, [versioned[path] || path]);
+                };
+            })();
+    </script>
+        <!-- END for scalajs routing -->
         @scalajs.html.scripts(s"${pageConfig.projectName}-client",
             routes.Assets.at(_).toString,
             name => getClass.getResource(s"/public/$name") != null)
 
-            <!-- the Client code -->
-        <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-jsdeps${if(pageConfig.isDevMode) "" else ".min"}.js") ></script>
-        <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-${if(pageConfig.isDevMode) "fast" else ""}opt.js") ></script>
+        <!-- I18N -->
+    <script type="text/javascript" src="@pme123.form.server.boundary.services.routes.HomeController.i18nMessages()"></script>
 
+        <!-- the Client code xxxxxxx-->
+    <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-jsdeps${if(pageConfig.isDevMode) "" else ".min"}.js") ></script>
+        <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-${if(pageConfig.isDevMode) "fast" else ""}opt.js") ></script>
+        <script type="text/javascript">
+                (function () {
+                    var tests = [];
+                    var MessagesEn = Messages('en');
+                    console.log("XXXX: "+Messages.messages['en']['ui.language.de'])
+                })();
+</script>
     </head>
     <body>
+
             <!-- calls to the Client code-->
         <script>client.FormClient.main("@pageConfig.context");</script>
 
