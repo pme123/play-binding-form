@@ -98,6 +98,10 @@
           <option name="url" value="https://github.com/fthomas/refined.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/pme123/play-binding-form.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
     <option name="cloneParentDir" value="$USER_HOME$/dev/Github/examples" />
