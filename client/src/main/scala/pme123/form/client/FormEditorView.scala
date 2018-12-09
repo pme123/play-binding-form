@@ -3,7 +3,6 @@ package pme123.form.client
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
-import pme123.form.client.FormUIStore.UIFormElem
 
 import scala.util.matching.Regex
 
@@ -55,7 +54,7 @@ private[client] object FormEditorView
     val uiSelElem = PropertyUIStore.uiState.selectedElement.bind
     <div class={s"${uiElem.wideClass} wide column"}>
       <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"}>
-       {BaseElementDiv(uiElem.elem).bind}
+       {BaseElementDiv(uiElem).bind}
         <div class="extra content">
           <div class="right floated author">
 

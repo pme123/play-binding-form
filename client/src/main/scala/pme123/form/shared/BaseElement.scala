@@ -17,36 +17,35 @@ case class BaseElement(ident: String,
                        extras: Map[ExtraProp, BaseElement] = Map.empty,
                        defaultValue: String = "",
                        layoutWide: LayoutWide = EIGHT,
-                       changeEvent: Option[(ExtraProp, String) => Unit] = None,
                       ) {
 
 }
 
 object BaseElement {
+
   def apply(elementType: ElementType,
-            supportedLangs: Seq[Language],
-            changeEvent: Option[(ExtraProp, String) => Unit]): BaseElement = {
+            supportedLangs: Seq[Language]): BaseElement = {
     val ident = s"${elementType.entryName}-${Random.nextInt(100000)}"
 
     BaseElement(
       ident,
       elementType,
       ElementTexts(supportedLangs, ident),
-      extras(elementType, supportedLangs, changeEvent),
+      extras(elementType, supportedLangs),
     )
   }
 
-  def extras(elementType: ElementType, supportedLangs: Seq[Language], changeEvent: Option[(ExtraProp, String) => Unit]): Map[ExtraProp, BaseElement] = {
+  def extras(elementType: ElementType, supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
     elementType match {
       case TITLE =>
-        TitleElem.extras(supportedLangs, changeEvent)
+        TitleElem.extras(supportedLangs)
       case _ => Map.empty
     }
   }
 }
 
 object TitleElem {
-  def extras(supportedLangs: Seq[Language], changeEvent: Option[(ExtraProp, String) => Unit]): Map[ExtraProp, BaseElement] = {
+  def extras(supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
     Map(
       SIZE -> BaseElement(SIZE.entryName,
         TEXTFIELD,
@@ -56,7 +55,6 @@ object TitleElem {
           ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)"))
         ),
         defaultValue = "huge",
-        changeEvent = changeEvent
       ))
   }
 }

@@ -1,12 +1,17 @@
 package pme123.form.client
 
-import com.thoughtworks.binding.Binding.{Constants, Var}
+import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
 import pme123.form.shared.PropTabType.{PROPERTIES, TEXTS}
 import pme123.form.shared.services.Language
-import pme123.form.shared.{ElementText, ElementType, LayoutWide, TextType}
+import pme123.form.shared._
+import com.softwaremill.quicklens._
+import pme123.form.shared.ElementType.TEXTFIELD
+import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
+import pme123.form.shared.services.Language.{DE, EN}
+import FormUIStore.supportedLangs
 
 object PropTab {
 
@@ -33,7 +38,6 @@ case object PropertiesTab {
     <div>
       {//
       elementTypeSelect.bind}{//
-      identInput.bind}{//
       defaultValueInput.bind}{//
       layoutWideSelect.bind}{//
       elementExtras.bind}
@@ -41,30 +45,20 @@ case object PropertiesTab {
   }
 
   @dom
-  private lazy val identInput: Binding[HTMLElement] = {
-    val elem = FormUIStore.uiState.selectedElement.bind
-    val ident = elem.value.elem.ident
-    <div class="field">
-      <label>Element Identifier</label>
-      <input id="elemIdent"
-             type="text"
-             value={ident}
-             onblur={_: Event =>
-               PropertyUIStore.changeIdent(elemIdent.value)}/>
-    </div>
-  }
-
-  @dom
   private lazy val defaultValueInput: Binding[HTMLElement] = {
-    val elem = FormUIStore.uiState.selectedElement.bind
-    val defaultValue = elem.value.elem.defaultValue
     <div class="field">
-      <label>Default Value</label>
-      <input id="elemDefaultValue"
-             type="text"
-             value={defaultValue}
-             onblur={_: Event =>
-               PropertyUIStore.changeDefaultValue(elemDefaultValue.value)}/>
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "elemDefaultValue",
+        TEXTFIELD,
+        ElementTexts(
+          ElementText(LABEL, Map(DE -> "Standart Wert", EN -> "Default Value")),
+          ElementText(PLACEHOLDER, Map(DE -> "Standart Wert", EN -> "Default Value")),
+          ElementText(TOOLTIP, Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start."))
+        )),
+        Some(PropertyUIStore.changeDefaultValue _)
+      )
+    ).bind}
     </div>
   }
 
@@ -126,10 +120,18 @@ case object PropertiesTab {
   @dom
   private lazy val elementExtras: Binding[HTMLElement] = {
     val elem = FormUIStore.uiState.selectedElement.bind
-    val extras = elem.bind.elem.extras
+    val extras = elem.bind.extras
 
     <div>
-      {Constants(extras.values.map(BaseElementDiv.apply).toSeq: _*).map(_.bind)}
+      {//
+      Constants(
+        extras
+          .map { case (ep, uie) =>
+            BaseElementDiv(
+              uie.modify(_.changeEvent)
+                .setTo(Some(PropertyUIStore.changeExtraProp(ep))))
+          }.toSeq: _*)
+        .map(_.bind)}
     </div>
   }
 

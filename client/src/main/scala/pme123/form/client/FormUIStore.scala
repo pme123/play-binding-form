@@ -2,9 +2,7 @@ package pme123.form.client
 
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
-import pme123.form.client.FormUIStore.UIFormElem
 import pme123.form.client.services.SemanticUI
-import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.PropTabType.PROPERTIES
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared._
@@ -81,9 +79,6 @@ object FormUIStore extends Logging {
     }
   }
 
-  case class UIFormElem(elem: BaseElement = BaseElement(TEXTFIELD, supportedLangs, None)) {
-    lazy val wideClass: String = elem.layoutWide.entryName.toLowerCase
-  }
 
 }
 
@@ -114,11 +109,11 @@ object PropertyUIStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     val elementType = ElementType.withNameInsensitive(elementTypeStr)
     changeUIFormElem(
-      uiElem.modify(_.elem.elementType)
-        .setTo(elementType)
-        .modify(_.elem.extras)
-        .setTo(BaseElement.extras(elementType, FormUIStore.supportedLangs, Some(changeExtraProp))
-        ))
+      UIFormElem(
+        BaseElement(elementType, FormUIStore.supportedLangs),
+        uiElem.changeEvent
+      )
+    )
   }
 
   def changeLayoutWide(layoutWide: String): Unit = {
@@ -153,7 +148,7 @@ object PropertyUIStore extends Logging {
     uiState.selectedElement.value.value = uiFormElem
   }
 
-  def changeExtraProp(extraProp: ExtraProp, text: String): Unit = {
+  def changeExtraProp(extraProp: ExtraProp)(text: String): Unit = {
     info(s"PropertyUIStore: changeExtraProp $extraProp $text")
     val uiElem = uiState.selectedElement.value.value
     val newElem =

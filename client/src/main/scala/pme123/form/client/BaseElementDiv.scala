@@ -6,18 +6,16 @@ import org.scalajs.jquery.jQuery
 import pme123.form.shared.ElementType.{TEXTAREA, TEXTFIELD, TITLE}
 import pme123.form.shared.ExtraProp.SIZE
 import pme123.form.shared.services.Language
-import pme123.form.shared.{BaseElement, ElementTexts, ExtraProp}
+import pme123.form.shared.{BaseElement, ElementTexts}
 
 sealed abstract class BaseElementDiv {
-
-  protected def create: Binding[HTMLElement]
 
   @dom
   def label(elementTexts: ElementTexts, activeLanguage: Language): Binding[HTMLElement] =
     <label class="">
-      {elementTexts.label.textFor(activeLanguage)}{//
+      {elementTexts.label.textFor(activeLanguage)}&nbsp;{//
       if (elementTexts.tooltip.textFor(activeLanguage).nonEmpty)
-        <i class="question circle outline icon ui tooltip"
+        <i class="question circle icon ui tooltip"
            title={elementTexts.tooltip.textFor(activeLanguage)}></i>
       else <span/>}
     </label>
@@ -26,12 +24,14 @@ sealed abstract class BaseElementDiv {
 
 object BaseElementDiv {
 
+
   @dom
-  def apply(elem: BaseElement): Binding[HTMLElement] =
+  def apply(uiFormElem: UIFormElem): Binding[HTMLElement] = {
+    val elem = uiFormElem.elem
     <div class="content">
       {elem.elementType match {
       case TEXTFIELD =>
-        TextFieldDiv(elem).create.bind
+        TextFieldDiv.create(uiFormElem).bind
       case TEXTAREA =>
         TextAreaDiv(elem).create.bind
       case TITLE =>
@@ -42,14 +42,16 @@ object BaseElementDiv {
         </div>
     }}
     </div>
+  }
 
 }
 
-case class TextFieldDiv(elem: BaseElement) extends BaseElementDiv {
+object TextFieldDiv extends BaseElementDiv {
 
   @dom
-  lazy val create: Binding[HTMLElement] = {
+  def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = FormUIStore.uiState.activeLanguage.bind
+    val elem = uiFormElem.elem
 
     <div class="field">
       {label(elem.texts, activeLanguage).bind //
@@ -61,9 +63,9 @@ case class TextFieldDiv(elem: BaseElement) extends BaseElementDiv {
              value={elem.defaultValue}
              onblur={_: Event =>
                val newText = jQuery(s"#${elem.ident}").value().toString
-               elem.changeEvent
+               uiFormElem.changeEvent
                  .foreach(ce =>
-                   ce(ExtraProp.withNameInsensitive(elem.ident), newText))}/>
+                   ce(newText))}/>
     </div>
     </div>
   }
