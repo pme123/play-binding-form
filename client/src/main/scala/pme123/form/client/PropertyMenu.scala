@@ -1,0 +1,63 @@
+package pme123.form.client
+
+import com.thoughtworks.binding.Binding.Constants
+import com.thoughtworks.binding.{Binding, dom}
+import org.scalajs.dom.raw.{Event, HTMLElement}
+import pme123.form.client.services.ClientUtils
+import pme123.form.shared.PropTabType
+
+private[client] object PropertyMenu
+  extends ClientUtils {
+
+  // 1. level of abstraction
+  // **************************
+  @dom
+  private[client] lazy val create: Binding[HTMLElement] = {
+    <div class="six wide column">
+      <div class="ui segment">
+        <form class="ui form">
+          {propHeader.bind}{//
+          menu.bind}{//
+          PropTab.create.bind}
+        </form>
+      </div>
+    </div>
+  }
+
+  // 2. level of abstraction
+  // **************************
+
+  @dom
+  private lazy val propHeader =
+    <h4 class="ui dividing header">
+      <i class={s"edit outline icon"}></i>
+      Element Properties</h4>
+
+  @dom
+  private lazy val menu: Binding[HTMLElement] = {
+    <div class="ui top attached tabular menu">
+      {Constants(
+      PropTabType.values
+        .map(menuItem): _*)
+      .map(_.bind)}
+    </div>
+  }
+
+
+  @dom
+  private def menuItem(propTabType: PropTabType): Binding[HTMLElement] = {
+    val activeType = FormUIStore.uiState.activePropTab.bind
+    <a class={s"${activePropTab(propTabType, activeType)} item"}
+       onclick={_: Event =>
+         FormUIStore.changeActivePropTab(propTabType)}>
+      {propTabType.label}
+    </a>
+  }
+
+  private def activePropTab(propTabType: PropTabType, activeType: PropTabType) =
+    if (propTabType == activeType)
+      "active"
+    else
+      ""
+
+}

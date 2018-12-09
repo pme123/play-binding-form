@@ -1,0 +1,42 @@
+@import pme123.form.server.entity.PageConfig
+
+@this(webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder, header: views.html.header)
+
+@(pageConfig: PageConfig)(implicit r: Request[_], rh: RequestHeader)
+
+<!DOCTYPE html>
+<html>
+    <head>
+
+        @header(pageConfig)
+
+             <!-- for scalajs routing -->
+        @helper.javascriptRouter("jsRoutes")(routes.javascript.Assets.versioned)
+
+        @Html("<script src=" + assets.withUrlPrefix(pageConfig.context).path("assets/javascripts/versioned.js") + " ></script>")
+
+            <!-- additional javascript files -->
+        <script type="text/javascript">
+                (function () {
+                    var oldVersioned = jsRoutes.controllers.Assets.versioned;
+                    jsRoutes.controllers.Assets.versioned = function (path) {
+                        return oldVersioned.apply(jsRoutes.controllers.Assets, [versioned[path] || path]);
+                    };
+                })();
+        </script>
+            <!-- END for scalajs routing -->
+        @scalajs.html.scripts(s"${pageConfig.projectName}-client",
+            routes.Assets.at(_).toString,
+            name => getClass.getResource(s"/public/$name") != null)
+
+            <!-- the Client code -->
+        <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-jsdeps${if(pageConfig.isDevMode) "" else ".min"}.js") ></script>
+        <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-${if(pageConfig.isDevMode) "fast" else ""}opt.js") ></script>
+
+    </head>
+    <body>
+            <!-- calls to the Client code-->
+        <script>client.FormClient.main("@pageConfig.context");</script>
+
+    </body>
+</html>
