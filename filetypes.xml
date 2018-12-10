@@ -7,6 +7,7 @@
       <mapping pattern="Dockerfile_CI3" type="PLAIN_TEXT" />
       <mapping pattern="Dockerfile_CI2" type="PLAIN_TEXT" />
       <mapping pattern="Dockerfile_Testing" type="PLAIN_TEXT" />
+      <mapping pattern="SECRET" type="PLAIN_TEXT" />
       <mapping ext="overrides" type="PLAIN_TEXT" />
       <mapping ext="bak" type="PLAIN_TEXT" />
       <mapping ext="gpg" type="PLAIN_TEXT" />
