@@ -11,7 +11,9 @@ sealed trait ElementType
   extends EnumEntry {
 
 
-  def labels: Map[Language, String]
+  def defaultValue: Option[String] = Some("")
+
+  def i18nKey = s"enum.element-type.${entryName.toLowerCase}"
 
 }
 
@@ -22,45 +24,19 @@ object ElementType
 
   val values: IndexedSeq[ElementType] = findValues
 
-  case object TEXTFIELD extends ElementType {
-    override def labels: Map[Language, String] =
-      Map(
-        DE -> "Text Feld",
-        EN -> "Text Field"
-      )
-  }
+  case object TEXTFIELD extends ElementType
 
-  case object TEXTAREA extends ElementType {
-    override def labels: Map[Language, String] =
-      Map(
-        DE -> "Text Bereich",
-        EN -> "Text Area"
-      )
-  }
+  case object TEXTAREA extends ElementType
 
   case object TITLE extends ElementType {
-    override def labels: Map[Language, String] =
-      Map(
-        DE -> "Titel",
-        EN -> "Title"
-      )
+
+    override def defaultValue: Option[String] = None
+
   }
 
-  case object CHECKBOX extends ElementType {
-    override def labels: Map[Language, String] =
-      Map(
-        DE -> "Check Box",
-        EN -> "Checkbox"
-      )
-  }
+  case object CHECKBOX extends ElementType
 
-  case object DROPDOWN extends ElementType {
-    override def labels: Map[Language, String] =
-      Map(
-        DE -> "Auswahl",
-        EN -> "Selection"
-      )
-  }
+  case object DROPDOWN extends ElementType
 
 }
 

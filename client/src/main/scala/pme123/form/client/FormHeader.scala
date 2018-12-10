@@ -84,19 +84,19 @@ private[client] object FormHeader
   @dom
   private lazy val languageButton = {
 
-    val language = FormUIStore.uiState.activeLanguage.value
+    val language = UIStore.activeLanguage.value
 
       <div class="ui icon top left pointing dropdown icon button">
         <input type="hidden"
                id="languageId"
                value={language.entryName}
                onchange={_: Event =>
-                 FormUIStore.changeLanguage(languageId.value)}/>
+                 UIStore.changeLanguage(languageId.value)}/>
         <div class="default text">
           <i class={s"${language.flag} big flag"}></i>
         </div>
         <div class="menu">
-          {Constants(FormUIStore.supportedLangs.map(languageItem): _*).map(_.bind)}
+          {Constants(UIStore.supportedLangs.map(languageItem): _*).map(_.bind)}
         </div>
       </div>
   }

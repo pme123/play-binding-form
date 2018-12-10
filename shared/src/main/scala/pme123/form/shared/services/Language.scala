@@ -12,6 +12,8 @@ sealed trait Language extends EnumEntry {
 
   def flag: String
 
+  def i18nKey = s"enum.language.$abbreviation"
+
   def labelUppercase: String = label.toUpperCase
 
   def labelLowercase: String = label.toLowerCase
