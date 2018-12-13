@@ -18,7 +18,7 @@ class HomeController @Inject()(template: views.html.index
                               (implicit val ec: ExecutionContext)
   extends SPAController(spaComps) {
 
-  private lazy val messages = jsMessagesFactory.all
+  private lazy val jsMessages = jsMessagesFactory.all
 
   def index(): Action[AnyContent] = SecuredAction.async { implicit request: Request[AnyContent] =>
     // uses the AssetsFinder API
@@ -28,7 +28,7 @@ class HomeController @Inject()(template: views.html.index
 
 
   def i18nMessages(): Action[AnyContent] = SecuredAction { implicit request =>
-    Ok(messages(Some("window.Messages")))
+    Ok(jsMessages.all(Some("window.Messages")))
   }
 
 }

@@ -4,14 +4,10 @@ import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
-import org.scalajs.jquery.jQuery
 import pme123.form.client.services.{SPAClient, SemanticUI}
-import pme123.form.client.services.SemanticUI.jq2semantic
 
 import scala.language.implicitConversions
-import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
-import scala.scalajs.js.timers.setTimeout
 
 object FormClient
   extends SPAClient {
@@ -25,7 +21,6 @@ object FormClient
   @JSExportTopLevel("client.FormClient.main")
   def main(context: String) {
     initClient(context)
-
     dom.render(document.body, render)
     SemanticUI.initDropdowns()
   }
@@ -41,7 +36,7 @@ object FormClient
   private lazy val consumer: Binding[HTMLElement] =
     <div>
       {// no websocket for now: ClientWebsocket.connectConsumerWS.bind
-    ""}
+      ""}
     </div>
 
   @dom

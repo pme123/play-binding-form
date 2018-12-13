@@ -34,16 +34,9 @@
         <!-- I18N -->
     <script type="text/javascript" src="@pme123.form.server.boundary.services.routes.HomeController.i18nMessages()"></script>
 
-        <!-- the Client code xxxxxxx-->
+        <!-- the Client code -->
     <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-jsdeps${if(pageConfig.isDevMode) "" else ".min"}.js") ></script>
         <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-${if(pageConfig.isDevMode) "fast" else ""}opt.js") ></script>
-        <script type="text/javascript">
-                (function () {
-                    var tests = [];
-                    var MessagesEn = Messages('en');
-                    console.log("XXXX: "+Messages.messages['en']['ui.language.de'])
-                })();
-</script>
     </head>
     <body>
 
