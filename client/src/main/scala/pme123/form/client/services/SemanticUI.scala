@@ -51,17 +51,19 @@ object SemanticUI {
     def prompt: js.UndefOr[String] = js.undefined
   }
 
-  def initDropdowns(): Unit ={
+  def initElements(): Unit ={
     setTimeout(100) {
       jQuery(".ui.dropdown").dropdown(js.Dynamic.literal(on = "hover"))
-    }
-  }
-
-  def initPlaceholders(): Unit = {
-    setTimeout(100) {
+      jQuery(".ui.clearable.dropdown")
+        .dropdown(
+          js.Dynamic.literal(on = "hover",
+          clearable = true)
+      )
+      jQuery(".ui.checkbox").checkbox()
       jQuery(".ui.tooltip").popup()
     }
   }
+
   def columnWide(wide: Int): String = {
     wide match {
       case 1 => "one"

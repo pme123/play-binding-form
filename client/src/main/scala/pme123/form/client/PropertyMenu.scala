@@ -3,8 +3,9 @@ package pme123.form.client
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
-import pme123.form.client.services.ClientUtils
+import pme123.form.client.services.{ClientUtils, Messages, UIStore}
 import pme123.form.shared.PropTabType
+import pme123.form.shared.PropTabType.ENTRIES
 
 private[client] object PropertyMenu
   extends ClientUtils {
@@ -35,9 +36,12 @@ private[client] object PropertyMenu
 
   @dom
   private lazy val menu: Binding[HTMLElement] = {
+    val selElemV = FormUIStore.uiState.selectedElement.bind
+    val selElem = selElemV.bind
     <div class="ui top attached tabular menu">
       {Constants(
       PropTabType.values
+        .filterNot(p => p == ENTRIES && !selElem.elem.hasEntries)
         .map(menuItem): _*)
       .map(_.bind)}
     </div>
@@ -46,11 +50,12 @@ private[client] object PropertyMenu
 
   @dom
   private def menuItem(propTabType: PropTabType): Binding[HTMLElement] = {
+    val activeLang = UIStore.activeLanguage.bind
     val activeType = FormUIStore.uiState.activePropTab.bind
     <a class={s"${activePropTab(propTabType, activeType)} item"}
        onclick={_: Event =>
          FormUIStore.changeActivePropTab(propTabType)}>
-      {propTabType.label}
+      {Messages(activeLang.entryName, propTabType.i18nKey)}
     </a>
   }
 

@@ -20,7 +20,6 @@ object FormUIStore extends Logging {
     val elem = Var(UIFormElem())
     uiState.formElements.value += elem
     changeSelectedElement(elem)
-    SemanticUI.initPlaceholders()
     elem
   }
 
@@ -40,14 +39,22 @@ object FormUIStore extends Logging {
     info(s"FormUIStore: changeSelectedElement ${elemVar.value}")
     if (uiState.selectedElement.value != elemVar) {
       uiState.selectedElement.value = elemVar
-      SemanticUI.initDropdowns()
+      SemanticUI.initElements()
+    }
+  }
+
+  def changeSelectedElement(uiFormElem: UIFormElem): Unit = {
+    info(s"FormUIStore: changeSelectedElement $uiFormElem")
+    if (uiState.selectedElement.value.value != uiFormElem) {
+      uiState.selectedElement.value.value = uiFormElem
+      SemanticUI.initElements()
     }
   }
 
   def changeActivePropTab(propTabType: PropTabType): Unit = {
     info(s"FormUIStore: changeActivePropTab $propTabType")
     uiState.activePropTab.value = propTabType
-    SemanticUI.initDropdowns()
+    SemanticUI.initElements()
   }
 
   case class UIState(formElements: Vars[Var[UIFormElem]],
@@ -58,7 +65,6 @@ object FormUIStore extends Logging {
   object UIState {
     def apply(): UIState = {
       val defaultElem = Var(UIFormElem())
-      SemanticUI.initPlaceholders()
 
       UIState(
         Vars(defaultElem),
@@ -125,16 +131,62 @@ object PropertyUIStore extends Logging {
         uiElem.modify(_.elem.texts.placeholder.texts.at(language))
           .setTo(text)
       case TOOLTIP =>
-        SemanticUI.initPlaceholders()
         uiElem.modify(_.elem.texts.tooltip.texts.at(language))
           .setTo(text)
     }
     changeUIFormElem(newElem)
   }
 
+
+  def addElementEntry(): Unit = {
+    info(s"FormUIStore: addFormElement")
+    val entry = ElementEntry(UIStore.supportedLangs)
+    val uiElem = uiState.selectedElement.value.value
+    FormUIStore.changeSelectedElement(
+      uiElem
+        .modify(_.elem.elemEntries)
+        .setTo(uiElem.elem.elemEntries.map(es => ElementEntries(es.entries :+ entry)))
+    )
+  }
+
+  def changeEntry(language: Language, pos: Int)(text: String): Unit = {
+    info(s"PropertyUIStore: changeEntry $language $pos $text")
+    val uiElem = uiState.selectedElement.value.value
+    FormUIStore.changeSelectedElement(
+      uiElem
+        .modify(_.elem.elemEntries)
+        .setTo(
+          uiElem.elem.elemEntries.map {
+            es =>
+              val e = es.entries(pos)
+              ElementEntries(
+                es.entries.updated(pos,
+                  e.modify(_.label.texts)
+                    .setTo(e.label.texts.updated(language, text))))
+          }))
+  }
+
+  def changeEntryIdent(pos: Int)(ident: String): Unit = {
+    info(s"PropertyUIStore: changeEntryIdent $pos $ident")
+    val uiElem = uiState.selectedElement.value.value
+    FormUIStore.changeSelectedElement(
+      uiElem
+        .modify(_.elem.elemEntries)
+        .setTo(
+          uiElem.elem.elemEntries.map {
+            es =>
+              val e = es.entries(pos)
+              ElementEntries(
+                es.entries.updated(pos,
+                  e.modify(_.ident)
+                    .setTo(ident)))
+          }))
+
+  }
+
   private def changeUIFormElem(uiFormElem: UIFormElem): Unit = {
     uiState.selectedElement.value.value = uiFormElem
-
+    SemanticUI.initElements()
   }
 
   def changeExtraProp(extraProp: ExtraProp)(text: String): Unit = {

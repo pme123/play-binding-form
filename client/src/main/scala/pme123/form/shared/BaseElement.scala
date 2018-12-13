@@ -1,7 +1,7 @@
 package pme123.form.shared
 
 import pme123.form.shared.ElementType._
-import pme123.form.shared.ExtraProp.SIZE
+import pme123.form.shared.ExtraProp.{CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared.services.Language
@@ -15,8 +15,11 @@ case class BaseElement(ident: String,
                        extras: Map[ExtraProp, BaseElement] = Map.empty,
                        value: Option[String] = Some(""),
                        layoutWide: LayoutWide = EIGHT,
-                       elemEntries: ElementEntries = ElementEntries()
+                       elemEntries: Option[ElementEntries] = None
                       ) {
+
+  val hasExtras: Boolean = extras.nonEmpty
+  val hasEntries: Boolean = elemEntries.nonEmpty
 
 }
 
@@ -31,7 +34,8 @@ object BaseElement {
       elementType,
       ElementTexts(supportedLangs, ident),
       extras(elementType, supportedLangs),
-      elementType.defaultValue
+      elementType.defaultValue,
+      elemEntries = entries(elementType)
     )
   }
 
@@ -39,9 +43,28 @@ object BaseElement {
     elementType match {
       case TITLE =>
         TitleElem.extras(supportedLangs)
+      case DROPDOWN =>
+       DropdownElem.extras(supportedLangs)
       case _ => Map.empty
     }
   }
+
+  def entries(elementType: ElementType): Option[ElementEntries] = {
+    elementType match {
+      case DROPDOWN =>
+        Some(ElementEntries())
+      case _ => None
+    }
+  }
+}
+
+case class ElementEntries(entries: Seq[ElementEntry] = Nil)
+
+case class ElementEntry(ident: String, label: ElementText)
+
+object ElementEntry {
+  def apply(supportedLangs: Seq[Language]): ElementEntry = new
+      ElementEntry("", ElementText.empty(supportedLangs))
 }
 
 object TitleElem {
@@ -60,8 +83,20 @@ object TitleElem {
   }
 }
 
-case class ElementEntries(entries: Seq[ElementEntry] = Nil)
+object DropdownElem {
+  def extras(supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
 
-case class ElementEntry(ident: String, label: ElementText)
+    Map(
+      CLEARABLE -> BaseElement(CLEARABLE.entryName,
+        CHECKBOX,
+        ElementTexts(
+          ElementText(LABEL, Map(DE -> "Wert löschen", EN -> "Clearable")),
+          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if you no value should be possible"))
+        ),
+        value = Some("true"),
+      ))
+  }
+}
 
 

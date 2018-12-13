@@ -14,7 +14,10 @@ object ExtraProp
 
   val values: IndexedSeq[ExtraProp] = findValues
 
+  // Used for: TitleElem
   case object SIZE extends ExtraProp
+  // Used for: Dropdown
+  case object CLEARABLE extends ExtraProp
 
 
 }

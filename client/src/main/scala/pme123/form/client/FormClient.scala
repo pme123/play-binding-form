@@ -22,7 +22,7 @@ object FormClient
   def main(context: String) {
     initClient(context)
     dom.render(document.body, render)
-    SemanticUI.initDropdowns()
+    SemanticUI.initElements()
   }
 
   def render = Binding {

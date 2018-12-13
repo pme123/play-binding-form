@@ -22,10 +22,10 @@ object Settings {
 
   // main versions
   lazy val scalaV = "2.12.6"
-  lazy val bindingV = "11.0.1"
+  lazy val bindingV = "11.5.0"
   lazy val jQueryV = "2.2.4"
   lazy val sloggingV = "0.6.1"
-  lazy val semanticV = "2.3.1"
+  lazy val semanticV = "2.4.1"
   lazy val silhouetteV = "5.0.5"
   lazy val doobieV = "0.5.3"
   lazy val scalaTestV = "3.0.5"

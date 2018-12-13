@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 
 object UIStore extends Logging {
 
-  val supportedLangs = Seq(EN, DE)
+  implicit val supportedLangs: Seq[Language] = Seq(EN, DE)
 
   val uiState = UIState()
 
@@ -41,9 +41,7 @@ object UIStore extends Logging {
         changeLoggedInUser(LoggedInUser(Some(u.modify(_.language).setTo(lang))))
 
       )
-
-    SemanticUI.initPlaceholders()
-    SemanticUI.initDropdowns()
+    SemanticUI.initElements()
   }
 
   case class UIState(

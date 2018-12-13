@@ -1,8 +1,6 @@
 package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
-import pme123.form.shared.services.Language
-import pme123.form.shared.services.Language.{DE, EN}
 
 import scala.collection.immutable.IndexedSeq
 

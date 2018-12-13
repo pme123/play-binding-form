@@ -18,3 +18,7 @@ enum.layout-wide.sixteen=16 - sixteen
 enum.layout-wide.ten=10 - ten
 enum.layout-wide.thirteen=13 - thirteen
 enum.layout-wide.twelve=12 - twelve
+enum.prop-tab-type.entries=Entries
+enum.prop-tab-type.properties=Properties
+enum.prop-tab-type.texts=Texts
+props.ident=Key (Identifier)

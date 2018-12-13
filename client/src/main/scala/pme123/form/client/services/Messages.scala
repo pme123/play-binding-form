@@ -9,5 +9,4 @@ object Messages extends js.Object {
 
   def apply(language: String, key: String, args: String*): String = js.native
 
-
 }

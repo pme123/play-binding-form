@@ -19,10 +19,17 @@ object ElementTexts {
     )
   }
 
-  def apply(labelI18NKey: String, supportedLangs: Seq[Language]): ElementTexts = {
+  def label(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
-      ElementText.label(labelI18NKey, supportedLangs),
+      ElementText.label(labelI18NKey),
       ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+      ElementText(TOOLTIP, supportedLangs.map(_ -> "").toMap)
+    )
+  }
+  def placeholder(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
+    ElementTexts(
+      ElementText(LABEL, supportedLangs.map(_ -> "").toMap),
+      ElementText.placeholder(labelI18NKey),
       ElementText(TOOLTIP, supportedLangs.map(_ -> "").toMap)
     )
   }
@@ -40,9 +47,22 @@ case class ElementText(textType: TextType, texts: Map[Language, String]) {
 
 object ElementText {
 
-  def label(labelI18NKey: String, supportedLangs: Seq[Language]): ElementText = {
+  private def texts(labelI18NKey: String)(implicit supportedLangs: Seq[Language]) =
+    supportedLangs.map(l => l -> Messages(l.abbreviation, labelI18NKey)).toMap
 
-      ElementText(LABEL, supportedLangs.map(l => l -> Messages(l.abbreviation, labelI18NKey)).toMap)
+  def label(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementText = {
+
+    ElementText(LABEL, texts(labelI18NKey))
+  }
+
+  def placeholder(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementText = {
+
+    ElementText(PLACEHOLDER, texts(labelI18NKey))
+  }
+
+  def empty(supportedLangs: Seq[Language]): ElementText = {
+
+    ElementText(LABEL, supportedLangs.map(l => l -> "").toMap)
   }
 }
 

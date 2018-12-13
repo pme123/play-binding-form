@@ -1,7 +1,6 @@
 package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
-import pme123.form.shared.PropTabType.findValues
 
 import scala.collection.immutable.IndexedSeq
 

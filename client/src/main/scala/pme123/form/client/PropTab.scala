@@ -3,11 +3,10 @@ package pme123.form.client
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.HTMLElement
-import pme123.form.client.services.UIStore
+import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{DROPDOWN, TEXTFIELD}
-import pme123.form.shared.PropTabType.{PROPERTIES, TEXTS}
+import pme123.form.shared.PropTabType.{ENTRIES, PROPERTIES, TEXTS}
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared._
 import pme123.form.shared.services.Language
@@ -18,12 +17,14 @@ object PropTab {
   @dom
   lazy val create: Binding[HTMLElement] = {
     val activeTab = FormUIStore.uiState.activePropTab.bind
-    <div class="ui bottom attached segment">
+    <div class="ui bottom attached segment card">
       {activeTab match {
       case PROPERTIES =>
         PropertiesTab.create.bind
       case TEXTS =>
         TextsTab.create.bind
+      case ENTRIES =>
+        EntriesTab.create.bind
 
     }}
     </div>
@@ -35,7 +36,7 @@ case object PropertiesTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    <div>
+    <div class="content">
       {//
       elementTypeSelect.bind}{//
       defaultValueInput.bind}{//
@@ -69,7 +70,6 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementTypeSelect: Binding[HTMLElement] = {
-    val activeLang = UIStore.activeLanguage.bind.abbreviation
     val elem = FormUIStore.uiState.selectedElement.bind
     val elementType = elem.value.elem.elementType
     <div class="field">
@@ -82,9 +82,9 @@ case object PropertiesTab {
           ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
           ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element."))
         ),
-        elemEntries = ElementEntries(
-          ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(et.i18nKey, supportedLangs)))
-        ),
+        elemEntries = Some(ElementEntries(
+          ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(et.i18nKey)))
+        )),
         value = Some(elementType.entryName)
       ),
 
@@ -108,9 +108,9 @@ case object PropertiesTab {
           ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
           ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen)."))
         ),
-        elemEntries = ElementEntries(
-          LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(lw.i18nKey, supportedLangs)))
-        ),
+        elemEntries = Some(ElementEntries(
+          LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(lw.i18nKey)))
+        )),
         value = Some(layoutWide.entryName)
       ),
 
@@ -145,7 +145,7 @@ case object TextsTab {
   @dom
   lazy val create: Binding[HTMLElement] = {
     val uiFormElem = FormUIStore.uiState.selectedElement.bind.bind
-    <div>
+    <div class="content">
       {//
       Constants(
         elementTextDiv(uiFormElem.elem.texts.label),
@@ -186,7 +186,7 @@ case object TextsTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$textType",
         TEXTFIELD,
-        ElementTexts(lang.i18nKey, supportedLangs),
+        ElementTexts.label(lang.i18nKey),
         value = Some(text)),
         Some(PropertyUIStore.changeText(lang, textType) _)
       )
@@ -196,5 +196,66 @@ case object TextsTab {
 
 }
 
+case object EntriesTab {
+
+  @dom
+  lazy val create: Binding[HTMLElement] = {
+    val uiFormElem = FormUIStore.uiState.selectedElement.bind.bind
+    if (uiFormElem.elem.hasEntries) {
+      val entries = uiFormElem.elem.elemEntries.get.entries
+      <div class="content">
+
+        {Constants(entries.zipWithIndex.map(e => entry(e._2, e._1)) :+ head: _*).map(_.bind)}
+      </div>
+    } else <span></span>
+  }
+
+  @dom
+  private def head: Binding[HTMLElement] =
+    <div class="">
+      <br/>
+      <div class="right floated author">
+
+        <button class="floated right mini ui circular blue icon button"
+                data:data-tooltip="Add Element Entry"
+                onclick={_: Event =>
+                  PropertyUIStore.addElementEntry()}>
+          <i class="add icon"></i>
+        </button>
+      </div>
+    </div>
+
+  @dom
+  private def entry(pos: Int, elementEntry: ElementEntry): Binding[HTMLElement] = {
+    <div class="field">
+      <p>&nbsp;</p>
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        s"field_ident_$pos",
+        TEXTFIELD,
+        ElementTexts.placeholder("props.ident"),
+        value = Some(elementEntry.ident)),
+        Some(PropertyUIStore.changeEntryIdent(pos) _)
+      )
+    ).bind}
+    <p>&nbsp;</p>
+      {Constants(elementEntry.label.texts.map(t => entryForLang(pos, t._1, t._2)).toSeq: _*).map(_.bind)}
+    </div>
+  }
+
+  @dom
+  private def entryForLang(pos: Int, lang: Language, text: String): Binding[HTMLElement] =
+    <div class="field">
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        s"${lang.abbreviation}-$pos",
+        TEXTFIELD,
+        ElementTexts.label(lang.i18nKey),
+        value = Some(text)),
+        Some(PropertyUIStore.changeEntry(lang, pos) _)
+      )
+    ).bind}
+    </div>
+}
 
 

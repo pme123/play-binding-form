@@ -18,3 +18,7 @@ enum.layout-wide.sixteen=16 - sechzehn
 enum.layout-wide.ten=10 - zehn
 enum.layout-wide.thirteen=13 - dreizehn
 enum.layout-wide.twelve=12 - zwölf
+enum.prop-tab-type.entries=Einträge
+enum.prop-tab-type.properties=Eigenschaften
+enum.prop-tab-type.texts=Texte
+props.ident=Schlüssel (Identität)

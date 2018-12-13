@@ -39,7 +39,6 @@
         <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-${if(pageConfig.isDevMode) "fast" else ""}opt.js") ></script>
     </head>
     <body>
-
             <!-- calls to the Client code-->
         <script>client.FormClient.main("@pageConfig.context");</script>
 

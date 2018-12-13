@@ -7,7 +7,8 @@ import scala.collection.immutable.IndexedSeq
 
 sealed trait PropTabType
   extends EnumEntry {
-  def label: String
+
+  def i18nKey = s"enum.prop-tab-type.${entryName.toLowerCase}"
 }
 
 object PropTabType
@@ -16,13 +17,11 @@ object PropTabType
 
   val values: IndexedSeq[PropTabType] = findValues
 
-  case object PROPERTIES extends PropTabType {
-    val label = "Properties"
-  }
+  case object PROPERTIES extends PropTabType
 
-  case object TEXTS extends PropTabType {
-    val label = "Texts"
-  }
+  case object TEXTS extends PropTabType
+
+  case object ENTRIES extends PropTabType
 
 }
 
