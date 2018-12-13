@@ -1,0 +1,19 @@
+<application>
+  <component name="FileTypeManager" version="17">
+    <extensionMap>
+      <mapping pattern="links" type="HTML" />
+      <mapping pattern=".credentials" type="PLAIN_TEXT" />
+      <mapping pattern="external-tasks" type="PLAIN_TEXT" />
+      <mapping pattern="empty" type="PLAIN_TEXT" />
+      <mapping pattern="Dockerfile_CI3" type="PLAIN_TEXT" />
+      <mapping pattern="Dockerfile_CI2" type="PLAIN_TEXT" />
+      <mapping pattern="Dockerfile_Testing" type="PLAIN_TEXT" />
+      <mapping pattern="SECRET" type="PLAIN_TEXT" />
+      <mapping ext="overrides" type="PLAIN_TEXT" />
+      <mapping ext="bak" type="PLAIN_TEXT" />
+      <mapping ext="gpg" type="PLAIN_TEXT" />
+      <mapping ext="bpmn" type="PLAIN_TEXT" />
+      <mapping ext="env" type="PLAIN_TEXT" />
+    </extensionMap>
+  </component>
+</application>
