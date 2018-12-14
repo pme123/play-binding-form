@@ -1,12 +1,14 @@
 package pme123.form.shared
 
+import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 import pme123.form.shared.ElementType._
-import pme123.form.shared.ExtraProp.{CLEARABLE, SIZE}
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
 
+import scala.collection.immutable.IndexedSeq
 import scala.util.Random
 
 case class BaseElement(ident: String,
@@ -25,26 +27,28 @@ case class BaseElement(ident: String,
 
 object BaseElement {
 
-  def apply(elementType: ElementType,
-            supportedLangs: Seq[Language]): BaseElement = {
+  def apply(elementType: ElementType)
+           (implicit supportedLangs: Seq[Language]): BaseElement = {
     val ident = s"${elementType.entryName}-${Random.nextInt(100000)}"
 
     BaseElement(
       ident,
       elementType,
       ElementTexts(supportedLangs, ident),
-      extras(elementType, supportedLangs),
+      extras(elementType),
       elementType.defaultValue,
       elemEntries = entries(elementType)
     )
   }
 
-  def extras(elementType: ElementType, supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras(elementType: ElementType)(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
     elementType match {
       case TITLE =>
-        TitleElem.extras(supportedLangs)
+        TitleElem.extras
       case DROPDOWN =>
-       DropdownElem.extras(supportedLangs)
+        DropdownElem.extras
+      case CHECKBOX =>
+        CheckboxElem.extras
       case _ => Map.empty
     }
   }
@@ -68,7 +72,7 @@ object ElementEntry {
 }
 
 object TitleElem {
-  def extras(supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
 
     Map(
       SIZE -> BaseElement(SIZE.entryName,
@@ -84,7 +88,7 @@ object TitleElem {
 }
 
 object DropdownElem {
-  def extras(supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
 
     Map(
       CLEARABLE -> BaseElement(CLEARABLE.entryName,
@@ -97,6 +101,51 @@ object DropdownElem {
         value = Some("true"),
       ))
   }
+}
+
+object CheckboxElem {
+  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+
+    Map(
+      CHECKBOX_TYPE -> BaseElement(CHECKBOX_TYPE.entryName,
+        DROPDOWN,
+        ElementTexts(
+          ElementText(LABEL, Map(DE -> "Art", EN -> "Type")),
+          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText(TOOLTIP, Map(DE -> "Art der Check-Box", EN -> "Type of the Checkbox"))
+        ),
+        elemEntries = Some(ElementEntries(
+          CheckboxType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(enum.i18nKey)))
+        )),
+        value = CheckboxType.defaultValue,
+      ))
+  }
+
+  sealed trait CheckboxType
+    extends EnumEntry {
+
+    def i18nKey = s"enum.checkbox-type.${entryName.toLowerCase}"
+
+  }
+
+
+  object CheckboxType
+    extends Enum[CheckboxType]
+      with PlayInsensitiveJsonEnum[CheckboxType] {
+
+    def defaultValue: Option[String] = Some(STANDARD.entryName)
+
+    val values: IndexedSeq[CheckboxType] = findValues
+
+    // Used for: TitleElem
+    case object STANDARD extends CheckboxType
+
+    case object SLIDER extends CheckboxType
+
+    case object TOGGLE extends CheckboxType
+
+  }
+
 }
 
 

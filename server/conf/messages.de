@@ -1,3 +1,6 @@
+enum.checkbox-type.slider=Schieber
+enum.checkbox-type.standard=Standart
+enum.checkbox-type.toggle=Schalter
 enum.element-type.checkbox=Check Box
 enum.element-type.dropdown=Auswahl Liste
 enum.element-type.textarea=Text Bereich

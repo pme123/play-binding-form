@@ -6,7 +6,7 @@ import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
 import pme123.form.client.services.UIStore
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTAREA, TEXTFIELD, TITLE}
-import pme123.form.shared.ExtraProp.SIZE
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, SIZE}
 import pme123.form.shared.services.Language
 import pme123.form.shared.{ElementEntry, ElementTexts}
 
@@ -165,8 +165,9 @@ object CheckboxDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
+    val typeClass = uiFormElem.elem.extras(CHECKBOX_TYPE).value.map(_.toLowerCase).getOrElse("")
       <div class="inline field">
-        <div class="ui checkbox">
+        <div class={s"ui $typeClass checkbox"}>
           <input id={elem.ident}
                  name={elem.ident}
                  type="checkbox"

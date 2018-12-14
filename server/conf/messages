@@ -1,3 +1,6 @@
+enum.checkbox-type.slider=Slider
+enum.checkbox-type.standard=Standard
+enum.checkbox-type.toggle=Toggle
 enum.element-type.checkbox=Checkbox
 enum.element-type.dropdown=Dropdown
 enum.element-type.textarea=Text Area

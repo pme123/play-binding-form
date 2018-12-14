@@ -18,6 +18,8 @@ object ExtraProp
   case object SIZE extends ExtraProp
   // Used for: Dropdown
   case object CLEARABLE extends ExtraProp
+  // Used for: Checkbox
+  case object CHECKBOX_TYPE extends ExtraProp
 
 
 }

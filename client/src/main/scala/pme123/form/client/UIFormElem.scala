@@ -6,7 +6,7 @@ import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.{BaseElement, ExtraProp}
 
 case class UIFormElem(
-                       elem: BaseElement = BaseElement(TEXTFIELD, supportedLangs),
+                       elem: BaseElement = BaseElement(TEXTFIELD),
                        extras: Map[ExtraProp, UIFormElem] = Map.empty,
                        changeEvent: ChangeEvent = None,
                      ) {

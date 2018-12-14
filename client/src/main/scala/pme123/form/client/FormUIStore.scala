@@ -79,6 +79,8 @@ object FormUIStore extends Logging {
 
 object PropertyUIStore extends Logging {
 
+  import UIStore.supportedLangs
+
   val uiState: FormUIStore.UIState = FormUIStore.uiState
 
   def changeIdent(ident: String): Unit = {
@@ -105,7 +107,7 @@ object PropertyUIStore extends Logging {
     val elementType = ElementType.withNameInsensitive(elementTypeStr)
     changeUIFormElem(
       UIFormElem(
-        BaseElement(elementType, UIStore.supportedLangs),
+        BaseElement(elementType),
         uiElem.changeEvent
       )
     )
