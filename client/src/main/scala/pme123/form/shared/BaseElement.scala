@@ -92,7 +92,7 @@ object DropdownElem {
         ElementTexts(
           ElementText(LABEL, Map(DE -> "Wert löschen", EN -> "Clearable")),
           ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
-          ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if you no value should be possible"))
+          ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible"))
         ),
         value = Some("true"),
       ))

@@ -20,7 +20,7 @@ sealed abstract class BaseElementDiv {
         if (elementTexts.tooltip.textFor(activeLanguage).nonEmpty)
           <i class="question circle icon ui tooltip"
              title={elementTexts.tooltip.textFor(activeLanguage)}></i>
-        else  <label class=""/>}
+        else  <span/>}
       </label>
     else <span/>
 
@@ -69,7 +69,7 @@ object DropdownDiv extends BaseElementDiv {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
     val clearableClass = if(elem.extras.headOption.map(_._2).flatMap(_.value).contains("true")) "clearable" else ""
-      <div class="field">
+    <div class="field">
       {label(elem.texts, activeLanguage).bind //
       }<div class={s"ui $clearableClass selection dropdown"}>
       <input id={elem.ident}
@@ -166,15 +166,18 @@ object CheckboxDiv extends BaseElementDiv {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
       <div class="inline field">
-        <div class="ui toggle checkbox">
+        <div class="ui checkbox">
           <input id={elem.ident}
                  name={elem.ident}
                  type="checkbox"
-                 value={elem.value.get}
+                 checked={elem.value.get}
                  tabIndex={0}
-                 class="hidden"
                  onchange={_: Event =>
-                   changeEvent(uiFormElem)}/>
+                   val newText = jQuery(s"#${uiFormElem.elem.ident}").is(":checked").toString
+                   uiFormElem.changeEvent
+                     .foreach(ce =>
+                       ce(newText))
+                 }/>
             {label(elem.texts, activeLanguage).bind //
               }
           </div>
