@@ -43,16 +43,9 @@ object FormClient
   private lazy val container: Binding[HTMLElement] =
     <div>
       {//
-      FormHeader.create().bind}<div class="ui four column doubling stackable grid">
-      <div class="ten wide column">
-        <div class="ui basic segment">
-
-          {//
-          mainView.bind.create().bind}
-        </div>
-      </div>{//
-      PropertyMenu.create.bind //
-      }
+      FormHeader.create().bind}<div class="main-content">
+      {//
+      mainView.bind.create().bind}
     </div>
     </div>
 

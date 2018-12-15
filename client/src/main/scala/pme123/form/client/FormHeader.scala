@@ -22,7 +22,8 @@ private[client] object FormHeader
       }{spacer.bind}<div class="ui right item">
       {//
       logInButton.bind}{//
-      languageButton.bind}
+      languageButton.bind}{//
+      editPreviewSwitch.bind}
     </div>
     </div>
 
@@ -51,6 +52,27 @@ private[client] object FormHeader
         <div class="meta"></div>
       </div>
     </div>
+  }
+
+  @dom
+  private def editPreviewSwitch = {
+    val mainView = UIRoute.route.state.bind
+    if (mainView.link == FormEditorView.link)
+      <button class="ui circular blue icon button"
+              data:data-tooltip="Show Form Preview"
+              data:data-position="bottom left"
+              onclick={_: Event =>
+                UIRoute.changeRoute(FormPreviewView)}>
+        <i class="file alternate outline icon"></i>
+      </button>
+    else
+      <button class="ui circular blue icon button"
+              data:data-tooltip="Edit Form Elements"
+              data:data-position="bottom left"
+              onclick={_: Event =>
+                UIRoute.changeRoute(FormEditorView)}>
+        <i class="edit icon"></i>
+      </button>
   }
 
   @dom

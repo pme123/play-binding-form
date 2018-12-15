@@ -14,7 +14,6 @@ private[client] object PropertyMenu
   // **************************
   @dom
   private[client] lazy val create: Binding[HTMLElement] = {
-    <div class="six wide column">
       <div class="ui segment">
         <form class="ui form">
           {propHeader.bind}{//
@@ -22,7 +21,6 @@ private[client] object PropertyMenu
           PropTab.create.bind}
         </form>
       </div>
-    </div>
   }
 
   // 2. level of abstraction

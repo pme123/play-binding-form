@@ -52,7 +52,9 @@ object FormUIStore extends Logging {
       newUIElem
     )
     uiState.selectedElement.value = newUIElemVar
-    uiState.formElements.value += newUIElemVar
+    uiState.formElements.value.insert(
+      uiState.formElements.value.indexOf(elemVar) + 1,
+      newUIElemVar)
     SemanticUI.initElements()
   }
 

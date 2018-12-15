@@ -3,6 +3,7 @@ package pme123.form.client
 import com.thoughtworks.binding.Route
 import org.scalajs.dom.window
 import pme123.form.client.FormClient.info
+import pme123.form.client.services.SemanticUI
 
 object UIRoute {
 
@@ -12,6 +13,9 @@ object UIRoute {
       case FormEditorView.hashRegex() =>
         info(s"FormEditorView")
         FormEditorView
+      case FormPreviewView.hashRegex() =>
+        info(s"FormPreviewView")
+        FormPreviewView
       case _ =>
         info(s"FormEditorView!!: $hashText")
         FormEditorView
@@ -19,8 +23,10 @@ object UIRoute {
   }
 
   def changeRoute(view: MainView) {
-    if (route.state.value != view)
+    if (route.state.value != view) {
       route.state.value = view
+      SemanticUI.initElements()
+    }
   }
 
 

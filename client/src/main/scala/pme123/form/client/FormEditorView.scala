@@ -19,12 +19,22 @@ private[client] object FormEditorView
   // **************************
   @dom
   def create(): Binding[HTMLElement] =
-    <div class="ui form">
-      {//
-      editorHeader.bind}<div class="ui section divider"></div>{//
-      editorContent.bind}
+    <div class="ui four column doubling stackable grid">
+      <div class="ten wide column">
+        <div class="ui basic segment">
+          <div class="ui form">
+            {//
+            editorHeader.bind}<div class="ui section divider"></div>{//
+            editorContent.bind}
+          </div>
+        </div>
+      </div>
+      <div class="six wide column">
+        {//
+        PropertyMenu.create.bind //
+        }
+      </div>
     </div>
-
 
   // 2. level of abstraction
   // **************************
@@ -54,30 +64,29 @@ private[client] object FormEditorView
     val uiSelElem = PropertyUIStore.uiState.selectedElement.bind
     <div class={s"${uiElem.wideClass} wide column"}>
       <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"}>
-       {BaseElementDiv(uiElem).bind}
-        <div class="extra content">
-          <div class="right floated author">
+        {BaseElementDiv(uiElem).bind}<div class="extra content">
+        <div class="right floated author">
 
-            <button class="floated right mini ui circular blue icon button"
-                    data:data-tooltip="Edit Form Element"
-                    onclick={_: Event =>
-                      FormUIStore.changeSelectedElement(uiElemVar)}>
-              <i class="edit icon"></i>
-            </button>
-            <button class="floated right mini ui circular grey icon button"
-                    data:data-tooltip="Copy Form Element"
-                    onclick={_: Event =>
-                      FormUIStore.copySelectedElement(uiElemVar)}>
-              <i class="copy icon"></i>
-            </button>
-            <button class="floated right mini ui circular red icon button"
-                    data:data-tooltip="Delete Form Element"
-                    onclick={_: Event =>
-                      FormUIStore.deleteSelectedElement(uiElemVar)}>
-              <i class="trash icon"></i>
-            </button>
-          </div>
+          <button class="floated right mini ui circular blue icon button"
+                  data:data-tooltip="Edit Form Element"
+                  onclick={_: Event =>
+                    FormUIStore.changeSelectedElement(uiElemVar)}>
+            <i class="edit icon"></i>
+          </button>
+          <button class="floated right mini ui circular grey icon button"
+                  data:data-tooltip="Copy Form Element"
+                  onclick={_: Event =>
+                    FormUIStore.copySelectedElement(uiElemVar)}>
+            <i class="copy icon"></i>
+          </button>
+          <button class="floated right mini ui circular red icon button"
+                  data:data-tooltip="Delete Form Element"
+                  onclick={_: Event =>
+                    FormUIStore.deleteSelectedElement(uiElemVar)}>
+            <i class="trash icon"></i>
+          </button>
         </div>
+      </div>
       </div>
     </div>
   }
