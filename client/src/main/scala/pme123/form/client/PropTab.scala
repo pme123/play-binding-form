@@ -145,7 +145,7 @@ case object TextsTab {
   @dom
   lazy val create: Binding[HTMLElement] = {
     val uiFormElem = FormUIStore.uiState.selectedElement.bind.bind
-    if (uiFormElem.elem.hasEntries)
+    if (uiFormElem.elem.hasTexts)
       <div class="content">
         {//
         val texts = uiFormElem.elem.texts.get

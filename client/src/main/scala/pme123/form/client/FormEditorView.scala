@@ -58,13 +58,19 @@ private[client] object FormEditorView
         <div class="extra content">
           <div class="right floated author">
 
-            <button class="floated right mini ui circular blue mini icon button"
+            <button class="floated right mini ui circular blue icon button"
                     data:data-tooltip="Edit Form Element"
                     onclick={_: Event =>
                       FormUIStore.changeSelectedElement(uiElemVar)}>
               <i class="edit icon"></i>
             </button>
-            <button class="floated right ui circular red mini icon button"
+            <button class="floated right mini ui circular grey icon button"
+                    data:data-tooltip="Copy Form Element"
+                    onclick={_: Event =>
+                      FormUIStore.copySelectedElement(uiElemVar)}>
+              <i class="copy icon"></i>
+            </button>
+            <button class="floated right mini ui circular red icon button"
                     data:data-tooltip="Delete Form Element"
                     onclick={_: Event =>
                       FormUIStore.deleteSelectedElement(uiElemVar)}>

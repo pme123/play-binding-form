@@ -43,6 +43,19 @@ object FormUIStore extends Logging {
     }
   }
 
+  def copySelectedElement(elemVar: Var[UIFormElem]): Unit = {
+    info(s"FormUIStore: copySelectedElement ${elemVar.value}")
+    val newUIElem = elemVar.value.modify(_.elem.ident)
+      .setTo(BaseElement.ident(elemVar.value.elem.elementType))
+    println(s"NEW: $newUIElem")
+    val newUIElemVar = Var(
+      newUIElem
+    )
+    uiState.selectedElement.value = newUIElemVar
+    uiState.formElements.value += newUIElemVar
+    SemanticUI.initElements()
+  }
+
   def changeSelectedElement(uiFormElem: UIFormElem): Unit = {
     info(s"FormUIStore: changeSelectedElement $uiFormElem")
     if (uiState.selectedElement.value.value != uiFormElem) {

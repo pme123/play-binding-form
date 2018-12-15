@@ -27,18 +27,18 @@ case class BaseElement(ident: String,
 }
 
 object BaseElement {
+  def ident(elementType: ElementType) = s"${elementType.entryName}-${Random.nextInt(100000)}"
 
   def apply(elementType: ElementType)
            (implicit supportedLangs: Seq[Language]): BaseElement = {
-    def ident = s"${elementType.entryName}-${Random.nextInt(100000)}"
 
     def texts = elementType match {
       case SPACER => None
-      case _ =>  Some(ElementTexts(ident))
+      case _ => Some(ElementTexts(ident(elementType)))
     }
 
     BaseElement(
-      ident,
+      ident(elementType),
       elementType,
       texts,
       extras(elementType),
