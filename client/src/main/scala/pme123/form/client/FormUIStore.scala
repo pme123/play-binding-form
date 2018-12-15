@@ -2,7 +2,6 @@ package pme123.form.client
 
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
-import pme123.form.client.FormUIStore.{info, uiState}
 import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.PropTabType.PROPERTIES
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
@@ -95,6 +94,18 @@ object PropertyUIStore extends Logging {
 
   val uiState: FormUIStore.UIState = FormUIStore.uiState
 
+  def changeElementType(elementTypeStr: String): Unit = {
+    info(s"PropertyUIStore: changeElementType $elementTypeStr")
+    val uiElem = uiState.selectedElement.value.value
+    val elementType = ElementType.withNameInsensitive(elementTypeStr)
+    val newUIElem = UIFormElem(
+      BaseElement(elementType),
+      uiElem.changeEvent
+    )
+    uiState.activePropElement.value = newUIElem.copy()
+    changeSelectedElement(newUIElem)
+  }
+
   def changeSelectedElement(uiFormElem: UIFormElem): Unit = {
     info(s"FormUIStore: changeSelectedElement $uiFormElem")
     if (uiState.selectedElement.value.value != uiFormElem) {
@@ -118,18 +129,6 @@ object PropertyUIStore extends Logging {
     changeUIFormElem(
       uiElem.modify(_.elem.value)
         .setTo(Some(defaultValue))
-    )
-  }
-
-  def changeElementType(elementTypeStr: String): Unit = {
-    info(s"PropertyUIStore: changeElementType $elementTypeStr")
-    val uiElem = uiState.selectedElement.value.value
-    val elementType = ElementType.withNameInsensitive(elementTypeStr)
-    changeUIFormElem(
-      UIFormElem(
-        BaseElement(elementType),
-        uiElem.changeEvent
-      )
     )
   }
 

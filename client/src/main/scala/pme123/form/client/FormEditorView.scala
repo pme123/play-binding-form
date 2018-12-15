@@ -24,7 +24,7 @@ private[client] object FormEditorView
         <div class="ui basic segment">
           <div class="ui form">
             {//
-            editorHeader.bind}<div class="ui section divider"></div>{//
+            editorHeader.bind}{//
             editorContent.bind}
           </div>
         </div>
@@ -40,17 +40,22 @@ private[client] object FormEditorView
   // **************************
 
   @dom
-  private lazy val editorHeader: Binding[HTMLElement] = <h1 class="header">
-    <i class="edit outline icon"></i> &nbsp; &nbsp;
-    Form Editor
-    <button class="ui circular blue icon button"
-            data:data-tooltip="Add Form Element"
-            onclick={_: Event =>
-              FormUIStore.addFormElement()}>
-      <i class="big add icon"></i>
-    </button>
-  </h1>
-
+  private lazy val editorHeader: Binding[HTMLElement] =
+    <div class="ui borderless menu">
+      <div class="ui item">
+        <h3 class="header">
+        <i class="edit outline icon"></i> &nbsp; &nbsp;
+        Form Editor</h3>
+        </div>
+      <div class="ui right item">
+        <button class="ui circular blue icon button"
+                data:data-tooltip="Add Form Element"
+                onclick={_: Event =>
+                  FormUIStore.addFormElement()}>
+          <i class="add icon"></i>
+        </button>
+      </div>
+    </div>
   @dom
   private lazy val editorContent: Binding[HTMLElement] =
     <div class="ui grid">
@@ -63,23 +68,29 @@ private[client] object FormEditorView
     val uiElem = uiElemVar.bind
     val uiSelElem = PropertyUIStore.uiState.selectedElement.bind
     <div class={s"${uiElem.wideClass} wide column"}>
-      <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"}>
+      <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"} >
         {BaseElementDiv(uiElem).bind}<div class="extra content">
-        <div class="right floated author">
+        <div class="right floated">
 
-          <button class="floated right mini ui circular blue icon button"
+          <button class="mini ui circular blue icon button"
                   data:data-tooltip="Edit Form Element"
                   onclick={_: Event =>
                     FormUIStore.changeSelectedElement(uiElemVar)}>
             <i class="edit icon"></i>
           </button>
-          <button class="floated right mini ui circular grey icon button"
+          <button class="mini ui circular grey icon button"
                   data:data-tooltip="Copy Form Element"
                   onclick={_: Event =>
                     FormUIStore.copySelectedElement(uiElemVar)}>
             <i class="copy icon"></i>
           </button>
-          <button class="floated right mini ui circular red icon button"
+          <button class="mini ui circular grey icon button"
+                  data:data-tooltip="Move Form Element (use drag'n'drop)"
+                  onclick={_: Event =>
+                    FormUIStore.copySelectedElement(uiElemVar)}>
+            <i class="hand spock icon"></i>
+          </button>
+          <button class="mini ui circular red icon button"
                   data:data-tooltip="Delete Form Element"
                   onclick={_: Event =>
                     FormUIStore.deleteSelectedElement(uiElemVar)}>

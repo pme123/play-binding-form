@@ -60,7 +60,7 @@ private[client] object FormHeader
     if (mainView.link == FormEditorView.link)
       <button class="ui circular blue icon button"
               data:data-tooltip="Show Form Preview"
-              data:data-position="bottom left"
+              data:data-position="bottom right"
               onclick={_: Event =>
                 UIRoute.changeRoute(FormPreviewView)}>
         <i class="file alternate outline icon"></i>
@@ -68,7 +68,7 @@ private[client] object FormHeader
     else
       <button class="ui circular blue icon button"
               data:data-tooltip="Edit Form Elements"
-              data:data-position="bottom left"
+              data:data-position="bottom right"
               onclick={_: Event =>
                 UIRoute.changeRoute(FormEditorView)}>
         <i class="edit icon"></i>
