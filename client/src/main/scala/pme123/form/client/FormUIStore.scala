@@ -2,6 +2,7 @@ package pme123.form.client
 
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
+import pme123.form.client.FormUIStore.{info, uiState}
 import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.PropTabType.PROPERTIES
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
@@ -39,6 +40,7 @@ object FormUIStore extends Logging {
     info(s"FormUIStore: changeSelectedElement ${elemVar.value}")
     if (uiState.selectedElement.value != elemVar) {
       uiState.selectedElement.value = elemVar
+      uiState.activePropElement.value = elemVar.value.copy()
       SemanticUI.initElements()
     }
   }
@@ -52,18 +54,11 @@ object FormUIStore extends Logging {
       newUIElem
     )
     uiState.selectedElement.value = newUIElemVar
+    uiState.activePropElement.value = elemVar.value.copy()
     uiState.formElements.value.insert(
       uiState.formElements.value.indexOf(elemVar) + 1,
       newUIElemVar)
     SemanticUI.initElements()
-  }
-
-  def changeSelectedElement(uiFormElem: UIFormElem): Unit = {
-    info(s"FormUIStore: changeSelectedElement $uiFormElem")
-    if (uiState.selectedElement.value.value != uiFormElem) {
-      uiState.selectedElement.value.value = uiFormElem
-      SemanticUI.initElements()
-    }
   }
 
   def changeActivePropTab(propTabType: PropTabType): Unit = {
@@ -74,6 +69,7 @@ object FormUIStore extends Logging {
 
   case class UIState(formElements: Vars[Var[UIFormElem]],
                      selectedElement: Var[Var[UIFormElem]],
+                     activePropElement: Var[UIFormElem],
                      activePropTab: Var[PropTabType],
                     )
 
@@ -84,6 +80,7 @@ object FormUIStore extends Logging {
       UIState(
         Vars(defaultElem),
         Var(defaultElem),
+        Var(defaultElem.value.copy()),
         Var(PROPERTIES),
       )
     }
@@ -97,6 +94,14 @@ object PropertyUIStore extends Logging {
   import UIStore.supportedLangs
 
   val uiState: FormUIStore.UIState = FormUIStore.uiState
+
+  def changeSelectedElement(uiFormElem: UIFormElem): Unit = {
+    info(s"FormUIStore: changeSelectedElement $uiFormElem")
+    if (uiState.selectedElement.value.value != uiFormElem) {
+      uiState.selectedElement.value.value = uiFormElem
+      SemanticUI.initElements()
+    }
+  }
 
   def changeIdent(ident: String): Unit = {
     info(s"PropertyUIStore: changeIdent $ident")
@@ -159,7 +164,7 @@ object PropertyUIStore extends Logging {
     info(s"FormUIStore: addFormElement")
     val entry = ElementEntry()
     val uiElem = uiState.selectedElement.value.value
-    FormUIStore.changeSelectedElement(
+    changeSelectedElement(
       uiElem
         .modify(_.elem.elemEntries)
         .setTo(uiElem.elem.elemEntries.map(es => ElementEntries(es.entries :+ entry)))
@@ -169,7 +174,7 @@ object PropertyUIStore extends Logging {
   def changeEntry(language: Language, pos: Int)(text: String): Unit = {
     info(s"PropertyUIStore: changeEntry $language $pos $text")
     val uiElem = uiState.selectedElement.value.value
-    FormUIStore.changeSelectedElement(
+    changeSelectedElement(
       uiElem
         .modify(_.elem.elemEntries)
         .setTo(
@@ -186,7 +191,7 @@ object PropertyUIStore extends Logging {
   def changeEntryIdent(pos: Int)(ident: String): Unit = {
     info(s"PropertyUIStore: changeEntryIdent $pos $ident")
     val uiElem = uiState.selectedElement.value.value
-    FormUIStore.changeSelectedElement(
+    changeSelectedElement(
       uiElem
         .modify(_.elem.elemEntries)
         .setTo(

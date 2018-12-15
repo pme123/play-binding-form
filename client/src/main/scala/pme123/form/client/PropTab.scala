@@ -47,7 +47,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val defaultValueInput: Binding[HTMLElement] = {
-    val selElem = FormUIStore.uiState.selectedElement.bind.bind
+    val selElem = FormUIStore.uiState.activePropElement.bind
 
     if (selElem.isEditable)
       <div class="field">
@@ -70,8 +70,8 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementTypeSelect: Binding[HTMLElement] = {
-    val elem = FormUIStore.uiState.selectedElement.bind
-    val elementType = elem.value.elem.elementType
+    val uiElem = FormUIStore.uiState.activePropElement.bind
+    val elementType = uiElem.elem.elementType
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
@@ -96,8 +96,8 @@ case object PropertiesTab {
 
   @dom
   private lazy val layoutWideSelect: Binding[HTMLElement] = {
-    val elem = FormUIStore.uiState.selectedElement.bind
-    val layoutWide = elem.value.elem.layoutWide
+    val uiElem = FormUIStore.uiState.activePropElement.bind
+    val layoutWide = uiElem.elem.layoutWide
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
@@ -122,8 +122,8 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementExtras: Binding[HTMLElement] = {
-    val elem = FormUIStore.uiState.selectedElement.bind
-    val extras = elem.bind.extras
+    val elem = FormUIStore.uiState.activePropElement.bind
+    val extras = elem.extras
 
     <div>
       {//
@@ -144,7 +144,7 @@ case object TextsTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = FormUIStore.uiState.selectedElement.bind.bind
+    val uiFormElem = FormUIStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasTexts)
       <div class="content">
         {//
@@ -197,7 +197,7 @@ case object EntriesTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = FormUIStore.uiState.selectedElement.bind.bind
+    val uiFormElem = FormUIStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasEntries) {
       val entries = uiFormElem.elem.elemEntries.get.entries
       <div class="content">

@@ -34,8 +34,8 @@ private[client] object PropertyMenu
 
   @dom
   private lazy val menu: Binding[HTMLElement] = {
-    val selElemV = FormUIStore.uiState.selectedElement.bind
-    val selElem = selElemV.bind
+    val selElemV = FormUIStore.uiState.activePropElement.bind
+    val selElem = selElemV
     <div class="ui top attached tabular menu">
       {Constants(
       PropTabType.values

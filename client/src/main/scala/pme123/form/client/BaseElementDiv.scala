@@ -157,23 +157,22 @@ object CheckboxDiv extends BaseElementDiv {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
     val typeClass = uiFormElem.elem.extras(CHECKBOX_TYPE).value.map(_.toLowerCase).getOrElse("")
-    val checked = if (elem.value.contains("true")) "checked" else ""
+    val checkedClass = if (elem.value.contains("true")) "checked" else ""
+    val checked = elem.value.contains("true")
     val texts = elem.texts.get
-    println(s"CHECK $checked value" + elem.value.get)
     <div class="inline field">
-      <div class={s"ui $typeClass checkbox $checked"}>
+      <div class={s"ui $typeClass checkbox $checkedClass"}>
         <input id={elem.ident}
                name={elem.ident}
                type="checkbox"
-               value={elem.value.get}
+               checked={checked}
                tabIndex={0}
-               checked="checked"
                onchange={_: Event =>
                  val newText = jQuery(s"#${uiFormElem.elem.ident}").is(":checked").toString
-                 println(s"new value: $newText")
                  uiFormElem.changeEvent
                    .foreach(ce =>
-                     ce(newText))}/>{label(texts, activeLanguage).bind //
+                     ce(newText))}/>{//
+        label(texts, activeLanguage).bind //
         }
       </div>
     </div>
@@ -224,8 +223,8 @@ object SpacerDiv extends BaseElementDiv {
 
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
-    <div >
-      </div>
+    <div>
+    </div>
   }
 
 }
