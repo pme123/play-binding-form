@@ -32,6 +32,18 @@ object ElementType
 
   }
 
+  case object DIVIDER extends ElementType {
+
+    override def defaultValue: Option[String] = None
+
+  }
+
+  case object SPACER extends ElementType {
+
+    override def defaultValue: Option[String] = None
+
+  }
+
   case object CHECKBOX extends ElementType
 
   case object DROPDOWN extends ElementType

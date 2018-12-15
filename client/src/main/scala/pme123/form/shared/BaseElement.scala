@@ -4,7 +4,7 @@ import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
-import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
+import pme123.form.shared.TextType.{LABEL, TOOLTIP}
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
 
@@ -13,13 +13,14 @@ import scala.util.Random
 
 case class BaseElement(ident: String,
                        elementType: ElementType,
-                       texts: ElementTexts,
+                       texts: Option[ElementTexts],
                        extras: Map[ExtraProp, BaseElement] = Map.empty,
                        value: Option[String] = Some(""),
                        layoutWide: LayoutWide = EIGHT,
                        elemEntries: Option[ElementEntries] = None
                       ) {
 
+  val hasTexts: Boolean = texts.nonEmpty
   val hasExtras: Boolean = extras.nonEmpty
   val hasEntries: Boolean = elemEntries.nonEmpty
 
@@ -29,12 +30,17 @@ object BaseElement {
 
   def apply(elementType: ElementType)
            (implicit supportedLangs: Seq[Language]): BaseElement = {
-    val ident = s"${elementType.entryName}-${Random.nextInt(100000)}"
+    def ident = s"${elementType.entryName}-${Random.nextInt(100000)}"
+
+    def texts = elementType match {
+      case SPACER => None
+      case _ =>  Some(ElementTexts(ident))
+    }
 
     BaseElement(
       ident,
       elementType,
-      ElementTexts(supportedLangs, ident),
+      texts,
       extras(elementType),
       elementType.defaultValue,
       elemEntries = entries(elementType)
@@ -43,12 +49,14 @@ object BaseElement {
 
   def extras(elementType: ElementType)(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
     elementType match {
-      case TITLE =>
-        TitleElem.extras
       case DROPDOWN =>
         DropdownElem.extras
       case CHECKBOX =>
         CheckboxElem.extras
+      case TITLE =>
+        TitleElem.extras
+      case DIVIDER =>
+        DividerElem.extras
       case _ => Map.empty
     }
   }
@@ -60,6 +68,12 @@ object BaseElement {
       case _ => None
     }
   }
+
+  def enumEntries(enums: Seq[I18nEnum])(implicit supportedLangs: Seq[Language]): Some[ElementEntries] = {
+    Some(ElementEntries(
+      enums.map(enum => ElementEntry(enum.entryName, ElementText.label(enum.i18nKey)))
+    ))
+  }
 }
 
 case class ElementEntries(entries: Seq[ElementEntry] = Nil)
@@ -67,24 +81,8 @@ case class ElementEntries(entries: Seq[ElementEntry] = Nil)
 case class ElementEntry(ident: String, label: ElementText)
 
 object ElementEntry {
-  def apply(supportedLangs: Seq[Language]): ElementEntry = new
-      ElementEntry("", ElementText.empty(supportedLangs))
-}
-
-object TitleElem {
-  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
-
-    Map(
-      SIZE -> BaseElement(SIZE.entryName,
-        TEXTFIELD,
-        ElementTexts(
-          ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size")),
-          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
-          ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)"))
-        ),
-        value = Some("huge"),
-      ))
-  }
+  def apply()(implicit supportedLangs: Seq[Language]): ElementEntry = new
+      ElementEntry("", ElementText.emptyLabel)
 }
 
 object DropdownElem {
@@ -93,12 +91,13 @@ object DropdownElem {
     Map(
       CLEARABLE -> BaseElement(CLEARABLE.entryName,
         CHECKBOX,
-        ElementTexts(
+        Some(ElementTexts(
           ElementText(LABEL, Map(DE -> "Wert löschen", EN -> "Clearable")),
-          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText.emptyPlaceholder,
           ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible"))
-        ),
+        )),
         value = Some("true"),
+        extras = BaseElement.extras(CHECKBOX)
       ))
   }
 }
@@ -109,20 +108,19 @@ object CheckboxElem {
     Map(
       CHECKBOX_TYPE -> BaseElement(CHECKBOX_TYPE.entryName,
         DROPDOWN,
-        ElementTexts(
+        Some(ElementTexts(
           ElementText(LABEL, Map(DE -> "Art", EN -> "Type")),
-          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText.emptyPlaceholder,
           ElementText(TOOLTIP, Map(DE -> "Art der Check-Box", EN -> "Type of the Checkbox"))
-        ),
-        elemEntries = Some(ElementEntries(
-          CheckboxType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(enum.i18nKey)))
         )),
+        elemEntries = BaseElement.enumEntries(CheckboxType.values),
         value = CheckboxType.defaultValue,
       ))
   }
 
   sealed trait CheckboxType
-    extends EnumEntry {
+    extends EnumEntry
+      with I18nEnum {
 
     def i18nKey = s"enum.checkbox-type.${entryName.toLowerCase}"
 
@@ -146,6 +144,68 @@ object CheckboxElem {
 
   }
 
+}
+
+
+object TitleElem {
+
+  sealed trait SizeType
+    extends EnumEntry
+      with I18nEnum {
+
+    def cssClass: String = entryName.toLowerCase
+
+    def i18nKey: String = s"enum.size-type.${entryName.toLowerCase}"
+
+  }
+
+
+  object SizeType
+    extends Enum[SizeType]
+      with PlayInsensitiveJsonEnum[SizeType] {
+
+    def defaultValue: Option[String] = Some(MEDIUM.entryName)
+
+    val values: IndexedSeq[SizeType] = findValues
+
+    // Used for: TitleElem
+    case object HUGE extends SizeType
+
+    case object BIG extends SizeType
+
+    case object MEDIUM extends SizeType
+
+    case object SMALL extends SizeType
+
+    case object TINY extends SizeType
+
+  }
+
+  def sizeElem(implicit supportedLangs: Seq[Language]) = BaseElement(SIZE.entryName,
+    DROPDOWN,
+    Some(ElementTexts(
+      ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size")),
+      ElementText.emptyPlaceholder,
+      ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)"))
+    )),
+    value = SizeType.defaultValue,
+    elemEntries = BaseElement.enumEntries(SizeType.values),
+  )
+
+  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+    Map(
+      SIZE -> sizeElem
+    )
+  }
+}
+
+object DividerElem {
+  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+
+    Map(
+      SIZE -> TitleElem.sizeElem
+    )
+  }
 }
 
 

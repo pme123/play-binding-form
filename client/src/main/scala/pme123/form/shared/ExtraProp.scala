@@ -14,13 +14,12 @@ object ExtraProp
 
   val values: IndexedSeq[ExtraProp] = findValues
 
-  // Used for: TitleElem
+  // Used for: TitleElem / DividerElem
   case object SIZE extends ExtraProp
   // Used for: Dropdown
   case object CLEARABLE extends ExtraProp
   // Used for: Checkbox
   case object CHECKBOX_TYPE extends ExtraProp
-
 
 }
 

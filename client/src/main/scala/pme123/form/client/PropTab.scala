@@ -55,11 +55,11 @@ case object PropertiesTab {
         UIFormElem(BaseElement(
           "elemDefaultValue",
           TEXTFIELD,
-          ElementTexts(
+          Some(ElementTexts(
             ElementText(LABEL, Map(DE -> "Standart Wert", EN -> "Default Value")),
             ElementText(PLACEHOLDER, Map(DE -> "Standart Wert", EN -> "Default Value")),
             ElementText(TOOLTIP, Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start."))
-          )),
+          ))),
           Some(PropertyUIStore.changeDefaultValue _)
         )
       ).bind}
@@ -77,11 +77,11 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "elementTypeId",
         DROPDOWN,
-        ElementTexts(
+        Some(ElementTexts(
           ElementText(LABEL, Map(DE -> "Element Typ", EN -> "Element Type")),
-          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText.emptyPlaceholder,
           ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element."))
-        ),
+        )),
         elemEntries = Some(ElementEntries(
           ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(et.i18nKey)))
         )),
@@ -103,11 +103,11 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "layoutWideId",
         DROPDOWN,
-        ElementTexts(
+        Some(ElementTexts(
           ElementText(LABEL, Map(DE -> "Layout Breite", EN -> "Layout Wide")),
-          ElementText(PLACEHOLDER, supportedLangs.map(_ -> "").toMap),
+          ElementText.emptyPlaceholder,
           ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen)."))
-        ),
+        )),
         elemEntries = Some(ElementEntries(
           LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(lw.i18nKey)))
         )),
@@ -145,39 +145,36 @@ case object TextsTab {
   @dom
   lazy val create: Binding[HTMLElement] = {
     val uiFormElem = FormUIStore.uiState.selectedElement.bind.bind
-    <div class="content">
-      {//
-      Constants(
-        elementTextDiv(uiFormElem.elem.texts.label),
-        onlyEditable(uiFormElem)(uiFormElem.elem.texts.placeholder),
-        onlyEditable(uiFormElem)(uiFormElem.elem.texts.tooltip)
-      ).map(_.bind)}
-    </div>
-  }
-
-  @dom
-  def onlyEditable(uiFormElem: UIFormElem)(elemText: ElementText): Binding[HTMLElement] = {
-    if (uiFormElem.isEditable)
-      <div>
-        {elementTextDiv(elemText).bind}
+    if (uiFormElem.elem.hasEntries)
+      <div class="content">
+        {//
+        val texts = uiFormElem.elem.texts.get
+        Constants(
+          elementTextDiv(texts.label, uiFormElem.isViewable),
+          elementTextDiv(texts.placeholder, uiFormElem.isEditable),
+          elementTextDiv(texts.tooltip, uiFormElem.isEditable)
+        ).map(_.bind)}
       </div>
     else
       <span></span>
   }
 
   @dom
-  def elementTextDiv(elementText: ElementText): Binding[HTMLElement] =
-    <div>
-      <h4>
-        {elementText.textType.label}
-      </h4>{//
-      Constants(elementText.texts
-        .map {
-          case (l, t) =>
-            textDiv(l, t, elementText.textType)
-        }.toSeq: _*)
-        .map(_.bind)}<br/>
-    </div>
+  def elementTextDiv(elementText: ElementText, show: Boolean): Binding[HTMLElement] =
+    if (show)
+      <div>
+        <h4>
+          {elementText.textType.label}
+        </h4>{//
+        Constants(elementText.texts
+          .map {
+            case (l, t) =>
+              textDiv(l, t, elementText.textType)
+          }.toSeq: _*)
+          .map(_.bind)}<br/>
+      </div>
+    else
+      <span></span>
 
   @dom
   def textDiv(lang: Language, text: String, textType: TextType): Binding[HTMLElement] = {
@@ -186,7 +183,7 @@ case object TextsTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$textType",
         TEXTFIELD,
-        ElementTexts.label(lang.i18nKey),
+        Some(ElementTexts.label(lang.i18nKey)),
         value = Some(text)),
         Some(PropertyUIStore.changeText(lang, textType) _)
       )
@@ -228,18 +225,19 @@ case object EntriesTab {
   @dom
   private def entry(pos: Int, elementEntry: ElementEntry): Binding[HTMLElement] = {
     <div class="field">
-      <p>&nbsp;</p>
-      {BaseElementDiv(
+      <p>
+        &nbsp;
+      </p>{BaseElementDiv(
       UIFormElem(BaseElement(
         s"field_ident_$pos",
         TEXTFIELD,
-        ElementTexts.placeholder("props.ident"),
+        Some(ElementTexts.placeholder("props.ident")),
         value = Some(elementEntry.ident)),
         Some(PropertyUIStore.changeEntryIdent(pos) _)
       )
-    ).bind}
-    <p>&nbsp;</p>
-      {Constants(elementEntry.label.texts.map(t => entryForLang(pos, t._1, t._2)).toSeq: _*).map(_.bind)}
+    ).bind}<p>
+      &nbsp;
+    </p>{Constants(elementEntry.label.texts.map(t => entryForLang(pos, t._1, t._2)).toSeq: _*).map(_.bind)}
     </div>
   }
 
@@ -250,7 +248,7 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$pos",
         TEXTFIELD,
-        ElementTexts.label(lang.i18nKey),
+        Some(ElementTexts.label(lang.i18nKey)),
         value = Some(text)),
         Some(PropertyUIStore.changeEntry(lang, pos) _)
       )

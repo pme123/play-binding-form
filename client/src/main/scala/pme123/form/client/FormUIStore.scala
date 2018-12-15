@@ -127,13 +127,13 @@ object PropertyUIStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     val newElem = textType match {
       case LABEL =>
-        uiElem.modify(_.elem.texts.label.texts.at(language))
+        uiElem.modify(_.elem.texts.each.label.texts.at(language))
           .setTo(text)
       case PLACEHOLDER =>
-        uiElem.modify(_.elem.texts.placeholder.texts.at(language))
+        uiElem.modify(_.elem.texts.each.placeholder.texts.at(language))
           .setTo(text)
       case TOOLTIP =>
-        uiElem.modify(_.elem.texts.tooltip.texts.at(language))
+        uiElem.modify(_.elem.texts.each.tooltip.texts.at(language))
           .setTo(text)
     }
     changeUIFormElem(newElem)
@@ -142,7 +142,7 @@ object PropertyUIStore extends Logging {
 
   def addElementEntry(): Unit = {
     info(s"FormUIStore: addFormElement")
-    val entry = ElementEntry(UIStore.supportedLangs)
+    val entry = ElementEntry()
     val uiElem = uiState.selectedElement.value.value
     FormUIStore.changeSelectedElement(
       uiElem

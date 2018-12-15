@@ -21,7 +21,7 @@ private[client] object FormEditorView
   def create(): Binding[HTMLElement] =
     <div class="ui form">
       {//
-      editorHeader.bind}{//
+      editorHeader.bind}<div class="ui section divider"></div>{//
       editorContent.bind}
     </div>
 

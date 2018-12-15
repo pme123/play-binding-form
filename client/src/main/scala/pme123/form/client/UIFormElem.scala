@@ -2,7 +2,7 @@ package pme123.form.client
 
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.UIFormElem.ChangeEvent
-import pme123.form.shared.ElementType.TEXTFIELD
+import pme123.form.shared.ElementType.{SPACER, TEXTFIELD}
 import pme123.form.shared.{BaseElement, ExtraProp}
 
 case class UIFormElem(
@@ -13,6 +13,11 @@ case class UIFormElem(
   // if the value is not set the element is read only like title
   val isEditable: Boolean = elem.value.nonEmpty
 
+  def isViewable: Boolean = elem.elementType match {
+    case SPACER => false
+    case _ => true
+  }
+
   lazy val wideClass: String = elem.layoutWide.entryName.toLowerCase
 }
 
@@ -22,12 +27,12 @@ object UIFormElem {
 
   def apply(elem: BaseElement,
             changeEvent: ChangeEvent): UIFormElem = {
-     val f =   UIFormElem(
-          elem,
-          elem.extras
-            .map{case (ep, be) => (ep, UIFormElem(be))},
-          changeEvent
-        )
+    val f = UIFormElem(
+      elem,
+      elem.extras
+        .map { case (ep, be) => (ep, UIFormElem(be)) },
+      changeEvent
+    )
     f
   }
 
