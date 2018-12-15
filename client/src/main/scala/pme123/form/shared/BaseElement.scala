@@ -97,7 +97,6 @@ object DropdownElem {
           ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible"))
         )),
         value = Some("true"),
-        extras = BaseElement.extras(CHECKBOX)
       ))
   }
 }

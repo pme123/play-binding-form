@@ -2,7 +2,8 @@ package pme123.form.client
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.{Event, HTMLElement}
+import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
+import pme123.form.client.services.DragDrop
 
 import scala.util.matching.Regex
 
@@ -67,8 +68,15 @@ private[client] object FormEditorView
 
     val uiElem = uiElemVar.bind
     val uiSelElem = PropertyUIStore.uiState.selectedElement.bind
-    <div class={s"${uiElem.wideClass} wide column"}>
-      <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"} >
+    <div class={s"${uiElem.wideClass} wide column"}
+         ondrop={ev: DragEvent =>
+           DragDrop.drop(uiElemVar)(ev)}
+         ondragover={ev: DragEvent =>
+           DragDrop.allowDrop(ev)}>
+      <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"}
+           ondragstart={_: DragEvent =>
+             DragDrop.drag(uiElemVar)}
+           draggable="true">
         {BaseElementDiv(uiElem).bind}<div class="extra content">
         <div class="right floated">
 

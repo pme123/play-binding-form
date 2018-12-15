@@ -1,6 +1,7 @@
 package pme123.form.client
 
 import com.softwaremill.quicklens._
+import com.thoughtworks.binding.Binding
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.PropTabType.PROPERTIES
@@ -24,7 +25,7 @@ object FormUIStore extends Logging {
   }
 
   def deleteSelectedElement(elemVar: Var[UIFormElem]): Unit = {
-    info(s"FormUIStore: deleteSelectedElement ${elemVar.value}")
+    info(s"FormUIStore: deleteSelectedElement ${ident(elemVar)}")
     if (uiState.selectedElement.value == elemVar) {
       val newElem = uiState.formElements.value.headOption
         .getOrElse {
@@ -36,16 +37,16 @@ object FormUIStore extends Logging {
   }
 
   def changeSelectedElement(elemVar: Var[UIFormElem]): Unit = {
-    info(s"FormUIStore: changeSelectedElement ${elemVar.value}")
+    info(s"FormUIStore: changeSelectedElement ${ident(elemVar)}")
     if (uiState.selectedElement.value != elemVar) {
       uiState.selectedElement.value = elemVar
-      uiState.activePropElement.value = elemVar.value.copy()
+      uiState.activePropElement.value = elemVar.value
       SemanticUI.initElements()
     }
   }
 
   def copySelectedElement(elemVar: Var[UIFormElem]): Unit = {
-    info(s"FormUIStore: copySelectedElement ${elemVar.value}")
+    info(s"FormUIStore: copySelectedElement ${ident(elemVar)}")
     val newUIElem = elemVar.value.modify(_.elem.ident)
       .setTo(BaseElement.ident(elemVar.value.elem.elementType))
     println(s"NEW: $newUIElem")
@@ -53,16 +54,30 @@ object FormUIStore extends Logging {
       newUIElem
     )
     uiState.selectedElement.value = newUIElemVar
-    uiState.activePropElement.value = elemVar.value.copy()
+    uiState.activePropElement.value = elemVar.value
     uiState.formElements.value.insert(
       uiState.formElements.value.indexOf(elemVar) + 1,
       newUIElemVar)
     SemanticUI.initElements()
   }
 
+  def moveElement(draggedElem: Var[UIFormElem], moveToElemVar: Var[UIFormElem]): Unit = {
+    info(s"FormUIStore: moveElement ${ident(draggedElem)} to ${ident(moveToElemVar)}")
+    uiState.formElements.value.remove(
+      uiState.formElements.value.indexOf(draggedElem))
+
+    uiState.formElements.value.insert(
+      uiState.formElements.value.indexOf(moveToElemVar) + 1,
+      draggedElem)
+
+    changeSelectedElement(draggedElem)
+  }
+
+
   def changeActivePropTab(propTabType: PropTabType): Unit = {
     info(s"FormUIStore: changeActivePropTab $propTabType")
     uiState.activePropTab.value = propTabType
+    uiState.activePropElement.value = uiState.selectedElement.value.value
     SemanticUI.initElements()
   }
 
@@ -79,11 +94,13 @@ object FormUIStore extends Logging {
       UIState(
         Vars(defaultElem),
         Var(defaultElem),
-        Var(defaultElem.value.copy()),
+        Var(defaultElem.value),
         Var(PROPERTIES),
       )
     }
   }
+
+  private def ident(uiElemVar: Var[UIFormElem]) = uiElemVar.value.elem.ident
 
 
 }
@@ -102,7 +119,7 @@ object PropertyUIStore extends Logging {
       BaseElement(elementType),
       uiElem.changeEvent
     )
-    uiState.activePropElement.value = newUIElem.copy()
+    uiState.activePropElement.value = newUIElem
     changeSelectedElement(newUIElem)
   }
 
@@ -160,14 +177,14 @@ object PropertyUIStore extends Logging {
 
 
   def addElementEntry(): Unit = {
-    info(s"FormUIStore: addFormElement")
+    info(s"FormUIStore: addElementEntry")
     val entry = ElementEntry()
     val uiElem = uiState.selectedElement.value.value
-    changeSelectedElement(
-      uiElem
-        .modify(_.elem.elemEntries)
-        .setTo(uiElem.elem.elemEntries.map(es => ElementEntries(es.entries :+ entry)))
-    )
+    val newUIElem = uiElem
+      .modify(_.elem.elemEntries)
+      .setTo(uiElem.elem.elemEntries.map(es => ElementEntries(es.entries :+ entry)))
+    changeSelectedElement(newUIElem)
+    uiState.activePropElement.value = newUIElem
   }
 
   def changeEntry(language: Language, pos: Int)(text: String): Unit = {

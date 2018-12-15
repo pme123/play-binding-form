@@ -156,7 +156,7 @@ object CheckboxDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
-    val typeClass = uiFormElem.elem.extras(CHECKBOX_TYPE).value.map(_.toLowerCase).getOrElse("")
+    val typeClass = uiFormElem.elem.extras.get(CHECKBOX_TYPE).flatMap(_.value).map(_.toLowerCase).getOrElse("")
     val checkedClass = if (elem.value.contains("true")) "checked" else ""
     val checked = elem.value.contains("true")
     val texts = elem.texts.get
