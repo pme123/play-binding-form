@@ -284,7 +284,7 @@ case object EntriesTab {
         TEXTFIELD,
         Some(ElementTexts.label(lang.i18nKey)),
         value = Some(text)),
-        Some(UIPropertyStore.changeEntry(lang, ident) _)
+        Some(UIPropertyStore.changeEntryText(lang, ident) _)
       )
     ).bind}
     </div>

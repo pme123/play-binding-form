@@ -24,7 +24,6 @@ object UIPropertyStore extends Logging {
     )
   }
 
-
   def changeIdent(ident: String): Unit = {
     info(s"PropertyUIStore: changeIdent $ident")
     val uiElem = uiState.selectedElement.value.value
@@ -80,7 +79,7 @@ object UIPropertyStore extends Logging {
     )
   }
 
-  def changeEntry(language: Language, ident: String)(text: String): Unit = {
+  def changeEntryText(language: Language, ident: String)(text: String): Unit = {
     info(s"PropertyUIStore: changeEntry $language $ident $text")
     val uiElem = uiState.selectedElement.value.value
     changeUIFormElem(
@@ -121,7 +120,7 @@ object UIPropertyStore extends Logging {
   }
 
   def deleteEntry(entry: ElementEntry): Unit = {
-    info(s"PropertyUIStore: deleteEntry ${entry.key}")
+    info(s"PropertyUIStore: deleteEntry ${entry.ident}")
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
       uiElem
@@ -131,17 +130,16 @@ object UIPropertyStore extends Logging {
   }
 
   def copyEntry(entry: ElementEntry): Unit = {
-    info(s"PropertyUIStore: copyEntry ${entry.key}")
+    info(s"PropertyUIStore: copyEntry ${entry.ident}")
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
       uiElem
         .modify(_.elem.elemEntries.each.entries)
         .setTo {
-          val entries = uiElem.elem.elemEntries.get.entries
-          entries
+          uiElem.elem.elemEntries.get.entries
             .foldLeft(Seq.empty[ElementEntry])((a, b) =>
-              if (b == entry)
-                a :+ b :+ b.copy()
+              if (b.ident == entry.ident)
+                a :+ b :+ b.copy(ident = ElementEntry.ident)
               else
                 a :+ b
             )
@@ -150,21 +148,18 @@ object UIPropertyStore extends Logging {
   }
 
   def moveEntry(draggedEntry: ElementEntry, moveToEntry: ElementEntry): Unit = {
-    info(s"PropertyUIStore: moveEntry ${draggedEntry.key}")
+    info(s"PropertyUIStore: moveEntry ${draggedEntry.ident}")
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
-      if (draggedEntry == moveToEntry)
-        uiElem
-      else
         uiElem
           .modify(_.elem.elemEntries.each.entries)
           .setTo {
             val entries = uiElem.elem.elemEntries.get.entries
             entries
               .foldLeft(Seq.empty[ElementEntry])((a, b) =>
-                if (b == moveToEntry)
+                if (b.ident == moveToEntry.ident)
                   a :+ b :+ draggedEntry
-                else if (b == draggedEntry)
+                else if (b.ident == draggedEntry.ident)
                   a
                 else
                   a :+ b
