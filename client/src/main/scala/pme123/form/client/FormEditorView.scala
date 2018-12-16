@@ -65,17 +65,14 @@ private[client] object FormEditorView
 
   @dom
   private def element(uiElemVar: Var[UIFormElem]): Binding[HTMLElement] = {
-
     val uiElem = uiElemVar.bind
-    val uiSelElem = PropertyUIStore.uiState.selectedElement.bind
+    val dragDrop = DragDrop(uiElemVar)
     <div class={s"${uiElem.wideClass} wide column"}
          ondrop={ev: DragEvent =>
-           DragDrop.drop(uiElemVar)(ev)}
+           dragDrop.drop(uiElemVar)(ev)}
          ondragover={ev: DragEvent =>
-           DragDrop.allowDrop(ev)}>
-      <div class={s"ui ${selectedClass(uiElem, uiSelElem.value)} card"}
-           ondragstart={_: DragEvent =>
-             DragDrop.drag(uiElemVar)}
+           dragDrop.allowDrop(ev)}>
+      <div class={s"ui ${selectedClass(uiElem, uiElem)} card"}
            draggable="true">
         {BaseElementDiv(uiElem).bind}<div class="extra content">
         <div class="right floated">
