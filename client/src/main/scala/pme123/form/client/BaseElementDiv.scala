@@ -96,7 +96,7 @@ object DropdownDiv extends BaseElementDiv {
 
   @dom
   private def elementEntry(entry: ElementEntry, language: Language): Binding[HTMLElement] = {
-    <div class="item" data:data-value={entry.ident}>
+    <div class="item" data:data-value={entry.key}>
       {entry.label.textFor(language)}
     </div>
   }

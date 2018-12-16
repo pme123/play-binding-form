@@ -34,7 +34,7 @@ private[client] object PropertyMenu
 
   @dom
   private lazy val menu: Binding[HTMLElement] = {
-    val selElemV = FormUIStore.uiState.activePropElement.bind
+    val selElemV = UIFormStore.uiState.activePropElement.bind
     val selElem = selElemV
     <div class="ui top attached tabular menu">
       {Constants(
@@ -50,10 +50,10 @@ private[client] object PropertyMenu
   @dom
   private def menuItem(propTabType: PropTabType): Binding[HTMLElement] = {
     val activeLang = UIStore.activeLanguage.bind
-    val activeType = FormUIStore.uiState.activePropTab.bind
+    val activeType = UIFormStore.uiState.activePropTab.bind
     <a class={s"${activePropTab(propTabType, activeType)} item"}
        onclick={_: Event =>
-         FormUIStore.changeActivePropTab(propTabType)}>
+         UIFormStore.changeActivePropTab(propTabType)}>
       {Messages(activeLang.entryName, propTabType.i18nKey)}
     </a>
   }

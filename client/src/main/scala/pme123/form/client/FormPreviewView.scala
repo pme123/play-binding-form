@@ -33,7 +33,7 @@ private[client] object FormPreviewView
   @dom
   private lazy val previewContent: Binding[HTMLElement] =
     <div class="ui grid">
-      {for (elem <- FormUIStore.uiState.formElements) yield element(elem).bind}
+      {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind}
     </div>
 
   @dom

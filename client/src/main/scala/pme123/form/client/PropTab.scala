@@ -3,7 +3,7 @@ package pme123.form.client
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.{Event, HTMLElement}
+import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{DROPDOWN, TEXTFIELD}
 import pme123.form.shared.PropTabType.{ENTRIES, PROPERTIES, TEXTS}
@@ -16,7 +16,7 @@ object PropTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val activeTab = FormUIStore.uiState.activePropTab.bind
+    val activeTab = UIFormStore.uiState.activePropTab.bind
     <div class="ui bottom attached segment card">
       {activeTab match {
       case PROPERTIES =>
@@ -47,7 +47,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val defaultValueInput: Binding[HTMLElement] = {
-    val selElem = FormUIStore.uiState.activePropElement.bind
+    val selElem = UIFormStore.uiState.activePropElement.bind
 
     if (selElem.isEditable)
       <div class="field">
@@ -60,7 +60,7 @@ case object PropertiesTab {
             ElementText(PLACEHOLDER, Map(DE -> "Standart Wert", EN -> "Default Value")),
             ElementText(TOOLTIP, Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start."))
           ))),
-          Some(PropertyUIStore.changeDefaultValue _)
+          Some(UIPropertyStore.changeDefaultValue _)
         )
       ).bind}
       </div>
@@ -70,7 +70,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementTypeSelect: Binding[HTMLElement] = {
-    val uiElem = FormUIStore.uiState.activePropElement.bind
+    val uiElem = UIFormStore.uiState.activePropElement.bind
     val elementType = uiElem.elem.elementType
     <div class="field">
       {BaseElementDiv(
@@ -88,7 +88,7 @@ case object PropertiesTab {
         value = Some(elementType.entryName)
       ),
 
-        Some(PropertyUIStore.changeElementType _)
+        Some(UIPropertyStore.changeElementType _)
       )
     ).bind}
     </div>
@@ -96,7 +96,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val layoutWideSelect: Binding[HTMLElement] = {
-    val uiElem = FormUIStore.uiState.activePropElement.bind
+    val uiElem = UIFormStore.uiState.activePropElement.bind
     val layoutWide = uiElem.elem.layoutWide
     <div class="field">
       {BaseElementDiv(
@@ -114,7 +114,7 @@ case object PropertiesTab {
         value = Some(layoutWide.entryName)
       ),
 
-        Some(PropertyUIStore.changeLayoutWide _)
+        Some(UIPropertyStore.changeLayoutWide _)
       )
     ).bind}
     </div>
@@ -122,7 +122,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementExtras: Binding[HTMLElement] = {
-    val elem = FormUIStore.uiState.activePropElement.bind
+    val elem = UIFormStore.uiState.activePropElement.bind
     val extras = elem.extras
 
     <div>
@@ -132,7 +132,7 @@ case object PropertiesTab {
           .map { case (ep, uie) =>
             BaseElementDiv(
               uie.modify(_.changeEvent)
-                .setTo(Some(PropertyUIStore.changeExtraProp(ep))))
+                .setTo(Some(UIPropertyStore.changeExtraProp(ep))))
           }.toSeq: _*)
         .map(_.bind)}
     </div>
@@ -144,7 +144,7 @@ case object TextsTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = FormUIStore.uiState.activePropElement.bind
+    val uiFormElem = UIFormStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasTexts)
       <div class="content">
         {//
@@ -185,7 +185,7 @@ case object TextsTab {
         TEXTFIELD,
         Some(ElementTexts.label(lang.i18nKey)),
         value = Some(text)),
-        Some(PropertyUIStore.changeText(lang, textType) _)
+        Some(UIPropertyStore.changeText(lang, textType) _)
       )
     ).bind}
     </div>
@@ -197,60 +197,94 @@ case object EntriesTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = FormUIStore.uiState.activePropElement.bind
+    val uiFormElem = UIFormStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasEntries) {
       val entries = uiFormElem.elem.elemEntries.get.entries
       <div class="content">
 
-        {Constants(entries.zipWithIndex.map(e => entry(e._2, e._1)) :+ head: _*).map(_.bind)}
+        {Constants(Seq(head) ++ entries.map(elementEntry): _*).map(_.bind)}
       </div>
     } else <span></span>
   }
 
   @dom
   private def head: Binding[HTMLElement] =
-    <div class="">
-      <br/>
-      <div class="right floated author">
-
-        <button class="floated right mini ui circular blue icon button"
+    <div class="ui borderless menu">
+      <div class="ui right item">
+        <button class="mini ui circular blue icon button"
                 data:data-tooltip="Add Element Entry"
                 onclick={_: Event =>
-                  PropertyUIStore.addElementEntry()}>
+                  UIPropertyStore.addEntry()}>
           <i class="add icon"></i>
         </button>
       </div>
     </div>
 
   @dom
-  private def entry(pos: Int, elementEntry: ElementEntry): Binding[HTMLElement] = {
-    <div class="field">
+  private def elementEntry(elementEntry: ElementEntry): Binding[HTMLElement] = {
+    <div class={s"ui card"}
+         draggable="true"
+         ondragstart={_: DragEvent =>
+           ElemEntryDragDrop.drag(elementEntry)}
+         ondrop={ev: DragEvent =>
+           ElemEntryDragDrop.drop(elementEntry)(ev)}
+         ondragover={ev: DragEvent =>
+           ElemEntryDragDrop.allowDrop(elementEntry)(ev)}>
+      {entry(elementEntry).bind}<div class="extra content">
+      <div class="right floated">
+
+        <button class="mini ui circular grey icon button"
+                data:data-tooltip="Copy Element Entry"
+                onclick={_: Event =>
+                  UIPropertyStore.copyEntry(elementEntry)}>
+          <i class="copy icon"></i>
+        </button>
+        <button class="mini ui circular grey icon button"
+                data:data-tooltip="Move Element Entry (use drag'n'drop)">
+          <i class="hand spock icon"></i>
+        </button>
+        <button class="mini ui circular red icon button"
+                data:data-tooltip="Delete Element Entry"
+                onclick={_: Event =>
+                  UIPropertyStore.deleteEntry(elementEntry)}>
+          <i class="trash icon"></i>
+        </button>
+      </div>
+    </div>
+    </div>
+  }
+
+
+  @dom
+  private def entry(elementEntry: ElementEntry): Binding[HTMLElement] = {
+    val ident = elementEntry.ident
+    <div class="content">
       <p>
         &nbsp;
       </p>{BaseElementDiv(
       UIFormElem(BaseElement(
-        s"field_ident_$pos",
+        s"field_ident_$ident",
         TEXTFIELD,
         Some(ElementTexts.placeholder("props.ident")),
-        value = Some(elementEntry.ident)),
-        Some(PropertyUIStore.changeEntryIdent(pos) _)
+        value = Some(elementEntry.key)),
+        Some(UIPropertyStore.changeEntryKey(ident) _)
       )
     ).bind}<p>
       &nbsp;
-    </p>{Constants(elementEntry.label.texts.map(t => entryForLang(pos, t._1, t._2)).toSeq: _*).map(_.bind)}
+    </p>{Constants(elementEntry.label.texts.map(t => entryForLang(ident, t._1, t._2)).toSeq: _*).map(_.bind)}
     </div>
   }
 
   @dom
-  private def entryForLang(pos: Int, lang: Language, text: String): Binding[HTMLElement] =
+  private def entryForLang(ident: String, lang: Language, text: String): Binding[HTMLElement] =
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
-        s"${lang.abbreviation}-$pos",
+        s"${lang.abbreviation}-$ident",
         TEXTFIELD,
         Some(ElementTexts.label(lang.i18nKey)),
         value = Some(text)),
-        Some(PropertyUIStore.changeEntry(lang, pos) _)
+        Some(UIPropertyStore.changeEntry(lang, ident) _)
       )
     ).bind}
     </div>

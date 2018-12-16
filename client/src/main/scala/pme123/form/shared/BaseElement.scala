@@ -78,10 +78,13 @@ object BaseElement {
 
 case class ElementEntries(entries: Seq[ElementEntry] = Nil)
 
-case class ElementEntry(ident: String, label: ElementText)
+case class ElementEntry(key: String, label: ElementText) {
+  val ident = s"ENTRY-${Random.nextInt(10000)}"
+
+}
 
 object ElementEntry {
-  def apply()(implicit supportedLangs: Seq[Language]): ElementEntry = new
+  def apply()(implicit supportedLangs: Seq[Language]): ElementEntry =
       ElementEntry("", ElementText.emptyLabel)
 }
 
