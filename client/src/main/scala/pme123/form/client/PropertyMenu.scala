@@ -5,7 +5,7 @@ import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client.services.{ClientUtils, Messages, UIStore}
 import pme123.form.shared.PropTabType
-import pme123.form.shared.PropTabType.{ENTRIES, TEXTS}
+import pme123.form.shared.PropTabType.{ENTRIES, TEXTS, VALIDATIONS}
 
 private[client] object PropertyMenu
   extends ClientUtils {
@@ -41,6 +41,7 @@ private[client] object PropertyMenu
       PropTabType.values
         .filterNot(p => p == ENTRIES && !selElem.elem.hasEntries)
         .filterNot(p => p == TEXTS && !selElem.elem.hasTexts)
+        .filterNot(p => p == VALIDATIONS && !selElem.elem.hasValidations)
         .map(menuItem): _*)
       .map(_.bind)}
     </div>

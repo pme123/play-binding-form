@@ -191,4 +191,27 @@ object UIPropertyStore extends Logging {
     ))
   }
 
+
+  def changeValidationEnabled(vRule: ValidationRule)(enabled: String): Unit = {
+    info(s"PropertyUIStore: changeValidationEnabled $vRule $enabled")
+    val uiElem = uiState.selectedElement.value.value
+    val newElem =
+      uiElem.elem.modify(_.validations.each.rules)
+        .setTo {
+          val entries = uiElem.elem.validations.get.rules
+          entries
+            .foldLeft(Seq.empty[ValidationRule])((a, b) =>
+              if (b == vRule)
+                a :+ b.copy(enabled = enabled.toBoolean)
+              else
+                a :+ b
+            )
+        }
+    changeUIFormElem(UIFormElem(
+      newElem,
+      uiElem.changeEvent
+    ))
+  }
+
+
 }

@@ -23,6 +23,8 @@ object PropTabType
 
   case object ENTRIES extends PropTabType
 
+  case object VALIDATIONS extends PropTabType
+
 }
 
 

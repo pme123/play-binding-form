@@ -4,9 +4,10 @@ import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
+import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
-import pme123.form.shared.ElementType.{DROPDOWN, TEXTFIELD}
-import pme123.form.shared.PropTabType.{ENTRIES, PROPERTIES, TEXTS}
+import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
+import pme123.form.shared.PropTabType._
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared._
 import pme123.form.shared.services.Language
@@ -25,6 +26,8 @@ object PropTab {
         TextsTab.create.bind
       case ENTRIES =>
         EntriesTab.create.bind
+      case VALIDATIONS =>
+        ValidationsTab.create.bind
 
     }}
     </div>
@@ -83,7 +86,7 @@ case object PropertiesTab {
           ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element."))
         )),
         elemEntries = Some(ElementEntries(
-          ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(et.i18nKey)))
+          ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
         )),
         value = Some(elementType.entryName)
       ),
@@ -109,7 +112,7 @@ case object PropertiesTab {
           ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen)."))
         )),
         elemEntries = Some(ElementEntries(
-          LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(lw.i18nKey)))
+          LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(I18n(lw.i18nKey))))
         )),
         value = Some(layoutWide.entryName)
       ),
@@ -183,7 +186,7 @@ case object TextsTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$textType",
         TEXTFIELD,
-        Some(ElementTexts.label(lang.i18nKey)),
+        Some(ElementTexts.label(I18n(lang.i18nKey))),
         value = Some(text)),
         Some(UIPropertyStore.changeText(lang, textType) _)
       )
@@ -254,7 +257,6 @@ case object EntriesTab {
     </div>
   }
 
-
   @dom
   private def entry(elementEntry: ElementEntry): Binding[HTMLElement] = {
     val ident = elementEntry.ident
@@ -265,7 +267,7 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"field_ident_$ident",
         TEXTFIELD,
-        Some(ElementTexts.placeholder("props.ident")),
+        Some(ElementTexts.placeholder(I18n("props.ident"))),
         value = Some(elementEntry.key)),
         Some(UIPropertyStore.changeEntryKey(ident) _)
       )
@@ -282,7 +284,7 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$ident",
         TEXTFIELD,
-        Some(ElementTexts.label(lang.i18nKey)),
+        Some(ElementTexts.label(I18n(lang.i18nKey))),
         value = Some(text)),
         Some(UIPropertyStore.changeEntryText(lang, ident) _)
       )
@@ -290,4 +292,36 @@ case object EntriesTab {
     </div>
 }
 
+case object ValidationsTab {
+
+  @dom
+  lazy val create: Binding[HTMLElement] = {
+    val uiFormElem = UIFormStore.uiState.activePropElement.bind
+    if (uiFormElem.elem.hasValidations) {
+      val validations = uiFormElem.elem.validations.toSeq.flatMap(_.rules)
+      println(s"validations: $validations")
+      <div class="content">
+
+        {Constants(validations.map(validationRule): _*).map(_.bind)}
+      </div>
+    } else <span></span>
+  }
+
+  @dom
+  private def validationRule(vRule: ValidationRule): Binding[HTMLElement] =
+    {
+      println(s"vRule: $vRule")
+      <div class="field">
+        {BaseElementDiv(
+        UIFormElem(BaseElement(
+          s"enable-${vRule.validationType}",
+          CHECKBOX,
+          Some(ElementTexts.label(I18n(vRule.validationType.i18nKey))),
+          value = Some(vRule.enabled.toString)),
+          Some(UIPropertyStore.changeValidationEnabled(vRule) _)
+        )
+      ).bind}
+      </div>
+    }
+}
 

@@ -2,7 +2,10 @@ package pme123.form.client
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
+import org.scalajs.dom.Event
 import org.scalajs.dom.raw.HTMLElement
+import pme123.form.client.services.{I18n, SemanticUI, UIStore}
+import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
 
 import scala.util.matching.Regex
 
@@ -20,21 +23,27 @@ private[client] object FormPreviewView
   @dom
   def create(): Binding[HTMLElement] =
     <div class="ui container">
-      <div class="ui form">
+      {<div class="ui form"
+            onsubmit={_: Event =>
+              println("SUBMITTED")}>
       {//
-      previewContent.bind}
-      </div>
-    </div>
+      previewContent.bind}{//
+      initFields.bind //
+      }<div class="ui error message"></div>
+    </div>}
 
+    </div>
 
   // 2. level of abstraction
   // **************************
-
   @dom
   private lazy val previewContent: Binding[HTMLElement] =
-    <div class="ui grid">
-      {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind}
-    </div>
+  <div class="ui grid">
+    {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind}<div class="sixteen wide column">
+    <div class="ui floated right submit button">Submit</div>
+    <div class="show-valid">is valid</div>
+  </div>
+  </div>
 
   @dom
   private def element(uiElemVar: Var[UIFormElem]): Binding[HTMLElement] = {
@@ -42,6 +51,26 @@ private[client] object FormPreviewView
     <div class={s"${uiElem.wideClass} wide column"}>
       {BaseElementDiv(uiElem).bind}
     </div>
+  }
+
+  @dom
+  private lazy val initFields = {
+    UIRoute.route.state.bind
+    val activeLang = UIStore.uiState.activeLanguage.bind
+    val fields = UIFormStore.uiState.formElements.value
+      .map { eV =>
+        val elem = eV.value.elem
+        elem.ident -> SemanticField(elem.ident,
+          elem.validations.toSeq
+            .flatMap(_.rules)
+            .filter(_.enabled)
+            .map(v =>
+              SemanticRule(v.semanticType, I18n(activeLang, v.validationType.i18nKey))
+            )
+        )
+      }.toMap
+    SemanticUI.initForm(SemanticForm(fields = fields))
+      <span/>
   }
 
 }

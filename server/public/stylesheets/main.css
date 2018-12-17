@@ -67,3 +67,11 @@
 .dropdown.icon.button {
     background-color: white !important;
 }
+
+.ui.form .show-valid {
+    display: none;
+}
+
+.ui.form.success .show-valid {
+    display: block;
+}

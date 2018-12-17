@@ -1,10 +1,12 @@
 package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
+import pme123.form.client.services.I18n
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.TextType.{LABEL, TOOLTIP}
+import pme123.form.shared.ValidationType.EMPTY
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
 
@@ -17,12 +19,14 @@ case class BaseElement(ident: String,
                        extras: Map[ExtraProp, BaseElement] = Map.empty,
                        value: Option[String] = Some(""),
                        layoutWide: LayoutWide = EIGHT,
-                       elemEntries: Option[ElementEntries] = None
+                       elemEntries: Option[ElementEntries] = None,
+                       validations: Option[Validations] = None,
                       ) {
 
   val hasTexts: Boolean = texts.nonEmpty
   val hasExtras: Boolean = extras.nonEmpty
   val hasEntries: Boolean = elemEntries.nonEmpty
+  val hasValidations: Boolean = validations.nonEmpty
 
 }
 
@@ -43,7 +47,8 @@ object BaseElement {
       texts,
       extras(elementType),
       elementType.defaultValue,
-      elemEntries = entries(elementType)
+      elemEntries = entries(elementType),
+      validations = validations(elementType),
     )
   }
 
@@ -69,9 +74,17 @@ object BaseElement {
     }
   }
 
+  def validations(elementType: ElementType): Option[Validations] = {
+    elementType match {
+      case TEXTFIELD =>
+        Some(Validations(Seq(ValidationRule(EMPTY))))
+      case _ => None
+    }
+  }
+
   def enumEntries(enums: Seq[I18nEnum])(implicit supportedLangs: Seq[Language]): Some[ElementEntries] = {
     Some(ElementEntries(
-      enums.map(enum => ElementEntry(enum.entryName, ElementText.label(enum.i18nKey)))
+      enums.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
     ))
   }
 }

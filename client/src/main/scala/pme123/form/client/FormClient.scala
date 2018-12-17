@@ -4,7 +4,8 @@ import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
-import pme123.form.client.services.{SPAClient, SemanticUI}
+import pme123.form.client.services.{I18n, SPAClient, SemanticUI, UIStore}
+import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
 
 import scala.language.implicitConversions
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -21,7 +22,7 @@ object FormClient
   @JSExportTopLevel("client.FormClient.main")
   def main(context: String) {
     initClient(context)
-    dom.render(document.body, render)
+    dom.render(document.getElementById("clientDiv"), render)
     SemanticUI.initElements()
   }
 

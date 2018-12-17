@@ -109,14 +109,14 @@ object TextFieldDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
-    val texts = elem.texts.get
+    val texts = elem.texts
     <div class="field">
-      {label(texts, activeLanguage).bind //
+      {if (texts.nonEmpty) label(texts.get, activeLanguage).bind else <span/> //
       }<div class="ui input">
       <input id={elem.ident}
              name={elem.ident}
              type="text"
-             placeholder={texts.placeholder.textFor(activeLanguage)}
+             placeholder={texts.map(_.placeholder.textFor(activeLanguage)).getOrElse("")}
              value={elem.value.get}
              onblur={_: Event =>
                changeEvent(uiFormElem)}/>
@@ -159,7 +159,7 @@ object CheckboxDiv extends BaseElementDiv {
     val typeClass = uiFormElem.elem.extras.get(CHECKBOX_TYPE).flatMap(_.value).map(_.toLowerCase).getOrElse("")
     val checkedClass = if (elem.value.contains("true")) "checked" else ""
     val checked = elem.value.contains("true")
-    val texts = elem.texts.get
+    val texts = elem.texts
     <div class="inline field">
       <div class={s"ui $typeClass checkbox $checkedClass"}>
         <input id={elem.ident}
@@ -172,7 +172,10 @@ object CheckboxDiv extends BaseElementDiv {
                  uiFormElem.changeEvent
                    .foreach(ce =>
                      ce(newText))}/>{//
-        label(texts, activeLanguage).bind //
+        if (texts.nonEmpty)
+          label(texts.get, activeLanguage).bind
+        else
+            <span/> //
         }
       </div>
     </div>

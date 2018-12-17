@@ -39,8 +39,42 @@
         <script src=@(s"${pageConfig.context}/assets/${pageConfig.projectName}-client-${if(pageConfig.isDevMode) "fast" else ""}opt.js") ></script>
     </head>
     <body>
+        <div id="clientDiv"></div>
             <!-- calls to the Client code-->
         <script>client.FormClient.main("@pageConfig.context");</script>
-
+<script>$('.ui.formxxxx')
+        .form({
+            on: 'blur',
+            fields: {
+                empty: {
+                    identifier  : 'empty',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'Please enter a value'
+                        }
+                    ]
+                },
+                dropdown: {
+                    identifier  : 'dropdown',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'Please select a dropdown value'
+                        }
+                    ]
+                },
+                checkbox: {
+                    identifier  : 'checkbox',
+                    rules: [
+                        {
+                            type   : 'checked',
+                            prompt : 'Please check the checkbox'
+                        }
+                    ]
+                }
+            }
+        })
+;</script>
     </body>
 </html>

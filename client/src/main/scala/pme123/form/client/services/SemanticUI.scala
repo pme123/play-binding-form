@@ -1,9 +1,12 @@
 package pme123.form.client.services
 
 import org.scalajs.jquery.{JQuery, jQuery}
+import play.api.libs.json.{JsObject, Json}
+import pme123.form.shared.SemanticForm
 
 import scala.language.implicitConversions
 import scala.scalajs.js
+import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.ScalaJSDefined
 import scala.scalajs.js.timers.setTimeout
 
@@ -32,35 +35,22 @@ object SemanticUI {
   // Monkey patching JQuery with implicit conversion
   implicit def jq2semantic(jq: JQuery): SemanticJQuery = jq.asInstanceOf[SemanticJQuery]
 
-  @ScalaJSDefined
-  trait Form extends js.Object {
-    def fields: js.Object
-  }
-
-  @ScalaJSDefined
-  trait Field extends js.Object {
-    def identifier: String
-
-    def rules: js.Array[Rule]
-  }
-
-  @ScalaJSDefined
-  trait Rule extends js.Object {
-    def `type`: String
-
-    def prompt: js.UndefOr[String] = js.undefined
-  }
-
   def initElements(): Unit ={
     setTimeout(100) {
       jQuery(".ui.dropdown").dropdown(js.Dynamic.literal(on = "hover"))
       jQuery(".ui.clearable.dropdown")
         .dropdown(
           js.Dynamic.literal(on = "hover",
-          clearable = true)
-      )
+            clearable = true)
+        )
       jQuery(".ui.checkbox").checkbox()
       jQuery(".ui.tooltip").popup()
+    }
+  }
+
+  def initForm(form: SemanticForm): Unit ={
+    setTimeout(100) {
+      jQuery(".ui.form").form(JSON.parse(Json.toJson(form).toString()))
     }
   }
 

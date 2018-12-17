@@ -1,6 +1,5 @@
 package pme123.form.shared
 
-import pme123.form.client.services.Messages
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared.services.Language
 
@@ -19,17 +18,18 @@ object ElementTexts {
     )
   }
 
-  def label(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
+  def label(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
-      ElementText.label(labelI18NKey),
+      ElementText.label(texts),
       ElementText.emptyPlaceholder,
       ElementText.emptyTooltip
     )
   }
-  def placeholder(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
+
+  def placeholder(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
       ElementText.emptyLabel,
-      ElementText.placeholder(labelI18NKey),
+      ElementText(PLACEHOLDER, texts),
       ElementText.emptyTooltip
     )
   }
@@ -47,18 +47,8 @@ case class ElementText(textType: TextType, texts: Map[Language, String]) {
 
 object ElementText {
 
-  private def texts(labelI18NKey: String)(implicit supportedLangs: Seq[Language]) =
-    supportedLangs.map(l => l -> Messages(l.abbreviation, labelI18NKey)).toMap
-
-  def label(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementText = {
-
-    ElementText(LABEL, texts(labelI18NKey))
-  }
-
-  def placeholder(labelI18NKey: String)(implicit supportedLangs: Seq[Language]): ElementText = {
-
-    ElementText(PLACEHOLDER, texts(labelI18NKey))
-  }
+  def label(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementText =
+    ElementText(LABEL, texts)
 
   def emptyLabel(implicit supportedLangs: Seq[Language]): ElementText = {
     ElementText(LABEL, empty)
