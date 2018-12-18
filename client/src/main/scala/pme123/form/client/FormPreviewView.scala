@@ -23,9 +23,7 @@ private[client] object FormPreviewView
   @dom
   def create(): Binding[HTMLElement] =
     <div class="ui container">
-      {<div class="ui form"
-            onsubmit={_: Event =>
-              println("SUBMITTED")}>
+      {<div class="ui form">
       {//
       previewContent.bind}{//
       initFields.bind //
@@ -39,9 +37,20 @@ private[client] object FormPreviewView
   @dom
   private lazy val previewContent: Binding[HTMLElement] =
   <div class="ui grid">
-    {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind}<div class="sixteen wide column">
-    <div class="ui floated right submit button">Submit</div>
-    <div class="show-valid">is valid</div>
+    {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind //
+    }
+    <div class="sixteen wide column">
+      <div class="ui divider"></div>
+    <div class="items">
+      <div class="item">
+        <div class="extra">
+          <div class="ui right floated submit button">Submit</div>
+          <div class="show-valid">
+            <i class="big green check icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   </div>
 

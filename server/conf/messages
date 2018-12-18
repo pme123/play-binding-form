@@ -32,5 +32,6 @@ enum.size-type.huge=Huge
 enum.size-type.medium=Medium
 enum.size-type.small=Small
 enum.size-type.tiny=Tiny
-enum.validation-type.empty=Required
+enum.validation-type.email=Please enter a valid e-mail
+enum.validation-type.empty=This Field is required.
 props.ident=Key (Identifier)

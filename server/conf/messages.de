@@ -32,5 +32,6 @@ enum.size-type.huge=Sehr Gross
 enum.size-type.medium=Mittel Gross
 enum.size-type.small=Klein
 enum.size-type.tiny=Sehr Klein
-enum.validation-type.empty=Obligatorisch
+enum.validation-type.email=Ihre Email Adresse ist ungültig
+enum.validation-type.empty=Dieses Feld ist obligatorisch.
 props.ident=Schlüssel (Identität)

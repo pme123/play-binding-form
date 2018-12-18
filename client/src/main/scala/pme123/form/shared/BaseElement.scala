@@ -6,7 +6,7 @@ import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.TextType.{LABEL, TOOLTIP}
-import pme123.form.shared.ValidationType.EMPTY
+import pme123.form.shared.ValidationType.{EMAIL, EMPTY}
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
 
@@ -77,7 +77,7 @@ object BaseElement {
   def validations(elementType: ElementType): Option[Validations] = {
     elementType match {
       case TEXTFIELD =>
-        Some(Validations(Seq(ValidationRule(EMPTY))))
+        Some(Validations(Seq(ValidationRule(EMPTY),ValidationRule(EMAIL))))
       case _ => None
     }
   }

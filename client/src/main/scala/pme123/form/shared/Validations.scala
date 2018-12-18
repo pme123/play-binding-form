@@ -29,6 +29,7 @@ object ValidationType
   val values: IndexedSeq[ValidationType] = findValues
 
   case object EMPTY extends ValidationType
+  case object EMAIL extends ValidationType
 
 
 }
