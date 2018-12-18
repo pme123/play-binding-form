@@ -6,7 +6,7 @@ import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.TextType.{LABEL, TOOLTIP}
-import pme123.form.shared.ValidationType.{EMAIL, EMPTY}
+import pme123.form.shared.ValidationType.{EMAIL, INTEGER}
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
 
@@ -18,6 +18,7 @@ case class BaseElement(ident: String,
                        texts: Option[ElementTexts],
                        extras: Map[ExtraProp, BaseElement] = Map.empty,
                        value: Option[String] = Some(""),
+                       required: Boolean = false,
                        layoutWide: LayoutWide = EIGHT,
                        elemEntries: Option[ElementEntries] = None,
                        validations: Option[Validations] = None,
@@ -77,7 +78,7 @@ object BaseElement {
   def validations(elementType: ElementType): Option[Validations] = {
     elementType match {
       case TEXTFIELD =>
-        Some(Validations(Seq(ValidationRule(EMPTY),ValidationRule(EMAIL))))
+        Some(Validations(Seq(ValidationRule(EMAIL), ValidationRule(INTEGER, params = List("0", "100")))))
       case _ => None
     }
   }
@@ -100,7 +101,7 @@ object ElementEntry {
   def ident = s"ENTRY-${Random.nextInt(10000)}"
 
   def apply()(implicit supportedLangs: Seq[Language]): ElementEntry =
-      ElementEntry("", ElementText.emptyLabel)
+    ElementEntry("", ElementText.emptyLabel)
 }
 
 object DropdownElem {

@@ -12,7 +12,12 @@ import scala.language.implicitConversions
 
 object UIFormStore extends Logging {
 
+
   val uiState = UIState()
+
+  def changePage(): Unit = {
+    uiState.activePropElement.value = uiState.selectedElement.value.value
+  }
 
   def addFormElement(): Var[UIFormElem] = {
     info(s"FormUIStore: addFormElement")

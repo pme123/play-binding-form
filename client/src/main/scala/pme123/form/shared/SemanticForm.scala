@@ -13,7 +13,7 @@ object SemanticForm {
 }
 
 
-case class SemanticField(identifier: FieldIdent, rules: Seq[SemanticRule])
+case class SemanticField(identifier: FieldIdent, optional: Boolean, rules: Seq[SemanticRule])
 
 object SemanticField {
   type FieldIdent = String

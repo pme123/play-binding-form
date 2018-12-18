@@ -51,6 +51,15 @@ object UIPropertyStore extends Logging {
     )
   }
 
+  def changeRequired(required: String): Unit = {
+    info(s"PropertyUIStore: changeRequired $required")
+    val uiElem = uiState.selectedElement.value.value
+    changeUIFormElem(
+      uiElem.modify(_.elem.required)
+        .setTo(required.toBoolean)
+    )
+  }
+
   def changeText(language: Language, textType: TextType)(text: String): Unit = {
     info(s"PropertyUIStore: changeText $language $textType $text")
     val uiElem = uiState.selectedElement.value.value
@@ -201,12 +210,13 @@ object UIPropertyStore extends Logging {
           val entries = uiElem.elem.validations.get.rules
           entries
             .foldLeft(Seq.empty[ValidationRule])((a, b) =>
-              if (b == vRule)
+              if (b.validationType == vRule.validationType)
                 a :+ b.copy(enabled = enabled.toBoolean)
               else
                 a :+ b
             )
         }
+    println(s"NEWELEM: $newElem")
     changeUIFormElem(UIFormElem(
       newElem,
       uiElem.changeEvent

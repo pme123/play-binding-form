@@ -2,6 +2,7 @@ package pme123.form.client
 
 import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
+import javax.swing.plaf.FontUIResource
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
 import pme123.form.client.services.{I18n, SPAClient, SemanticUI, UIStore}
@@ -46,7 +47,9 @@ object FormClient
       {//
       FormHeader.create().bind}<div class="main-content">
       {//
-      mainView.bind.create().bind}
+      val main = mainView.bind
+      UIFormStore.changePage()
+        main.create().bind}
     </div>
     </div>
 

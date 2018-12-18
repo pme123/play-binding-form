@@ -44,6 +44,7 @@ case object PropertiesTab {
       elementTypeSelect.bind}{//
       defaultValueInput.bind}{//
       layoutWideSelect.bind}{//
+      requiredCheckbox.bind}{//
       elementExtras.bind}
     </div>
   }
@@ -118,6 +119,29 @@ case object PropertiesTab {
       ),
 
         Some(UIPropertyStore.changeLayoutWide _)
+      )
+    ).bind}
+    </div>
+  }
+
+  @dom
+  private lazy val requiredCheckbox: Binding[HTMLElement] = {
+    val uiElem = UIFormStore.uiState.activePropElement.bind
+    val required = uiElem.elem.required
+    <div class="field">
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "requiredId",
+        CHECKBOX,
+        Some(ElementTexts(
+          ElementText(LABEL, Map(DE -> "Obligatorisch", EN -> "Required")),
+          ElementText.emptyPlaceholder,
+          ElementText(TOOLTIP, Map(DE -> "Das Feld ist zwingend auszufüllen.", EN -> "The value of the field is required."))
+        )),
+        value = Some(required.toString)
+      ),
+
+        Some(UIPropertyStore.changeRequired _)
       )
     ).bind}
     </div>
@@ -299,7 +323,6 @@ case object ValidationsTab {
     val uiFormElem = UIFormStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasValidations) {
       val validations = uiFormElem.elem.validations.toSeq.flatMap(_.rules)
-      println(s"validations: $validations")
       <div class="content">
 
         {Constants(validations.map(validationRule): _*).map(_.bind)}

@@ -13,10 +13,11 @@ import pme123.form.shared.{ElementEntry, ElementTexts}
 sealed abstract class BaseElementDiv {
 
   @dom
-  protected def label(elementTexts: ElementTexts, activeLanguage: Language): Binding[HTMLElement] = {
+  protected def label(elementTexts: ElementTexts, activeLanguage: Language, required: Boolean): Binding[HTMLElement] = {
+    val requiredStr = if(required) "*" else ""
     if (elementTexts.label.textFor(activeLanguage).nonEmpty)
       <label class="">
-        {elementTexts.label.textFor(activeLanguage)}&nbsp;{//
+        {elementTexts.label.textFor(activeLanguage) + requiredStr}&nbsp;{//
         if (elementTexts.tooltip.textFor(activeLanguage).nonEmpty)
           <i class="question circle icon ui tooltip"
              title={elementTexts.tooltip.textFor(activeLanguage)}></i>
@@ -75,7 +76,7 @@ object DropdownDiv extends BaseElementDiv {
     val clearableClass = if (elem.extras.headOption.map(_._2).flatMap(_.value).contains("true")) "clearable" else ""
     val texts = elem.texts.get
     <div class="field">
-      {label(texts, activeLanguage).bind //
+      {label(texts, activeLanguage, elem.required).bind //
       }<div class={s"ui $clearableClass selection dropdown"}>
       <input id={elem.ident}
              name={elem.ident}
@@ -111,7 +112,7 @@ object TextFieldDiv extends BaseElementDiv {
     val elem = uiFormElem.elem
     val texts = elem.texts
     <div class="field">
-      {if (texts.nonEmpty) label(texts.get, activeLanguage).bind else <span/> //
+      {if (texts.nonEmpty) label(texts.get, activeLanguage, elem.required).bind else <span/> //
       }<div class="ui input">
       <input id={elem.ident}
              name={elem.ident}
@@ -134,7 +135,7 @@ object TextAreaDiv extends BaseElementDiv {
     val elem = uiFormElem.elem
     val texts = elem.texts.get
     <div class="field">
-      {label(texts, activeLanguage).bind //
+      {label(texts, activeLanguage, elem.required).bind //
       }<div class="ui input">
       <textarea id={elem.ident}
                 name={elem.ident}
@@ -173,7 +174,7 @@ object CheckboxDiv extends BaseElementDiv {
                    .foreach(ce =>
                      ce(newText))}/>{//
         if (texts.nonEmpty)
-          label(texts.get, activeLanguage).bind
+          label(texts.get, activeLanguage, elem.required).bind
         else
             <span/> //
         }

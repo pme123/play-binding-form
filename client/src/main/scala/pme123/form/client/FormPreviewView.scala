@@ -2,7 +2,6 @@ package pme123.form.client
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.Event
 import org.scalajs.dom.raw.HTMLElement
 import pme123.form.client.services.{I18n, SemanticUI, UIStore}
 import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
@@ -70,12 +69,13 @@ private[client] object FormPreviewView
       .map { eV =>
         val elem = eV.value.elem
         elem.ident -> SemanticField(elem.ident,
+          !elem.required,
           elem.validations.toSeq
             .flatMap(_.rules)
             .filter(_.enabled)
             .map(v =>
-              SemanticRule(v.semanticType, I18n(activeLang, v.validationType.i18nKey))
-            )
+              SemanticRule(v.semanticType, I18n(activeLang, v.validationType.promptI18nKey, v.params: _*))
+            ) ++ (if(elem.required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
         )
       }.toMap
     SemanticUI.initForm(SemanticForm(fields = fields))
