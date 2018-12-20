@@ -74,7 +74,7 @@ private[client] object FormPreviewView
             .flatMap(_.rules)
             .filter(_.enabled)
             .map(v =>
-              SemanticRule(v.semanticType, I18n(activeLang, v.validationType.promptI18nKey, v.params: _*))
+              SemanticRule(v.semanticType, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))
             ) ++ (if(elem.required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
         )
       }.toMap

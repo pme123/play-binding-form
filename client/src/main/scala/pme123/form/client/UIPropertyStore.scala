@@ -211,17 +211,38 @@ object UIPropertyStore extends Logging {
           entries
             .foldLeft(Seq.empty[ValidationRule])((a, b) =>
               if (b.validationType == vRule.validationType)
-                a :+ b.copy(enabled = enabled.toBoolean)
+                a :+ b.modify(_.enabled).setTo(enabled.toBoolean)
               else
                 a :+ b
             )
         }
-    println(s"NEWELEM: $newElem")
     changeUIFormElem(UIFormElem(
       newElem,
       uiElem.changeEvent
     ))
   }
+
+  def changeValidationRule(vRule: ValidationRule, param: String)(value: String): Unit = {
+    info(s"PropertyUIStore: changeValidationRule $vRule $param")
+    val uiElem = uiState.selectedElement.value.value
+    val newElem =
+      uiElem.elem.modify(_.validations.each.rules)
+        .setTo {
+          val entries = uiElem.elem.validations.get.rules
+          entries
+            .foldLeft(Seq.empty[ValidationRule])((a, b) =>
+              if (b.validationType == vRule.validationType)
+                a :+ b.modify(_.params).setTo(vRule.changeParam(param, value))
+              else
+                a :+ b
+            )
+        }
+    changeUIFormElem(UIFormElem(
+      newElem,
+      uiElem.changeEvent
+    ))
+  }
+
 
 
 }

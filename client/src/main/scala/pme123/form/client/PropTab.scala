@@ -4,9 +4,11 @@ import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
+import org.scalajs.jquery.jQuery
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
+import pme123.form.shared.ExtraProp.SIZE
 import pme123.form.shared.PropTabType._
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared._
@@ -324,17 +326,18 @@ case object ValidationsTab {
     if (uiFormElem.elem.hasValidations) {
       val validations = uiFormElem.elem.validations.toSeq.flatMap(_.rules)
       <div class="content">
-
-        {Constants(validations.map(validationRule): _*).map(_.bind)}
+        <table>
+          {Constants(validations.map(validationRule): _*).map(_.bind)}
+        </table>
       </div>
     } else <span></span>
   }
 
   @dom
-  private def validationRule(vRule: ValidationRule): Binding[HTMLElement] =
-    {
-      println(s"vRule: $vRule")
-      <div class="field">
+  private def validationRule(vRule: ValidationRule): Binding[HTMLElement] = {
+    println(s"vRule: $vRule")
+    <tr>
+      <td>
         {BaseElementDiv(
         UIFormElem(BaseElement(
           s"enable-${vRule.validationType}",
@@ -344,7 +347,80 @@ case object ValidationsTab {
           Some(UIPropertyStore.changeValidationEnabled(vRule) _)
         )
       ).bind}
-      </div>
+      </td>{//
+      validationField(vRule).bind}
+    </tr>
+  }
+
+  @dom
+  private def validationField(vRule: ValidationRule): Binding[HTMLElement] = {
+
+    val valType = vRule.validationType
+
+    vRule.params match {
+      case ValidationParams(Some(p), _, _) =>
+        <div class="ui input">
+          <input id={s"p-${vRule.validationType.entryName}"}
+                 name={s"p-${vRule.validationType.entryName}"}
+                 type="text"
+                 size={10}
+                 placeholder={"placeholder"}
+                 value={p}
+                 onblur={_: Event =>
+                   val newText = jQuery(s"#p-${vRule.validationType.entryName}").value().toString
+
+                 // changeValidationRule(vRule)(newText)
+                 }/>
+        </div>
+      case ValidationParams(_, Some(p1), Some(p2)) =>
+        <td>
+          <table>
+          <tr>
+            {Constants(validationParam(vRule, "p1", p1.toString),
+            validationParam(vRule, "p2", p2.toString))
+            .map(_.bind)}</tr>
+          </table>
+        </td>
+      case ValidationParams(_, Some(p), _) =>
+        <div class="ui input">
+          <input id={s"p-${vRule.validationType.entryName}"}
+                 name={s"p-${vRule.validationType.entryName}"}
+                 type="number"
+                 size={10}
+                 placeholder={"placeholder"}
+                 value={p.toString}
+                 onblur={_: Event =>
+                   val newText = jQuery(s"#p-${vRule.validationType.entryName}").value().toString
+
+                 // changeValidationRule(vRule)(newText)
+                 }/>
+        </div>
+      case _ => <span/>
     }
+  }
+
+  @dom
+  private def validationParam(vRule: ValidationRule, param: String, paramValue: String): Binding[HTMLElement] = {
+    val valType = vRule.validationType
+    <td>
+      <div class="ui input">
+        {BaseElementDiv(
+        UIFormElem(BaseElement(
+          s"$param-${valType.entryName}",
+          TEXTFIELD,
+          Some(ElementTexts.label(I18n(valType.i18nKey(param)))),
+          value = Some(paramValue.toString),
+          extras = Map(
+            SIZE -> BaseElement(SIZE.entryName,
+              TEXTFIELD,
+              None,
+              value = Some("5"),
+            ))),
+          Some(UIPropertyStore.changeValidationRule(vRule, param) _)
+        )).bind}
+      </div>
+    </td>
+  }
+
 }
 

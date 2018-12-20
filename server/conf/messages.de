@@ -37,5 +37,7 @@ enum.validation-type.email.prompt=Ihre Email Adresse ist ungültig
 enum.validation-type.empty=Obligatorisch
 enum.validation-type.empty.prompt=Dieses Feld ist obligatorisch.
 enum.validation-type.integer=Ganze Zahl
+enum.validation-type.integer.p1=von
+enum.validation-type.integer.p2=bis
 enum.validation-type.integer.prompt=Wir erwarten eine ganze Zahl zwischen {0} und {1}.
 props.ident=Schlüssel (Identität)

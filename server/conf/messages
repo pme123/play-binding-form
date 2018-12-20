@@ -37,5 +37,7 @@ enum.validation-type.email.prompt=Please enter a valid e-mail
 enum.validation-type.empty=Required
 enum.validation-type.empty.prompt=This Field is required.
 enum.validation-type.integer=Integer
+enum.validation-type.integer.p1=from
+enum.validation-type.integer.p2=to
 enum.validation-type.integer.prompt=We expect an Integer between {0} and {1}.
 props.ident=Key (Identifier)

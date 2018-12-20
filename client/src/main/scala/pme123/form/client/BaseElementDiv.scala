@@ -4,6 +4,7 @@ import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
+import pme123.form.client.TextAreaDiv.label
 import pme123.form.client.services.UIStore
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, SIZE}
@@ -14,7 +15,7 @@ sealed abstract class BaseElementDiv {
 
   @dom
   protected def label(elementTexts: ElementTexts, activeLanguage: Language, required: Boolean): Binding[HTMLElement] = {
-    val requiredStr = if(required) "*" else ""
+    val requiredStr = if (required) "*" else ""
     if (elementTexts.label.textFor(activeLanguage).nonEmpty)
       <label class="">
         {elementTexts.label.textFor(activeLanguage) + requiredStr}&nbsp;{//
@@ -111,11 +112,13 @@ object TextFieldDiv extends BaseElementDiv {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
     val texts = elem.texts
+    val size = elem.extras.get(SIZE).flatMap(_.value).map(_.toInt).getOrElse(20)
     <div class="field">
       {if (texts.nonEmpty) label(texts.get, activeLanguage, elem.required).bind else <span/> //
       }<div class="ui input">
       <input id={elem.ident}
              name={elem.ident}
+             size={size}
              type="text"
              placeholder={texts.map(_.placeholder.textFor(activeLanguage)).getOrElse("")}
              value={elem.value.get}
@@ -161,8 +164,9 @@ object CheckboxDiv extends BaseElementDiv {
     val checkedClass = if (elem.value.contains("true")) "checked" else ""
     val checked = elem.value.contains("true")
     val texts = elem.texts
-    <div class="inline field">
-      <div class={s"ui $typeClass checkbox $checkedClass"}>
+    <div class="field">
+      {label(texts.get, activeLanguage, elem.required).bind //
+      }<div class={s"ui $typeClass checkbox $checkedClass"}>
         <input id={elem.ident}
                name={elem.ident}
                type="checkbox"
@@ -172,12 +176,7 @@ object CheckboxDiv extends BaseElementDiv {
                  val newText = jQuery(s"#${uiFormElem.elem.ident}").is(":checked").toString
                  uiFormElem.changeEvent
                    .foreach(ce =>
-                     ce(newText))}/>{//
-        if (texts.nonEmpty)
-          label(texts.get, activeLanguage, elem.required).bind
-        else
-            <span/> //
-        }
+                     ce(newText))}/>
       </div>
     </div>
 

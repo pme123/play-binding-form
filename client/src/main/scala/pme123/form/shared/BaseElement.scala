@@ -55,6 +55,8 @@ object BaseElement {
 
   def extras(elementType: ElementType)(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
     elementType match {
+      case TEXTFIELD =>
+        TextElem.extras
       case DROPDOWN =>
         DropdownElem.extras
       case CHECKBOX =>
@@ -78,7 +80,8 @@ object BaseElement {
   def validations(elementType: ElementType): Option[Validations] = {
     elementType match {
       case TEXTFIELD =>
-        Some(Validations(Seq(ValidationRule(EMAIL), ValidationRule(INTEGER, params = List("0", "100")))))
+        Some(Validations(Seq(ValidationRule(EMAIL), ValidationRule(INTEGER,
+          params = ValidationParams(intParam1 = Some(0), intParam2 = Some(100))))))
       case _ => None
     }
   }
@@ -102,6 +105,18 @@ object ElementEntry {
 
   def apply()(implicit supportedLangs: Seq[Language]): ElementEntry =
     ElementEntry("", ElementText.emptyLabel)
+}
+
+object TextElem {
+  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+
+    Map(
+      SIZE -> BaseElement(SIZE.entryName,
+        TEXTFIELD,
+        Some(ElementTexts.label(Map(DE -> "Feld Grösse", EN -> "Field Size"))),
+        value = Some("20"),
+      ))
+  }
 }
 
 object DropdownElem {
