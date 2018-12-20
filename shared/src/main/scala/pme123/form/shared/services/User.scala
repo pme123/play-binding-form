@@ -2,6 +2,7 @@ package pme123.form.shared.services
 
 import julienrf.json.derived
 import play.api.libs.json.OFormat
+import pme123.form.shared.services.SPAExtensions._
 
 case class User(username: User.UserId,
                 groups: Set[User.GroupId],

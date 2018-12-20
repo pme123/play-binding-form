@@ -1,6 +1,6 @@
 package pme123.form.shared
 
-import pme123.form.shared.services._
+import pme123.form.shared.services.SPAExtensions._
 import julienrf.json.derived
 import play.api.libs.json.OFormat
 

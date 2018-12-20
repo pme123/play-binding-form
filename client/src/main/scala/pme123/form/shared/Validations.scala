@@ -7,15 +7,12 @@ import com.softwaremill.quicklens._
 
 case class Validations(rules: Seq[ValidationRule])
 
-case class ValidationRule(validationType: ValidationType, enabled: Boolean = false, params: ValidationParams = ValidationParams()) {
-
-  val semanticType: String = validationType.entryName.toLowerCase + params.semanticParams
-
-}
+case class ValidationRule(validationType: ValidationType, enabled: Boolean = false, params: ValidationParams = ValidationParams())
 
 object ValidationRule {
 
   implicit class ValidationRuleOps(vRule: ValidationRule) {
+
     def changeParam(param: String, value: String): ValidationParams = param match {
       case "p" => vRule.params.modify(_.stringParam)
         .setTo(Some(value))
@@ -23,6 +20,14 @@ object ValidationRule {
         .setTo(Some(value.toInt))
       case "p2" => vRule.params.modify(_.intParam2)
         .setTo(Some(value.toInt))
+    }
+
+    lazy val semanticType: String = vRule.validationType.entryName.toLowerCase + semanticParams
+
+    lazy val semanticParams: String = vRule.params.values match {
+      case x :: y :: _ => s"[$x..$y]"
+      case x :: _ => s"[$x]"
+      case _ => ""
     }
   }
 
@@ -34,11 +39,6 @@ case class ValidationParams(stringParam: Option[String] = None,
 
   val values: List[String] = List(stringParam, intParam1, intParam2).flatten.map(_.toString)
 
-  val semanticParams: String = values match {
-    case x :: y :: _ => s"[$x..$y]"
-    case x :: _ => s"[$x]"
-    case _ => ""
-  }
 
 }
 

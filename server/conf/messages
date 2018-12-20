@@ -41,3 +41,6 @@ enum.validation-type.integer.p1=from
 enum.validation-type.integer.p2=to
 enum.validation-type.integer.prompt=We expect an Integer between {0} and {1}.
 props.ident=Key (Identifier)
+enum.validation-type.reg_exp=Regex
+enum.validation-type.reg_exp.p=Expression
+enum.validation-type.reg_exp.prompt=We expect a String that adheres to the Regex {0}.

@@ -6,7 +6,7 @@ import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.TextType.{LABEL, TOOLTIP}
-import pme123.form.shared.ValidationType.{EMAIL, INTEGER}
+import pme123.form.shared.ValidationType.{EMAIL, INTEGER, REG_EXP}
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
 
@@ -81,7 +81,10 @@ object BaseElement {
     elementType match {
       case TEXTFIELD =>
         Some(Validations(Seq(ValidationRule(EMAIL), ValidationRule(INTEGER,
-          params = ValidationParams(intParam1 = Some(0), intParam2 = Some(100))))))
+          params = ValidationParams(intParam1 = Some(0), intParam2 = Some(100))),
+          ValidationRule(REG_EXP,
+            params = ValidationParams(stringParam = Some("")))
+        )))
       case _ => None
     }
   }

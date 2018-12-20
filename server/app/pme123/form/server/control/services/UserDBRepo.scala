@@ -5,6 +5,7 @@ import doobie.implicits._
 import javax.inject.Inject
 import pme123.form.server.entity.AuthUser
 import pme123.form.shared.services._
+import pme123.form.shared.services.SPAExtensions._
 
 import scala.concurrent.{ExecutionContext, Future}
 

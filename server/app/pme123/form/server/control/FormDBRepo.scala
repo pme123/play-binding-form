@@ -4,7 +4,7 @@ import doobie.Fragment
 import doobie.implicits._
 import javax.inject.Inject
 import pme123.form.server.control.services.DoobieDB
-import pme123.form.shared.services._
+import pme123.form.shared.services.SPAExtensions._
 import pme123.form.shared.{Form, FormCategory, FormProduct}
 
 import scala.concurrent.{ExecutionContext, Future}

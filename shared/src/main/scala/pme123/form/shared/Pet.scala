@@ -5,7 +5,7 @@ import julienrf.json.derived
 import play.api.libs.json.OFormat
 
 import scala.collection.immutable
-import pme123.form.shared.services._
+import pme123.form.shared.services.SPAExtensions._
 
 case class Forms(
                  formProduct: FormProduct,

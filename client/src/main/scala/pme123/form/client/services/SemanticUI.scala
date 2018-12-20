@@ -50,6 +50,7 @@ object SemanticUI {
 
   def initForm(form: SemanticForm): Unit ={
     setTimeout(100) {
+      println("INIT FORM: " + Json.toJson(form).toString())
       jQuery(".ui.form").form(JSON.parse(Json.toJson(form).toString()))
     }
   }

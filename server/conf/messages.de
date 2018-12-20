@@ -41,3 +41,6 @@ enum.validation-type.integer.p1=von
 enum.validation-type.integer.p2=bis
 enum.validation-type.integer.prompt=Wir erwarten eine ganze Zahl zwischen {0} und {1}.
 props.ident=Schlüssel (Identität)
+enum.validation-type.reg_exp=Regex
+enum.validation-type.reg_exp.p=Ausdruck
+enum.validation-type.reg_exp.prompt=Wir erwarten einen Text, welcher dem Regex {0} entspricht.

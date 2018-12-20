@@ -4,7 +4,6 @@ import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
-import org.scalajs.jquery.jQuery
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
@@ -359,48 +358,29 @@ case object ValidationsTab {
 
     vRule.params match {
       case ValidationParams(Some(p), _, _) =>
-        <div class="ui input">
-          <input id={s"p-${vRule.validationType.entryName}"}
-                 name={s"p-${vRule.validationType.entryName}"}
-                 type="text"
-                 size={10}
-                 placeholder={"placeholder"}
-                 value={p}
-                 onblur={_: Event =>
-                   val newText = jQuery(s"#p-${vRule.validationType.entryName}").value().toString
-
-                 // changeValidationRule(vRule)(newText)
-                 }/>
-        </div>
+        <td>
+          {validationParam(vRule, "p", p.toString, 20).bind}
+        </td>
       case ValidationParams(_, Some(p1), Some(p2)) =>
         <td>
           <table>
-          <tr>
-            {Constants(validationParam(vRule, "p1", p1.toString),
-            validationParam(vRule, "p2", p2.toString))
-            .map(_.bind)}</tr>
+            <tr>
+              {Constants(validationParam(vRule, "p1", p1.toString),
+              validationParam(vRule, "p2", p2.toString))
+              .map(_.bind)}
+            </tr>
           </table>
         </td>
-      case ValidationParams(_, Some(p), _) =>
-        <div class="ui input">
-          <input id={s"p-${vRule.validationType.entryName}"}
-                 name={s"p-${vRule.validationType.entryName}"}
-                 type="number"
-                 size={10}
-                 placeholder={"placeholder"}
-                 value={p.toString}
-                 onblur={_: Event =>
-                   val newText = jQuery(s"#p-${vRule.validationType.entryName}").value().toString
-
-                 // changeValidationRule(vRule)(newText)
-                 }/>
-        </div>
+      case ValidationParams(_, Some(p1), _) =>
+        <td>
+          {validationParam(vRule, "p1", p1.toString).bind}
+        </td>
       case _ => <span/>
     }
   }
 
   @dom
-  private def validationParam(vRule: ValidationRule, param: String, paramValue: String): Binding[HTMLElement] = {
+  private def validationParam(vRule: ValidationRule, param: String, paramValue: String, size: Int = 5): Binding[HTMLElement] = {
     val valType = vRule.validationType
     <td>
       <div class="ui input">
@@ -414,7 +394,7 @@ case object ValidationsTab {
             SIZE -> BaseElement(SIZE.entryName,
               TEXTFIELD,
               None,
-              value = Some("5"),
+              value = Some(s"$size"),
             ))),
           Some(UIPropertyStore.changeValidationRule(vRule, param) _)
         )).bind}

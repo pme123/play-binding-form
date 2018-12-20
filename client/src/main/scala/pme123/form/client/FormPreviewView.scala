@@ -5,6 +5,7 @@ import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.HTMLElement
 import pme123.form.client.services.{I18n, SemanticUI, UIStore}
 import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
+import pme123.form.shared.services.SPAExtensions.{StringPos, _}
 
 import scala.util.matching.Regex
 
@@ -74,7 +75,7 @@ private[client] object FormPreviewView
             .flatMap(_.rules)
             .filter(_.enabled)
             .map(v =>
-              SemanticRule(v.semanticType, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))
+              SemanticRule(v.semanticType.toCamelCase, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))
             ) ++ (if(elem.required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
         )
       }.toMap
