@@ -4,11 +4,10 @@ import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 import pme123.form.client.services.I18n
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
+import pme123.form.shared.ExtraPropValue.ExtraValue
 import pme123.form.shared.LayoutWide.EIGHT
-import pme123.form.shared.TextType.{LABEL, TOOLTIP}
 import pme123.form.shared.ValidationType.{EMAIL, INTEGER, REG_EXP}
 import pme123.form.shared.services.Language
-import pme123.form.shared.services.Language.{DE, EN}
 
 import scala.collection.immutable.IndexedSeq
 import scala.util.Random
@@ -16,7 +15,7 @@ import scala.util.Random
 case class BaseElement(ident: String,
                        elementType: ElementType,
                        texts: Option[ElementTexts],
-                       extras: Map[ExtraProp, BaseElement] = Map.empty,
+                       extras: ExtraProperties = ExtraProperties(),
                        value: Option[String] = Some(""),
                        required: Boolean = false,
                        layoutWide: LayoutWide = EIGHT,
@@ -25,13 +24,14 @@ case class BaseElement(ident: String,
                       ) {
 
   val hasTexts: Boolean = texts.nonEmpty
-  val hasExtras: Boolean = extras.nonEmpty
+  val hasExtras: Boolean = extras.hasExtras
   val hasEntries: Boolean = elemEntries.nonEmpty
   val hasValidations: Boolean = validations.nonEmpty
 
 }
 
 object BaseElement {
+
   def ident(elementType: ElementType) = s"${elementType.entryName}-${Random.nextInt(100000)}"
 
   def apply(elementType: ElementType)
@@ -53,7 +53,7 @@ object BaseElement {
     )
   }
 
-  def extras(elementType: ElementType)(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras(elementType: ElementType): ExtraProperties = {
     elementType match {
       case TEXTFIELD =>
         TextElem.extras
@@ -65,7 +65,7 @@ object BaseElement {
         TitleElem.extras
       case DIVIDER =>
         DividerElem.extras
-      case _ => Map.empty
+      case _ => ExtraProperties()
     }
   }
 
@@ -96,6 +96,22 @@ object BaseElement {
   }
 }
 
+case class ExtraProperties(propValues: Seq[ExtraPropValue] = Nil) {
+
+  val hasExtras: Boolean = propValues.nonEmpty
+
+  def valueFor(extraProp: ExtraProp): Option[String] =
+    propValues.find(_.extraProp == extraProp)
+      .flatMap(_.value)
+}
+
+
+case class ExtraPropValue(extraProp: ExtraProp, value: ExtraValue)
+
+object ExtraPropValue {
+  type ExtraValue = Option[String]
+}
+
 case class ElementEntries(entries: Seq[ElementEntry] = Nil)
 
 case class ElementEntry(key: String, label: ElementText, ident: String = ElementEntry.ident) {
@@ -111,47 +127,31 @@ object ElementEntry {
 }
 
 object TextElem {
-  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras: ExtraProperties = {
 
-    Map(
-      SIZE -> BaseElement(SIZE.entryName,
-        TEXTFIELD,
-        Some(ElementTexts.label(Map(DE -> "Feld Grösse", EN -> "Field Size"))),
-        value = Some("20"),
-      ))
+    ExtraProperties()
   }
 }
 
 object DropdownElem {
-  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras: ExtraProperties = {
 
-    Map(
-      CLEARABLE -> BaseElement(CLEARABLE.entryName,
-        CHECKBOX,
-        Some(ElementTexts(
-          ElementText(LABEL, Map(DE -> "Wert löschen", EN -> "Clearable")),
-          ElementText.emptyPlaceholder,
-          ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible"))
-        )),
-        value = Some("true"),
+    ExtraProperties(Seq(
+      ExtraPropValue(
+        CLEARABLE, Some("true")
       ))
+    )
   }
 }
 
 object CheckboxElem {
-  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras: ExtraProperties = {
 
-    Map(
-      CHECKBOX_TYPE -> BaseElement(CHECKBOX_TYPE.entryName,
-        DROPDOWN,
-        Some(ElementTexts(
-          ElementText(LABEL, Map(DE -> "Art", EN -> "Type")),
-          ElementText.emptyPlaceholder,
-          ElementText(TOOLTIP, Map(DE -> "Art der Check-Box", EN -> "Type of the Checkbox"))
-        )),
-        elemEntries = BaseElement.enumEntries(CheckboxType.values),
-        value = CheckboxType.defaultValue,
+    ExtraProperties(Seq(
+      ExtraPropValue(
+        CHECKBOX_TYPE, CheckboxType.defaultValue
       ))
+    )
   }
 
   sealed trait CheckboxType
@@ -217,29 +217,20 @@ object TitleElem {
 
   }
 
-  def sizeElem(implicit supportedLangs: Seq[Language]) = BaseElement(SIZE.entryName,
-    DROPDOWN,
-    Some(ElementTexts(
-      ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size")),
-      ElementText.emptyPlaceholder,
-      ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)"))
-    )),
-    value = SizeType.defaultValue,
-    elemEntries = BaseElement.enumEntries(SizeType.values),
-  )
+  def sizeElem = ExtraPropValue(SIZE, SizeType.defaultValue)
 
-  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
-    Map(
-      SIZE -> sizeElem
+  def extras: ExtraProperties = {
+    ExtraProperties(
+      Seq(sizeElem)
     )
   }
 }
 
 object DividerElem {
-  def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, BaseElement] = {
+  def extras: ExtraProperties = {
 
-    Map(
-      SIZE -> TitleElem.sizeElem
+    ExtraProperties(
+      Seq(TitleElem.sizeElem)
     )
   }
 }

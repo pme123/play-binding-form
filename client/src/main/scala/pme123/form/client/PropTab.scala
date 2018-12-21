@@ -373,14 +373,14 @@ case object ValidationsTab {
         </td>
       case ValidationParams(_, Some(p1), _) =>
         <td>
-          {validationParam(vRule, "p1", p1.toString).bind}
+          {validationParam(vRule, "p1", p1.toString, 20).bind}
         </td>
       case _ => <span/>
     }
   }
 
   @dom
-  private def validationParam(vRule: ValidationRule, param: String, paramValue: String, size: Int = 5): Binding[HTMLElement] = {
+  private def validationParam(vRule: ValidationRule, param: String, paramValue: String, size: Int = 6): Binding[HTMLElement] = {
     val valType = vRule.validationType
     <td>
       <div class="ui input">
@@ -390,12 +390,11 @@ case object ValidationsTab {
           TEXTFIELD,
           Some(ElementTexts.label(I18n(valType.i18nKey(param)))),
           value = Some(paramValue.toString),
-          extras = Map(
-            SIZE -> BaseElement(SIZE.entryName,
-              TEXTFIELD,
-              None,
-              value = Some(s"$size"),
-            ))),
+          extras = ExtraProperties(Seq(
+            ExtraPropValue(
+              SIZE,Some(s"$size")
+            )
+          ))),
           Some(UIPropertyStore.changeValidationRule(vRule, param) _)
         )).bind}
       </div>

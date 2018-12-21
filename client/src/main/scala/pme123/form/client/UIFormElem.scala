@@ -29,8 +29,7 @@ object UIFormElem {
             changeEvent: ChangeEvent): UIFormElem = {
     val f = UIFormElem(
       elem,
-      elem.extras
-        .map { case (ep, be) => (ep, UIFormElem(be)) },
+      BaseElementExtras.extras(elem.elementType),
       changeEvent
     )
     f

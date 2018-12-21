@@ -4,10 +4,9 @@ import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
-import pme123.form.client.TextAreaDiv.label
 import pme123.form.client.services.UIStore
 import pme123.form.shared.ElementType._
-import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, SIZE}
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.services.Language
 import pme123.form.shared.{ElementEntry, ElementTexts}
 
@@ -74,7 +73,7 @@ object DropdownDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
-    val clearableClass = if (elem.extras.headOption.map(_._2).flatMap(_.value).contains("true")) "clearable" else ""
+    val clearableClass = if (elem.extras.valueFor(CLEARABLE).contains("true")) "clearable" else ""
     val texts = elem.texts.get
     <div class="field">
       {label(texts, activeLanguage, elem.required).bind //
@@ -112,7 +111,7 @@ object TextFieldDiv extends BaseElementDiv {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
     val texts = elem.texts
-    val size = elem.extras.get(SIZE).flatMap(_.value).map(_.toInt).getOrElse(20)
+    val size = elem.extras.valueFor(SIZE).map(_.toInt).getOrElse(20)
     <div class="field">
       {if (texts.nonEmpty) label(texts.get, activeLanguage, elem.required).bind else <span/> //
       }<div class="ui input">
@@ -160,7 +159,7 @@ object CheckboxDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
-    val typeClass = uiFormElem.elem.extras.get(CHECKBOX_TYPE).flatMap(_.value).map(_.toLowerCase).getOrElse("")
+    val typeClass = uiFormElem.elem.extras.valueFor(CHECKBOX_TYPE).map(_.toLowerCase).getOrElse("")
     val checkedClass = if (elem.value.contains("true")) "checked" else ""
     val checked = elem.value.contains("true")
     val texts = elem.texts
@@ -191,7 +190,7 @@ object TitleDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
-    val sizeClass = elem.extras(SIZE).value.map(_.toLowerCase).getOrElse("")
+    val sizeClass = elem.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
     val texts = elem.texts.get
     <div class="field">
       <div class={s"ui $sizeClass header"}>
@@ -212,7 +211,7 @@ object DividerDiv extends BaseElementDiv {
     val texts = elem.texts.get
     val text = texts.label.textFor(activeLanguage)
     val horDivider = if (text.nonEmpty) "horizontal" else ""
-    val sizeClass = elem.extras(SIZE).value.map(_.toLowerCase).getOrElse("")
+    val sizeClass = elem.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
     <div class={s"ui $horDivider divider"}>
       <div class={s"ui $sizeClass header"}>
         {text}

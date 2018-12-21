@@ -191,8 +191,16 @@ object UIPropertyStore extends Logging {
     info(s"PropertyUIStore: changeExtraProp $extraProp $text")
     val uiElem = uiState.selectedElement.value.value
     val newElem =
-      uiElem.elem.modify(_.extras.at(extraProp).value)
-        .setTo(Some(text))
+      uiElem.elem.modify(_.extras.propValues)
+        .setTo {
+          uiElem.elem.extras.propValues
+            .foldLeft(Seq.empty[ExtraPropValue])((a, b) =>
+              if (b.extraProp == extraProp)
+                a :+ b.modify(_.value).setTo(Some(text))
+              else
+                a :+ b
+            )
+        }
 
     changeUIFormElem(UIFormElem(
       newElem,
