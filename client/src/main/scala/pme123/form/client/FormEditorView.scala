@@ -44,17 +44,16 @@ private[client] object FormEditorView
   // **************************
 
   @dom
-  private lazy val editorHeader: Binding[HTMLElement] =
-  {
+  private lazy val editorHeader: Binding[HTMLElement] = {
     <div class="ui borderless menu">
       <div class="ui item">
         <h3 class="header">
           <i class="edit outline icon"></i> &nbsp; &nbsp;
           Form Editor</h3>
       </div>
-      <div class="ui right item">{
-        BaseElementDiv(
-          UIFormElem(
+      <div class="ui right item">
+        {BaseElementDiv(
+        UIFormElem(
           BaseElement(
             "form-ident",
             TEXTFIELD,
@@ -65,10 +64,11 @@ private[client] object FormEditorView
                 DE -> "Form Identität",
                 EN -> "Form Identity",
               )))
-            )
-          )
-        )).bind
-        }
+            ),
+            value = Some(UIFormStore.uiState.formId.value)),
+          Map.empty,
+          Some(UIFormStore.changeFormId _),
+        )).bind}
       </div>
       <div class="ui right item">
         <button class="ui circular blue icon button"
@@ -78,7 +78,8 @@ private[client] object FormEditorView
           <i class="add icon"></i>
         </button>
       </div>
-    </div>}
+    </div>
+  }
 
   @dom
   private lazy val editorContent: Binding[HTMLElement] =

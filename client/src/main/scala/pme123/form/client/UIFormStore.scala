@@ -8,6 +8,7 @@ import pme123.form.shared._
 import pme123.form.shared.services.Logging
 
 import scala.language.implicitConversions
+import scala.util.Random
 
 
 object UIFormStore extends Logging {
@@ -84,10 +85,16 @@ object UIFormStore extends Logging {
     SemanticUI.initElements()
   }
 
+  def changeFormId(formId: String): Unit = {
+    info(s"FormUIStore: changeFormId $formId")
+    uiState.formId.value = formId
+  }
+
   case class UIState(formElements: Vars[Var[UIFormElem]],
                      selectedElement: Var[Var[UIFormElem]],
                      activePropElement: Var[UIFormElem],
                      activePropTab: Var[PropTabType],
+                     formId: Var[String],
                     )
 
   object UIState {
@@ -99,6 +106,7 @@ object UIFormStore extends Logging {
         Var(defaultElem),
         Var(defaultElem.value),
         Var(PROPERTIES),
+        Var(s"form-${Random.nextInt(100)}")
       )
     }
   }

@@ -25,6 +25,6 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
 
   def forms(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
-        Ok(Json.toJson(FormContainer())).as(JSON)
+        Ok(Json.toJson(FormContainer("form-id"))).as(JSON)
   }
 }
