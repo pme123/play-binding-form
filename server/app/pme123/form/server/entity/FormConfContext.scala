@@ -25,11 +25,6 @@ object FormConfSettings {
   val charEncodingProp = "char.encoding"
   val timezoneProp = "timezone"
   val wsocketHostsAllowedProp = "wsocket.hosts.allowed"
-  // kafka
-  val kafkaWsBootstrapServersProp = "kafka.ws.bootstrap-servers"
-  val kafkaWsPathMsgTopicProp = "kafka.ws.path-msg.topic"
-  val kafkaWsPathMsgProducerProp = "kafka.ws.path-msg.producer"
-  val kafkaWsPathMsgConsumerProp = "kafka.ws.path-msg.consumer"
 
   // security
   val authenticatorExpiryProp = "security.cookieAuthenticator.rememberMe.authenticatorExpiry"
@@ -57,11 +52,6 @@ abstract class FormConfSettings(config: Configuration)
   val timezone: String = baseConfig.get[String](timezoneProp)
   val timezoneID: ZoneId = ZoneId.of(timezone)
   val wsocketHostsAllowed: Seq[String] = baseConfig.get[Seq[String]](wsocketHostsAllowedProp)
-  // kafka
-  val kafkaWsBootstrapServers: String = baseConfig.get[String](kafkaWsBootstrapServersProp)
-  val kafkaWsPathMsgTopic: String = baseConfig.get[String](kafkaWsPathMsgTopicProp)
-  val kafkaWsPathMsgProducer: Configuration = baseConfig.get[Configuration](kafkaWsPathMsgProducerProp)
-  val kafkaWsPathMsgConsumer: Configuration = baseConfig.get[Configuration](kafkaWsPathMsgConsumerProp)
 
   //security
   val authenticatorExpiry: FiniteDuration = config.get[FiniteDuration](authenticatorExpiryProp)
@@ -78,10 +68,6 @@ abstract class FormConfSettings(config: Configuration)
       , SettingsProp(timezoneProp, timezone)
       , SettingsProp(charEncodingProp, charEncoding)
       , SettingsProp(wsocketHostsAllowedProp, wsocketHostsAllowed.map(_.toString))
-      // kafka
-      , SettingsProp(kafkaWsBootstrapServersProp, kafkaWsBootstrapServers)
-      , SettingsProp(kafkaWsPathMsgProducerProp, kafkaWsPathMsgProducer.toString)
-      , SettingsProp(kafkaWsPathMsgTopicProp, kafkaWsPathMsgTopic)
       // security
       , SettingsProp(authenticatorExpiryProp, authenticatorExpiry)
       , SettingsProp(authenticatorIdleTimeoutProp, authenticatorIdleTimeout)

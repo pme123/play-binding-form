@@ -2,7 +2,7 @@ package pme123.form.shared
 
 import play.api.libs.json.{Json, OFormat}
 
-case class FormContainer(elems: Seq[BaseElement])
+case class FormContainer(elems: Seq[BaseElement] = Nil)
 
 object FormContainer {
 
