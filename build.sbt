@@ -5,6 +5,7 @@ import sbtcrossproject.{CrossType, crossProject}
 lazy val formRoot = project.in(file(".")).
   aggregate(sharedJvm, sharedJs, server, client)
   .settings(organizationSettings)
+  .settings(dockerComposeSettings)
   .settings(
     publish := {}
     , publishLocal := {}
@@ -13,7 +14,7 @@ lazy val formRoot = project.in(file(".")).
     , run := {
       (run in server in Compile).evaluated
     }
-  )
+  ).enablePlugins(DockerComposePlugin)
 
 lazy val server = (project in file("server"))
   .settings(scalaJSProjects := Seq(client))

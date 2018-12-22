@@ -1,6 +1,7 @@
 package pme123.form.client
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
+import pme123.form.client.services.I18n
 import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TITLE}
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.TextType.{LABEL, TOOLTIP}
@@ -33,11 +34,12 @@ object BaseElementExtras {
         CLEARABLE -> UIFormElem(
           BaseElement(CLEARABLE.entryName,
             CHECKBOX,
-            Some(ElementTexts(
-              ElementText(LABEL, Map(DE -> "Wert löschen", EN -> "Clearable")),
-              ElementText.emptyPlaceholder,
-              ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible"))
-            )),
+            DataType.BOOLEAN,
+            texts = ElementTexts(
+              Some(ElementText.label(Map(DE -> "Wert löschen", EN -> "Clearable"))),
+              None,
+              Some(ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible")))
+            ),
             value = Some("true"),
           )))
     }
@@ -49,12 +51,13 @@ object BaseElementExtras {
       Map(
         CHECKBOX_TYPE -> UIFormElem(BaseElement(CHECKBOX_TYPE.entryName,
           DROPDOWN,
-          Some(ElementTexts(
-            ElementText(LABEL, Map(DE -> "Art", EN -> "Type")),
-            ElementText.emptyPlaceholder,
-            ElementText(TOOLTIP, Map(DE -> "Art der Check-Box", EN -> "Type of the Checkbox"))
-          )),
-          elemEntries = BaseElement.enumEntries(CheckboxType.values),
+          DataType.STRING,
+          texts = ElementTexts(
+            Some(ElementText.label(Map(DE -> "Art", EN -> "Type"))),
+            None,
+            Some(ElementText(TOOLTIP, Map(DE -> "Art der Check-Box", EN -> "Type of the Checkbox")))
+          ),
+          elemEntries = I18n.enumEntries(CheckboxType.values),
           value = CheckboxType.defaultValue,
         )))
     }
@@ -125,13 +128,15 @@ object BaseElementExtras {
     def sizeElem(implicit supportedLangs: Seq[Language]) =
       UIFormElem(BaseElement(SIZE.entryName,
         DROPDOWN,
-        Some(ElementTexts(
-          ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size")),
-          ElementText.emptyPlaceholder,
-          ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)"))
-        )),
-        value = SizeType.defaultValue,
-        elemEntries = BaseElement.enumEntries(SizeType.values),
+        DataType.STRING,
+          texts = ElementTexts(
+          Some(ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size"))),
+          None,
+          Some(ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)")))
+        ),
+           value = SizeType.defaultValue,
+        elemEntries = I18n.enumEntries(SizeType.values),
+
       ))
 
     def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, UIFormElem] = {

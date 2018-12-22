@@ -4,8 +4,25 @@ import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 
 import scala.collection.immutable.IndexedSeq
 import com.softwaremill.quicklens._
+import pme123.form.shared.ElementType.TEXTFIELD
+import pme123.form.shared.ValidationType.{EMAIL, INTEGER, REG_EXP}
 
-case class Validations(rules: Seq[ValidationRule])
+case class Validations(hasValidations: Boolean = false, rules: Seq[ValidationRule] = Nil)
+
+object Validations {
+
+  def apply(elementType: ElementType): Validations = {
+    elementType match {
+      case TEXTFIELD =>
+        Validations(hasValidations = true, Seq(ValidationRule(EMAIL), ValidationRule(INTEGER,
+          params = ValidationParams(intParam1 = Some(0), intParam2 = Some(100))),
+          ValidationRule(REG_EXP,
+            params = ValidationParams(stringParam = Some("")))
+        ))
+      case _ => Validations()
+    }
+  }
+}
 
 case class ValidationRule(validationType: ValidationType, enabled: Boolean = false, params: ValidationParams = ValidationParams())
 

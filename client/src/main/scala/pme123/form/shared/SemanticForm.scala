@@ -9,9 +9,7 @@ object SemanticForm {
 
   implicit val jsonFormat: OFormat[SemanticForm] = Json.format[SemanticForm]
 
-
 }
-
 
 case class SemanticField(identifier: FieldIdent, optional: Boolean, rules: Seq[SemanticRule])
 

@@ -1,37 +1,46 @@
 package pme123.form.shared
 
+import pme123.form.shared.BaseElement.ident
+import pme123.form.shared.ElementType.SPACER
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared.services.Language
 
-case class ElementTexts(label: ElementText,
-                        placeholder: ElementText,
-                        tooltip: ElementText) {
+case class ElementTexts(label: Option[ElementText] = None,
+                        placeholder: Option[ElementText] = None,
+                        tooltip: Option[ElementText] = None) {
+
+  val hasTexts: Boolean = label.nonEmpty || placeholder.nonEmpty || tooltip.nonEmpty
+
+  def textForLabel(lang: Language): String = label.map(_.textFor(lang)).getOrElse("")
+
+  def textForPlaceholder(lang: Language): String = placeholder.map(_.textFor(lang)).getOrElse("")
+
+  def textForTooltip(lang: Language): String = tooltip.map(_.textFor(lang)).getOrElse("")
 
 }
 
 object ElementTexts {
   def apply(defaultLabel: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
-      ElementText(LABEL, supportedLangs.map(_ -> defaultLabel).toMap),
-      ElementText.emptyPlaceholder,
-      ElementText.emptyTooltip
+      Some(ElementText.label(supportedLangs.map(_ -> defaultLabel).toMap)),
     )
   }
 
   def label(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
-      ElementText.label(texts),
-      ElementText.emptyPlaceholder,
-      ElementText.emptyTooltip
+      Some(ElementText.label(texts)),
     )
   }
 
   def placeholder(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
-      ElementText.emptyLabel,
-      ElementText(PLACEHOLDER, texts),
-      ElementText.emptyTooltip
+      placeholder = Some(ElementText(PLACEHOLDER, texts)),
     )
+  }
+
+  def apply(elementType: ElementType)(implicit supportedLangs: Seq[Language]): ElementTexts = elementType match {
+    case SPACER => ElementTexts()
+    case _ => ElementTexts(ident(elementType))
   }
 }
 

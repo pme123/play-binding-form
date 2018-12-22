@@ -60,11 +60,12 @@ case object PropertiesTab {
         UIFormElem(BaseElement(
           "elemDefaultValue",
           TEXTFIELD,
-          Some(ElementTexts(
-            ElementText(LABEL, Map(DE -> "Standart Wert", EN -> "Default Value")),
-            ElementText(PLACEHOLDER, Map(DE -> "Standart Wert", EN -> "Default Value")),
-            ElementText(TOOLTIP, Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start."))
-          ))),
+          DataType.STRING,
+          ElementTexts(
+            Some(ElementText(LABEL, Map(DE -> "Standart Wert", EN -> "Default Value"))),
+              Some(ElementText(PLACEHOLDER, Map(DE -> "Standart Wert", EN -> "Default Value"))),
+                Some(ElementText(TOOLTIP, Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
+          )),
           Some(UIPropertyStore.changeDefaultValue _)
         )
       ).bind}
@@ -82,14 +83,15 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "elementTypeId",
         DROPDOWN,
-        Some(ElementTexts(
-          ElementText(LABEL, Map(DE -> "Element Typ", EN -> "Element Type")),
-          ElementText.emptyPlaceholder,
-          ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element."))
-        )),
-        elemEntries = Some(ElementEntries(
+        DataType.STRING,
+        ElementTexts(
+          Some(ElementText(LABEL, Map(DE -> "Element Typ", EN -> "Element Type"))),
+          None,
+            Some(ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
+        ),
+        elemEntries = ElementEntries(
           ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
-        )),
+        ),
         value = Some(elementType.entryName)
       ),
 
@@ -108,14 +110,15 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "layoutWideId",
         DROPDOWN,
-        Some(ElementTexts(
-          ElementText(LABEL, Map(DE -> "Layout Breite", EN -> "Layout Wide")),
-          ElementText.emptyPlaceholder,
-          ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen)."))
-        )),
-        elemEntries = Some(ElementEntries(
+        DataType.STRING,
+        ElementTexts(
+          Some(ElementText(LABEL, Map(DE -> "Layout Breite", EN -> "Layout Wide"))),
+          None,
+            Some(ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen).")))
+        ),
+        elemEntries = ElementEntries(
           LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(I18n(lw.i18nKey))))
-        )),
+        ),
         value = Some(layoutWide.entryName)
       ),
 
@@ -134,11 +137,12 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "requiredId",
         CHECKBOX,
-        Some(ElementTexts(
-          ElementText(LABEL, Map(DE -> "Obligatorisch", EN -> "Required")),
-          ElementText.emptyPlaceholder,
-          ElementText(TOOLTIP, Map(DE -> "Das Feld ist zwingend auszufüllen.", EN -> "The value of the field is required."))
-        )),
+        DataType.BOOLEAN,
+        ElementTexts(
+          Some(ElementText.label(Map(DE -> "Obligatorisch", EN -> "Required"))),
+          None,
+          Some(ElementText(TOOLTIP, Map(DE -> "Das Feld ist zwingend auszufüllen.", EN -> "The value of the field is required.")))
+        ),
         value = Some(required.toString)
       ),
 
@@ -176,11 +180,11 @@ case object TextsTab {
     if (uiFormElem.elem.hasTexts)
       <div class="content">
         {//
-        val texts = uiFormElem.elem.texts.get
+        val texts = uiFormElem.elem.texts
         Constants(
-          elementTextDiv(texts.label, uiFormElem.isViewable),
-          elementTextDiv(texts.placeholder, uiFormElem.isEditable),
-          elementTextDiv(texts.tooltip, uiFormElem.isEditable)
+          elementTextDiv(texts.label.get, uiFormElem.isViewable),
+          elementTextDiv(texts.placeholder.get, uiFormElem.isEditable),
+          elementTextDiv(texts.tooltip.get, uiFormElem.isEditable)
         ).map(_.bind)}
       </div>
     else
@@ -211,7 +215,8 @@ case object TextsTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$textType",
         TEXTFIELD,
-        Some(ElementTexts.label(I18n(lang.i18nKey))),
+        DataType.STRING,
+        ElementTexts.label(I18n(lang.i18nKey)),
         value = Some(text)),
         Some(UIPropertyStore.changeText(lang, textType) _)
       )
@@ -227,7 +232,7 @@ case object EntriesTab {
   lazy val create: Binding[HTMLElement] = {
     val uiFormElem = UIFormStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasEntries) {
-      val entries = uiFormElem.elem.elemEntries.get.entries
+      val entries = uiFormElem.elem.elemEntries.entries
       <div class="content">
 
         {Constants(Seq(head) ++ entries.map(elementEntry): _*).map(_.bind)}
@@ -292,7 +297,8 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"field_ident_$ident",
         TEXTFIELD,
-        Some(ElementTexts.placeholder(I18n("props.ident"))),
+        DataType.STRING,
+        ElementTexts.placeholder(I18n("props.ident")),
         value = Some(elementEntry.key)),
         Some(UIPropertyStore.changeEntryKey(ident) _)
       )
@@ -309,7 +315,8 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$ident",
         TEXTFIELD,
-        Some(ElementTexts.label(I18n(lang.i18nKey))),
+        DataType.STRING,
+        ElementTexts.label(I18n(lang.i18nKey)),
         value = Some(text)),
         Some(UIPropertyStore.changeEntryText(lang, ident) _)
       )
@@ -323,7 +330,7 @@ case object ValidationsTab {
   lazy val create: Binding[HTMLElement] = {
     val uiFormElem = UIFormStore.uiState.activePropElement.bind
     if (uiFormElem.elem.hasValidations) {
-      val validations = uiFormElem.elem.validations.toSeq.flatMap(_.rules)
+      val validations = uiFormElem.elem.validations.rules
       <div class="content">
         <table>
           {Constants(validations.map(validationRule): _*).map(_.bind)}
@@ -341,7 +348,8 @@ case object ValidationsTab {
         UIFormElem(BaseElement(
           s"enable-${vRule.validationType}",
           CHECKBOX,
-          Some(ElementTexts.label(I18n(vRule.validationType.i18nKey))),
+          DataType.BOOLEAN,
+          ElementTexts.label(I18n(vRule.validationType.i18nKey)),
           value = Some(vRule.enabled.toString)),
           Some(UIPropertyStore.changeValidationEnabled(vRule) _)
         )
@@ -353,8 +361,6 @@ case object ValidationsTab {
 
   @dom
   private def validationField(vRule: ValidationRule): Binding[HTMLElement] = {
-
-    val valType = vRule.validationType
 
     vRule.params match {
       case ValidationParams(Some(p), _, _) =>
@@ -388,7 +394,8 @@ case object ValidationsTab {
         UIFormElem(BaseElement(
           s"$param-${valType.entryName}",
           TEXTFIELD,
-          Some(ElementTexts.label(I18n(valType.i18nKey(param)))),
+          DataType.STRING,
+          ElementTexts.label(I18n(valType.i18nKey(param))),
           value = Some(paramValue.toString),
           extras = ExtraProperties(Seq(
             ExtraPropValue(

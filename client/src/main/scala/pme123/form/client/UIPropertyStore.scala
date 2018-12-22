@@ -65,13 +65,13 @@ object UIPropertyStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     val newElem = textType match {
       case LABEL =>
-        uiElem.modify(_.elem.texts.each.label.texts.at(language))
+        uiElem.modify(_.elem.texts.label.each.texts.at(language))
           .setTo(text)
       case PLACEHOLDER =>
-        uiElem.modify(_.elem.texts.each.placeholder.texts.at(language))
+        uiElem.modify(_.elem.texts.placeholder.each.texts.at(language))
           .setTo(text)
       case TOOLTIP =>
-        uiElem.modify(_.elem.texts.each.tooltip.texts.at(language))
+        uiElem.modify(_.elem.texts.tooltip.each.texts.at(language))
           .setTo(text)
     }
     changeUIFormElem(newElem)
@@ -83,9 +83,8 @@ object UIPropertyStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
       uiElem
-        .modify(_.elem.elemEntries)
-        .setTo(uiElem.elem.elemEntries.map(es => ElementEntries(es.entries :+ ElementEntry())))
-    )
+        .modify(_.elem.elemEntries.entries)
+        .setTo(uiElem.elem.elemEntries.entries :+ ElementEntry()))
   }
 
   def changeEntryText(language: Language, ident: String)(text: String): Unit = {
@@ -93,39 +92,35 @@ object UIPropertyStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     changeUIFormElem(
       uiElem
-        .modify(_.elem.elemEntries)
-        .setTo(
-          uiElem.elem.elemEntries.map {
-            es =>
-              ElementEntries(
-                es.entries.foldLeft(Seq.empty[ElementEntry]) { (a, b) =>
-                  if (b.ident == ident)
-                    a :+ b.modify(_.label.texts)
-                      .setTo(b.label.texts.updated(language, text))
-                  else
-                    a:+ b
-                })
-          }))
+        .modify(_.elem.elemEntries.entries)
+        .setTo {
+          uiElem.elem.elemEntries.entries
+            .foldLeft(Seq.empty[ElementEntry]) { (a, b) =>
+              if (b.ident == ident)
+                a :+ b.modify(_.label.texts)
+                  .setTo(b.label.texts.updated(language, text))
+              else
+                a :+ b
+            }
+        })
   }
 
-  def changeEntryKey(ident: String)(key:String): Unit = {
+  def changeEntryKey(ident: String)(key: String): Unit = {
     info(s"PropertyUIStore: changeEntryIdent $key $ident")
     val uiElem = uiState.selectedElement.value.value
     changeUIFormElem(
       uiElem
-        .modify(_.elem.elemEntries)
-        .setTo(
-          uiElem.elem.elemEntries.map {
-            es =>
-              ElementEntries(
-                es.entries.foldLeft(Seq.empty[ElementEntry]) { (a, b) =>
-                  if (b.ident == ident)
-                    a :+ b.modify(_.key)
-                      .setTo(key)
-                  else
-                    a:+ b
-                })
-          }))
+        .modify(_.elem.elemEntries.entries)
+        .setTo {
+          uiElem.elem.elemEntries.entries
+            .foldLeft(Seq.empty[ElementEntry]) { (a, b) =>
+              if (b.ident == ident)
+                a :+ b.modify(_.key)
+                  .setTo(key)
+              else
+                a :+ b
+            }
+        })
   }
 
   def deleteEntry(entry: ElementEntry): Unit = {
@@ -133,8 +128,8 @@ object UIPropertyStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
       uiElem
-        .modify(_.elem.elemEntries.each.entries)
-        .setTo(uiElem.elem.elemEntries.get.entries.filter(_ != entry))
+        .modify(_.elem.elemEntries.entries)
+        .setTo(uiElem.elem.elemEntries.entries.filter(_ != entry))
     )
   }
 
@@ -143,9 +138,9 @@ object UIPropertyStore extends Logging {
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
       uiElem
-        .modify(_.elem.elemEntries.each.entries)
+        .modify(_.elem.elemEntries.entries)
         .setTo {
-          uiElem.elem.elemEntries.get.entries
+          uiElem.elem.elemEntries.entries
             .foldLeft(Seq.empty[ElementEntry])((a, b) =>
               if (b.ident == entry.ident)
                 a :+ b :+ b.copy(ident = ElementEntry.ident)
@@ -160,20 +155,19 @@ object UIPropertyStore extends Logging {
     info(s"PropertyUIStore: moveEntry ${draggedEntry.ident}")
     val uiElem = uiState.selectedElement.value.value
     changeActivePropElem(
-        uiElem
-          .modify(_.elem.elemEntries.each.entries)
-          .setTo {
-            val entries = uiElem.elem.elemEntries.get.entries
-            entries
-              .foldLeft(Seq.empty[ElementEntry])((a, b) =>
-                if (b.ident == moveToEntry.ident)
-                  a :+ b :+ draggedEntry
-                else if (b.ident == draggedEntry.ident)
-                  a
-                else
-                  a :+ b
-              )
-          }
+      uiElem
+        .modify(_.elem.elemEntries.entries)
+        .setTo {
+          uiElem.elem.elemEntries.entries
+            .foldLeft(Seq.empty[ElementEntry])((a, b) =>
+              if (b.ident == moveToEntry.ident)
+                a :+ b :+ draggedEntry
+              else if (b.ident == draggedEntry.ident)
+                a
+              else
+                a :+ b
+            )
+        }
     )
   }
 
@@ -213,10 +207,9 @@ object UIPropertyStore extends Logging {
     info(s"PropertyUIStore: changeValidationEnabled $vRule $enabled")
     val uiElem = uiState.selectedElement.value.value
     val newElem =
-      uiElem.elem.modify(_.validations.each.rules)
+      uiElem.elem.modify(_.validations.rules)
         .setTo {
-          val entries = uiElem.elem.validations.get.rules
-          entries
+          uiElem.elem.validations.rules
             .foldLeft(Seq.empty[ValidationRule])((a, b) =>
               if (b.validationType == vRule.validationType)
                 a :+ b.modify(_.enabled).setTo(enabled.toBoolean)
@@ -234,10 +227,9 @@ object UIPropertyStore extends Logging {
     info(s"PropertyUIStore: changeValidationRule $vRule $param")
     val uiElem = uiState.selectedElement.value.value
     val newElem =
-      uiElem.elem.modify(_.validations.each.rules)
+      uiElem.elem.modify(_.validations.rules)
         .setTo {
-          val entries = uiElem.elem.validations.get.rules
-          entries
+          uiElem.elem.validations.rules
             .foldLeft(Seq.empty[ValidationRule])((a, b) =>
               if (b.validationType == vRule.validationType)
                 a :+ b.modify(_.params).setTo(vRule.changeParam(param, value))
@@ -250,7 +242,6 @@ object UIPropertyStore extends Logging {
       uiElem.changeEvent
     ))
   }
-
 
 
 }

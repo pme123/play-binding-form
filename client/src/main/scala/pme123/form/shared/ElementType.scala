@@ -49,6 +49,3 @@ object ElementType
   case object DROPDOWN extends ElementType
 
 }
-
-
-

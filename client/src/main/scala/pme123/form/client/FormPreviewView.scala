@@ -2,10 +2,10 @@ package pme123.form.client
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client.services.{I18n, SemanticUI, UIStore}
+import pme123.form.shared.services.SPAExtensions.StringPos
 import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
-import pme123.form.shared.services.SPAExtensions.{StringPos, _}
 
 import scala.util.matching.Regex
 
@@ -44,7 +44,7 @@ private[client] object FormPreviewView
     <div class="items">
       <div class="item">
         <div class="extra">
-          <div class="ui right floated submit button">Submit</div>
+          <div class="ui right floated submit button">Validate</div>
           <div class="show-valid">
             <i class="big green check icon"></i>
           </div>
@@ -71,8 +71,7 @@ private[client] object FormPreviewView
         val elem = eV.value.elem
         elem.ident -> SemanticField(elem.ident,
           !elem.required,
-          elem.validations.toSeq
-            .flatMap(_.rules)
+          elem.validations.rules
             .filter(_.enabled)
             .map(v =>
               SemanticRule(v.semanticType.toCamelCase, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))

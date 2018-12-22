@@ -12,6 +12,7 @@ import sbt.{Def, ExclusionRule, URL, _}
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import scoverage.ScoverageSbtPlugin.autoImport._
 import webscalajs.WebScalaJS.autoImport.scalaJSPipeline
+import com.tapad.docker.DockerComposePlugin.autoImport.composeFile
 
 object Settings {
 
@@ -161,4 +162,7 @@ object Settings {
     buildInfoPackage := "pme123.adapters.version"
   )
 
+  lazy val dockerComposeSettings: Seq[Def.Setting[_]] = Seq(
+    composeFile := "./docker/docker-compose.yml"
+  )
 }

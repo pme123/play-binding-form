@@ -31,4 +31,6 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.4.0")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")
 // dependency
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.0")
+// docker
+addSbtPlugin("com.tapad" % "sbt-docker-compose" % "1.0.34")
 
