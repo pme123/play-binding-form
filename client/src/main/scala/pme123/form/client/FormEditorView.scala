@@ -3,6 +3,10 @@ package pme123.form.client
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
+import pme123.form.client.services.UIStore.supportedLangs
+import pme123.form.shared.ElementType.TEXTFIELD
+import pme123.form.shared.services.Language.{DE, EN}
+import pme123.form.shared.{BaseElement, DataType, ElementText, ElementTexts}
 
 import scala.util.matching.Regex
 
@@ -41,11 +45,30 @@ private[client] object FormEditorView
 
   @dom
   private lazy val editorHeader: Binding[HTMLElement] =
+  {
     <div class="ui borderless menu">
       <div class="ui item">
         <h3 class="header">
           <i class="edit outline icon"></i> &nbsp; &nbsp;
           Form Editor</h3>
+      </div>
+      <div class="ui right item">{
+        BaseElementDiv(
+          UIFormElem(
+          BaseElement(
+            "form-ident",
+            TEXTFIELD,
+            DataType.STRING,
+            ElementTexts(
+              None,
+              Some(ElementText.placeholder(Map(
+                DE -> "Form Identität",
+                EN -> "Form Identity",
+              )))
+            )
+          )
+        )).bind
+        }
       </div>
       <div class="ui right item">
         <button class="ui circular blue icon button"
@@ -55,7 +78,7 @@ private[client] object FormEditorView
           <i class="add icon"></i>
         </button>
       </div>
-    </div>
+    </div>}
 
   @dom
   private lazy val editorContent: Binding[HTMLElement] =

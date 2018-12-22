@@ -117,11 +117,9 @@ object TextFieldDiv extends BaseElementDiv {
       }<div class="ui input">
       <input id={elem.ident}
              name={elem.ident}
-             data:cam-variable-name={elem.ident}
-             data:cam-variable-type={elem.dataType.entryName}
              size={size}
              type="text"
-             placeholder={texts.textForLabel(activeLanguage)}
+             placeholder={texts.textForPlaceholder(activeLanguage)}
              value={elem.value.get}
              onblur={_: Event =>
                changeEvent(uiFormElem)}/>

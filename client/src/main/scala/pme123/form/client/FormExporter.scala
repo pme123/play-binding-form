@@ -14,7 +14,6 @@ object FormExporter {
           eV.value.elem
         }
     )
-    println("JSON EXPORT" + Json.toJson(form))
     val tab = window.open("data:text/json", "Json Export")
     tab.document.write(Json.toJson(form).toString())
     tab.focus()

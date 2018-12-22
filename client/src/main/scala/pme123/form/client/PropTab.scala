@@ -9,7 +9,6 @@ import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
 import pme123.form.shared.ExtraProp.SIZE
 import pme123.form.shared.PropTabType._
-import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared._
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
@@ -63,8 +62,8 @@ case object PropertiesTab {
           DataType.STRING,
           ElementTexts(
             Some(ElementText.label(Map(DE -> "Standart Wert", EN -> "Default Value"))),
-              Some(ElementText.placeholder(Map(DE -> "Standart Wert", EN -> "Default Value"))),
-                Some(ElementText.tooltip(Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
+            Some(ElementText.placeholder(Map(DE -> "Standart Wert", EN -> "Default Value"))),
+            Some(ElementText.tooltip(Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
           )),
           Some(UIPropertyStore.changeDefaultValue _)
         )
@@ -87,7 +86,7 @@ case object PropertiesTab {
         ElementTexts(
           Some(ElementText.label(Map(DE -> "Element Typ", EN -> "Element Type"))),
           None,
-            Some(ElementText.tooltip(Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
+          Some(ElementText.tooltip(Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
         ),
         elemEntries = ElementEntries(
           ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
@@ -114,7 +113,7 @@ case object PropertiesTab {
         ElementTexts(
           Some(ElementText.label(Map(DE -> "Layout Breite", EN -> "Layout Wide"))),
           None,
-            Some(ElementText.tooltip(Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen).")))
+          Some(ElementText.tooltip(Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen).")))
         ),
         elemEntries = ElementEntries(
           LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(I18n(lw.i18nKey))))
@@ -182,10 +181,10 @@ case object TextsTab {
         {//
         val texts = uiFormElem.elem.texts
         Constants(
-          elementTextDiv(texts.label.get, uiFormElem.isViewable),
-          elementTextDiv(texts.placeholder.get, uiFormElem.isEditable),
-          elementTextDiv(texts.tooltip.get, uiFormElem.isEditable)
-        ).map(_.bind)}
+          texts.label.map(elementTextDiv(_, uiFormElem.isViewable)).toList ++
+            texts.placeholder.map(elementTextDiv(_, uiFormElem.isEditable)).toList ++
+            texts.tooltip.map(elementTextDiv(_, uiFormElem.isEditable)).toList
+            : _*).map(_.bind)}
       </div>
     else
       <span></span>
@@ -341,7 +340,6 @@ case object ValidationsTab {
 
   @dom
   private def validationRule(vRule: ValidationRule): Binding[HTMLElement] = {
-    println(s"vRule: $vRule")
     <tr>
       <td>
         {BaseElementDiv(
@@ -399,7 +397,7 @@ case object ValidationsTab {
           value = Some(paramValue.toString),
           extras = ExtraProperties(Seq(
             ExtraPropValue(
-              SIZE,Some(s"$size")
+              SIZE, Some(s"$size")
             )
           ))),
           Some(UIPropertyStore.changeValidationRule(vRule, param) _)

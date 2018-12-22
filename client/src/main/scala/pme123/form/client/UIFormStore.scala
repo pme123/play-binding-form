@@ -53,7 +53,6 @@ object UIFormStore extends Logging {
     info(s"FormUIStore: copySelectedElement ${ident(elemVar)}")
     val newUIElem = elemVar.value.modify(_.elem.ident)
       .setTo(BaseElement.ident(elemVar.value.elem.elementType))
-    println(s"NEW: $newUIElem")
     val newUIElemVar = Var(
       newUIElem
     )

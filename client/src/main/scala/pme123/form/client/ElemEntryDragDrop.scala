@@ -9,7 +9,6 @@ object ElemEntryDragDrop {
   val dragObject: Var[Option[ElementEntry]] = Var(None)
 
   def allowDrop(moveToEntry: ElementEntry)(ev: DragEvent): Unit = {
-    println(s"allowDrop ${dragObject.value.get.key} - ${moveToEntry.key}")
 
     if (dragObject.value.exists(_.ident != moveToEntry.ident) &&
       dragObject.value.exists(_.getClass == moveToEntry.getClass))

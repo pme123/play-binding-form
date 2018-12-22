@@ -31,8 +31,6 @@ object BaseElement {
 
   def apply(elementType: ElementType)
            (implicit supportedLangs: Seq[Language]): BaseElement = {
-
-
     BaseElement(
       ident(elementType),
       elementType,

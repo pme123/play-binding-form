@@ -24,9 +24,12 @@ case class ElementTexts(label: Option[ElementText] = None,
 }
 
 object ElementTexts {
+
   def apply(defaultLabel: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
       Some(ElementText.label(supportedLangs.map(_ -> defaultLabel).toMap)),
+      Some(ElementText.emptyPlaceholder),
+      Some(ElementText.emptyTooltip),
     )
   }
 
