@@ -1,5 +1,6 @@
 package pme123.form.shared
 
+import play.api.libs.json.{Json, OFormat}
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.services.Language
 
@@ -41,9 +42,10 @@ object BaseElement {
       elemEntries = ElementEntries(elementType),
       validations = Validations(elementType),
     )
-
-
   }
+
+  implicit val jsonFormat: OFormat[BaseElement] = Json.format[BaseElement]
+
 }
 
 

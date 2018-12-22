@@ -1,6 +1,6 @@
 package pme123.form.shared
 
-import pme123.form.client.services.I18n
+import play.api.libs.json.{Json, OFormat}
 import pme123.form.shared.ElementType.DROPDOWN
 import pme123.form.shared.services.Language
 
@@ -21,6 +21,9 @@ object ElementEntries {
   def apply(entries: Seq[ElementEntry]): ElementEntries = {
     ElementEntries(hasEntries = true, entries)
   }
+
+  implicit val jsonFormat: OFormat[ElementEntries] = Json.format[ElementEntries]
+
 }
 
 case class ElementEntry(key: String, label: ElementText, ident: String = ElementEntry.ident) {
@@ -33,4 +36,7 @@ object ElementEntry {
 
   def apply()(implicit supportedLangs: Seq[Language]): ElementEntry =
     ElementEntry("", ElementText.emptyLabel)
+
+  implicit val jsonFormat: OFormat[ElementEntry] = Json.format[ElementEntry]
+
 }

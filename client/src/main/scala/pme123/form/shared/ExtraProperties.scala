@@ -1,6 +1,7 @@
 package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
+import play.api.libs.json.{Json, OFormat}
 import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TEXTFIELD, TITLE}
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.ExtraPropValue.ExtraValue
@@ -17,6 +18,7 @@ case class ExtraProperties(propValues: Seq[ExtraPropValue] = Nil) {
 }
 
 object ExtraProperties {
+
   def apply(elementType: ElementType): ExtraProperties = {
     elementType match {
       case TEXTFIELD =>
@@ -141,6 +143,10 @@ object ExtraProperties {
       )
     }
   }
+
+  implicit val jsonFormat: OFormat[ExtraProperties] = Json.format[ExtraProperties]
+
+
 }
 
 
@@ -148,6 +154,9 @@ case class ExtraPropValue(extraProp: ExtraProp, value: ExtraValue)
 
 object ExtraPropValue {
   type ExtraValue = Option[String]
+
+  implicit val jsonFormat: OFormat[ExtraPropValue] = Json.format[ExtraPropValue]
+
 }
 
 

@@ -1,11 +1,12 @@
 package pme123.form.shared
 
-import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
-
-import scala.collection.immutable.IndexedSeq
 import com.softwaremill.quicklens._
+import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
+import play.api.libs.json.{Json, OFormat}
 import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.ValidationType.{EMAIL, INTEGER, REG_EXP}
+
+import scala.collection.immutable.IndexedSeq
 
 case class Validations(hasValidations: Boolean = false, rules: Seq[ValidationRule] = Nil)
 
@@ -22,6 +23,9 @@ object Validations {
       case _ => Validations()
     }
   }
+
+  implicit val jsonFormat: OFormat[Validations] = Json.format[Validations]
+
 }
 
 case class ValidationRule(validationType: ValidationType, enabled: Boolean = false, params: ValidationParams = ValidationParams())
@@ -48,6 +52,8 @@ object ValidationRule {
     }
   }
 
+  implicit val jsonFormat: OFormat[ValidationRule] = Json.format[ValidationRule]
+
 }
 
 case class ValidationParams(stringParam: Option[String] = None,
@@ -57,6 +63,10 @@ case class ValidationParams(stringParam: Option[String] = None,
   val values: List[String] = List(stringParam, intParam1, intParam2).flatten.map(_.toString)
 
 
+}
+
+object ValidationParams {
+  implicit val jsonFormat: OFormat[ValidationParams] = Json.format[ValidationParams]
 }
 
 sealed trait ValidationType

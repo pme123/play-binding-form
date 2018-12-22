@@ -38,7 +38,7 @@ object BaseElementExtras {
             texts = ElementTexts(
               Some(ElementText.label(Map(DE -> "Wert löschen", EN -> "Clearable"))),
               None,
-              Some(ElementText(TOOLTIP, Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible")))
+              Some(ElementText.tooltip(Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible")))
             ),
             value = Some("true"),
           )))

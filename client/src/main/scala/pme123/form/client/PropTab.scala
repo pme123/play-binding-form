@@ -62,9 +62,9 @@ case object PropertiesTab {
           TEXTFIELD,
           DataType.STRING,
           ElementTexts(
-            Some(ElementText(LABEL, Map(DE -> "Standart Wert", EN -> "Default Value"))),
-              Some(ElementText(PLACEHOLDER, Map(DE -> "Standart Wert", EN -> "Default Value"))),
-                Some(ElementText(TOOLTIP, Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
+            Some(ElementText.label(Map(DE -> "Standart Wert", EN -> "Default Value"))),
+              Some(ElementText.placeholder(Map(DE -> "Standart Wert", EN -> "Default Value"))),
+                Some(ElementText.tooltip(Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
           )),
           Some(UIPropertyStore.changeDefaultValue _)
         )
@@ -85,9 +85,9 @@ case object PropertiesTab {
         DROPDOWN,
         DataType.STRING,
         ElementTexts(
-          Some(ElementText(LABEL, Map(DE -> "Element Typ", EN -> "Element Type"))),
+          Some(ElementText.label(Map(DE -> "Element Typ", EN -> "Element Type"))),
           None,
-            Some(ElementText(TOOLTIP, Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
+            Some(ElementText.tooltip(Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
         ),
         elemEntries = ElementEntries(
           ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
@@ -112,9 +112,9 @@ case object PropertiesTab {
         DROPDOWN,
         DataType.STRING,
         ElementTexts(
-          Some(ElementText(LABEL, Map(DE -> "Layout Breite", EN -> "Layout Wide"))),
+          Some(ElementText.label(Map(DE -> "Layout Breite", EN -> "Layout Wide"))),
           None,
-            Some(ElementText(TOOLTIP, Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen).")))
+            Some(ElementText.tooltip(Map(DE -> "Die Breite des Elementes innerhalb des Layouts (vier bis sechzehn)", EN -> "The wide of an element within its layout (four to sixteen).")))
         ),
         elemEntries = ElementEntries(
           LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(I18n(lw.i18nKey))))
@@ -141,7 +141,7 @@ case object PropertiesTab {
         ElementTexts(
           Some(ElementText.label(Map(DE -> "Obligatorisch", EN -> "Required"))),
           None,
-          Some(ElementText(TOOLTIP, Map(DE -> "Das Feld ist zwingend auszufüllen.", EN -> "The value of the field is required.")))
+          Some(ElementText.tooltip(Map(DE -> "Das Feld ist zwingend auszufüllen.", EN -> "The value of the field is required.")))
         ),
         value = Some(required.toString)
       ),

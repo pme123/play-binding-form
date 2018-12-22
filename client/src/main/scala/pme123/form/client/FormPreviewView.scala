@@ -38,10 +38,16 @@ private[client] object FormPreviewView
   private lazy val previewContent: Binding[HTMLElement] =
   <div class="ui grid">
     {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind //
-    }
-    <div class="sixteen wide column">
-      <div class="ui divider"></div>
+    }<div class="sixteen wide column">
+    <div class="ui divider"></div>
     <div class="items">
+      <div class="item">
+        <div class="extra">
+          <div class="ui right floated button"
+               onclick={_: Event =>
+                 FormExporter.exportForm()}>Export</div>
+        </div>
+      </div>
       <div class="item">
         <div class="extra">
           <div class="ui right floated submit button">Validate</div>
@@ -75,7 +81,7 @@ private[client] object FormPreviewView
             .filter(_.enabled)
             .map(v =>
               SemanticRule(v.semanticType.toCamelCase, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))
-            ) ++ (if(elem.required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
+            ) ++ (if (elem.required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
         )
       }.toMap
     SemanticUI.initForm(SemanticForm(fields = fields))

@@ -5,6 +5,7 @@ import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{SPACER, TEXTFIELD}
 import pme123.form.shared.{BaseElement, ExtraProp}
 
+
 case class UIFormElem(
                        elem: BaseElement = BaseElement(TEXTFIELD),
                        extras: Map[ExtraProp, UIFormElem] = Map.empty,
