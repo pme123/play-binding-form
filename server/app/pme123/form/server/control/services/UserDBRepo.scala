@@ -15,7 +15,7 @@ class UserDBRepo @Inject()()
   extends DoobieDB {
 
   def insertUser(user: User): Future[Int] =
-    insert(
+    update(
       sql"""insert into users (username, groups, firstname, lastname, email, avatar, language)
              values (${user.username}, ${user.groupsString}, ${user.firstName}, ${user.lastName}, ${user.email}, ${user.avatar}, ${user.languageString})"""
     )

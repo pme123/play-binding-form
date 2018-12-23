@@ -8,16 +8,18 @@ import org.scalajs.dom.window
 object FormExporter {
 
   def exportForm(): Unit = {
-    val form = FormContainer(
+    val tab = window.open("data:text/json", "Json Export")
+    tab.document.write(Json.toJson(createForm).toString())
+    tab.focus()
+  }
+
+   def createForm: FormContainer = {
+    FormContainer(
       UIFormStore.uiState.formId.value,
       UIFormStore.uiState.formElements.value
         .map { eV =>
           eV.value.elem
         }
     )
-    val tab = window.open("data:text/json", "Json Export")
-    tab.document.write(Json.toJson(form).toString())
-    tab.focus()
   }
-
 }

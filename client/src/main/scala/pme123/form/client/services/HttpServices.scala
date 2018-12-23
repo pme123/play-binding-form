@@ -27,6 +27,12 @@ trait HttpServices
                    (implicit reads: Reads[A], writes: Writes[B]): Binding[HTMLElement] =
     callService[A](apiPath, Ajax.put(apiPath, InputData.str2ajax(Json.toJson(body).toString())), storeChange)
 
+  def httpPost[A, B](apiPath: String
+                    , body: B
+                    , storeChange: A => Unit)
+                   (implicit reads: Reads[A], writes: Writes[B]): Binding[HTMLElement] =
+    callService[A](apiPath, Ajax.post(apiPath, InputData.str2ajax(Json.toJson(body).toString())), storeChange)
+
   @dom
   def callService[A](apiPath: String
                      , ajaxCall: Future[XMLHttpRequest]
@@ -51,7 +57,7 @@ trait HttpServices
           }.get}
         </div>
       case Some(Failure(exception: AjaxException)) =>
-        val msg = s"Problem accessing $apiPath > ${exception.xhr.status}: ${exception.xhr.statusText}"
+        val msg = s"Problem accessing $apiPath > ${exception.xhr.status}: ${exception.xhr.statusText} ${exception.xhr.responseText}"
         error(msg, exception) //
         <span>
           {errorMessage(msg).bind}

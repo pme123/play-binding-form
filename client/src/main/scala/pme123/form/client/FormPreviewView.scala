@@ -18,13 +18,15 @@ private[client] object FormPreviewView
 
   val link: String = name
 
+  val persistForm = Var(false)
+
   // 1. level of abstraction
   // **************************
   @dom
   def create(): Binding[HTMLElement] =
     <div class="ui container">
       {<div class="ui form">
-      {//
+      {persistFormDiv.bind}{//
       previewContent.bind}{//
       initFields.bind //
       }<div class="ui error message"></div>
@@ -46,6 +48,15 @@ private[client] object FormPreviewView
           <div class="ui right floated button"
                onclick={_: Event =>
                  FormExporter.exportForm()}>Export</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="extra">
+          <div class="ui right floated button"
+               onclick={_: Event =>
+                 persistForm.value = true}>
+            {s"Save Form"}
+          </div>
         </div>
       </div>
       <div class="item">
@@ -86,6 +97,21 @@ private[client] object FormPreviewView
       }.toMap
     SemanticUI.initForm(SemanticForm(fields = fields))
       <span/>
+  }
+
+  @dom
+  private lazy val persistFormDiv: Binding[HTMLElement] = {
+    val doPersist = persistForm.bind
+    if (doPersist)
+      <div>
+        {
+        persistForm.value = false
+        ServerServices.persistForm(
+        FormExporter.createForm
+      ).bind}
+      </div>
+    else
+        <span/>
   }
 
 }

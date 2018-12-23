@@ -29,7 +29,7 @@ trait DoobieDB {
     )
     */
 
-  protected def insert(sql: Fragment): Future[Int] =
+  protected def update(sql: Fragment): Future[Int] =
     Future(
       blocking(
         sql

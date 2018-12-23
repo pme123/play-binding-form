@@ -1,9 +1,5 @@
 package pme123.form.server.boundary
 
-import cats.data.NonEmptyList
-import doobie._
-import doobie.implicits._
-import doobie.util.fragment.Fragment
 import javax.inject._
 import play.api.libs.json._
 import play.api.mvc._
@@ -19,12 +15,29 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 @Singleton
 class FormApi @Inject()(formDBRepo: FormDBRepo,
-                            val spaComps: SPAComponents)
-                           (implicit val ec: ExecutionContext)
+                        val spaComps: SPAComponents)
+                       (implicit val ec: ExecutionContext)
   extends SPAController(spaComps) {
+
+  def persistForm() = Action.async { implicit request: Request[AnyContent] =>
+    val eventualResult: Future[Result] = request.body.asText.map { body =>
+      val eventualResult: Future[Result] =
+        Json.parse(body).validate[FormContainer] match {
+          case JsSuccess(form, _) =>
+            formDBRepo.persist(form)
+              .map(form =>
+                Ok(Json.toJson(form)).as(JSON))
+          case err: JsError =>
+            Future.successful(BadRequest(s"Problem parsing Formcontainer: ${err}"))
+        }
+      eventualResult
+    }.getOrElse(Future.successful(BadRequest("No Form in Body!")))
+    eventualResult
+  }
 
   def forms(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
 
-        Ok(Json.toJson(FormContainer("form-id"))).as(JSON)
+    Ok(Json.toJson(FormContainer("form-id"))).as(JSON)
   }
+
 }

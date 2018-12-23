@@ -67,7 +67,7 @@ private[client] object FormEditorView
             ),
             value = Some(UIFormStore.uiState.formId.value)),
           Map.empty,
-          Some(UIFormStore.changeFormId _),
+          Some(UIFormStore.changeFormId),
         )).bind}
       </div>
       <div class="ui right item">
