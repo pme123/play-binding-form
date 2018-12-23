@@ -25,6 +25,22 @@ class FormDBInitializer @Inject()()
         )"""
   )
 
+  val initUser: Int = initTable(
+    sql"""
+        DROP TABLE IF EXISTS users
+      """,
+    sql"""
+        CREATE TABLE users (
+          id   SERIAL,
+          username VARCHAR NOT NULL UNIQUE,
+          groups VARCHAR,
+          firstName VARCHAR,
+          lastName VARCHAR,
+          email VARCHAR,
+          avatar VARCHAR,
+          language VARCHAR
+         )"""
+  )
 
   private def initTable(drop: Fragment, create: Fragment): Int = {
     (drop.update.run, create.update.run)

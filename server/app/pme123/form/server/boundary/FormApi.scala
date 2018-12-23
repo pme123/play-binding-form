@@ -40,4 +40,9 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
     Ok(Json.toJson(FormContainer("form-id"))).as(JSON)
   }
 
+  def formIds(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    formDBRepo.formIds()
+      .map(ids => Ok(Json.toJson(ids)).as(JSON))
+  }
+
 }

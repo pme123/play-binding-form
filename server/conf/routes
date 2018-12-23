@@ -15,6 +15,7 @@ GET         /auth/logout                           pme123.form.server.boundary.s
 GET         /api/loggedInUser                      pme123.form.server.boundary.services.UserApi.loggedInUser()
 
 GET         /api/forms               pme123.form.server.boundary.FormApi.forms()
+GET         /api/formIds               pme123.form.server.boundary.FormApi.formIds()
 + nocsrf
 POST        /api/form                pme123.form.server.boundary.FormApi.persistForm()
 

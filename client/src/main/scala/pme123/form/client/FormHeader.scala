@@ -21,6 +21,7 @@ private[client] object FormHeader
       title.bind //
       }{spacer.bind}<div class="ui right item">
       {//
+      formsButton.bind}{//
       logInButton.bind}{//
       languageButton.bind}{//
       editPreviewSwitch.bind}
@@ -76,6 +77,26 @@ private[client] object FormHeader
   }
 
   @dom
+  private def formsButton = {
+    ServerServices.formIds().bind
+    <div class="ui floating dropdown icon button">
+      <span class="text">
+        Choose Form
+      </span>
+      <div class="menu">
+        {for (formId <- UIFormStore.uiState.formIds) yield formIdLink(formId).bind}
+      </div>
+    </div>
+  }
+
+  @dom
+  private def formIdLink(formId: String) = {
+    <a href={s"${UIStore.uiState.webContext.value}/auth/logout"} class="item">
+      {formId}
+    </a>
+  }
+
+  @dom
   private def logInButton = {
     val user = UIStore.uiState.loggedInUser.bind
     if (user.isDefined)
@@ -108,19 +129,19 @@ private[client] object FormHeader
 
     val language = UIStore.activeLanguage.value
 
-      <div class="ui icon top left pointing dropdown icon button">
-        <input type="hidden"
-               id="languageId"
-               value={language.entryName}
-               onchange={_: Event =>
-                 UIStore.changeLanguage(languageId.value)}/>
-        <div class="default text">
-          <i class={s"${language.flag} big flag"}></i>
-        </div>
-        <div class="menu">
-          {Constants(UIStore.supportedLangs.map(languageItem): _*).map(_.bind)}
-        </div>
+    <div class="ui icon top left pointing dropdown icon button">
+      <input type="hidden"
+             id="languageId"
+             value={language.entryName}
+             onchange={_: Event =>
+               UIStore.changeLanguage(languageId.value)}/>
+      <div class="default text">
+        <i class={s"${language.flag} big flag"}></i>
       </div>
+      <div class="menu">
+        {Constants(UIStore.supportedLangs.map(languageItem): _*).map(_.bind)}
+      </div>
+    </div>
   }
 
   @dom

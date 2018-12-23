@@ -26,6 +26,11 @@ class FormDBRepo @Inject()()
       }.map(_ => form)
   }
 
+  def formIds(): Future[List[String]] = {
+    selectForms()
+      .map(_.map(_.formId))
+  }
+
   def insertForm(formCont: FormContainer): Future[Int] = {
     val formContent = Json.toJson(formCont).toString()
     update(

@@ -19,4 +19,10 @@ object ServerServices
     )
   }
 
+  def formIds(): Binding[HTMLElement] = {
+    val path = s"$apiPath/formIds"
+
+    httpGet(path, (ids: Seq[String]) => UIFormStore.changeFormIds(ids))
+  }
+
 }

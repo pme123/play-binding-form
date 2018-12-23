@@ -90,11 +90,18 @@ object UIFormStore extends Logging {
     uiState.formId.value = formId
   }
 
+  def changeFormIds(formIds: Seq[String]): Unit = {
+    info(s"FormUIStore: changeFormIds $formIds")
+    uiState.formIds.value.clear()
+    uiState.formIds.value ++= formIds
+  }
+
   case class UIState(formElements: Vars[Var[UIFormElem]],
                      selectedElement: Var[Var[UIFormElem]],
                      activePropElement: Var[UIFormElem],
                      activePropTab: Var[PropTabType],
                      formId: Var[String],
+                     formIds: Vars[String]
                     )
 
   object UIState {
@@ -106,7 +113,8 @@ object UIFormStore extends Logging {
         Var(defaultElem),
         Var(defaultElem.value),
         Var(PROPERTIES),
-        Var(s"form-${Random.nextInt(100)}")
+        Var(s"form-${Random.nextInt(100)}"),
+        Vars.empty
       )
     }
   }

@@ -1,6 +1,6 @@
 import com.google.inject.AbstractModule
 import play.api.libs.concurrent.AkkaGuiceSupport
-import pme123.form.server.control.FormDBInitializer
+import pme123.form.server.control.{ExcelImporter, FormDBInitializer}
 import slogging.{LoggerConfig, SLF4JLoggerFactory}
 
 class Module extends AbstractModule with AkkaGuiceSupport {
@@ -10,6 +10,9 @@ class Module extends AbstractModule with AkkaGuiceSupport {
     LoggerConfig.factory = SLF4JLoggerFactory()
 
     bind(classOf[FormDBInitializer])
+      .asEagerSingleton()
+
+    bind(classOf[ExcelImporter])
       .asEagerSingleton()
   }
 }
