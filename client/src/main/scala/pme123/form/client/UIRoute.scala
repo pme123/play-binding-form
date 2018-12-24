@@ -16,6 +16,9 @@ object UIRoute {
       case FormPreviewView.hashRegex() =>
         info(s"FormPreviewView")
         FormPreviewView
+      case DataView.hashRegex() =>
+        info(s"DataView")
+        DataView
       case _ =>
         info(s"FormEditorView!!: $hashText")
         FormEditorView

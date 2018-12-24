@@ -44,3 +44,7 @@ props.ident=Schlüssel (Identität)
 enum.validation-type.reg_exp=Regex
 enum.validation-type.reg_exp.p=Ausdruck
 enum.validation-type.reg_exp.prompt=Wir erwarten einen Text, welcher dem Regex {0} entspricht.
+enum.structure-type.string=Text
+enum.structure-type.number=Nummer
+enum.structure-type.boolean=Ja / Nein
+enum.structure-type.object=Objekt

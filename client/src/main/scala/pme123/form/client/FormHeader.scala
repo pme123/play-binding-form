@@ -81,7 +81,7 @@ private[client] object FormHeader
 
   @dom
   private def formsButton = {
-    ServerServices.formIds().bind
+    FormServices.formIds().bind
     <div class="ui floating dropdown icon button">
       <span class="text">
         Choose Form
@@ -119,7 +119,7 @@ private[client] object FormHeader
       </div>
     else
       <div class="ui item">
-        {ServerServices.loggedInUser().bind //
+        {FormServices.loggedInUser().bind //
         }<button class="ui icon button"
                  onclick={_: Event =>
                    window.open(s"${UIStore.uiState.webContext.value}/auth/login", "_self")}
@@ -162,7 +162,7 @@ private[client] object FormHeader
     val change = changeForm.bind
     if (change.nonEmpty)
       <div>
-        {ServerServices.getForm(change.get).bind}
+        {FormServices.getForm(change.get).bind}
       </div>
     else
       <span/>

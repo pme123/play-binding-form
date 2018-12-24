@@ -106,7 +106,7 @@ private[client] object FormPreviewView
       <div>
         {
         persistForm.value = false
-        ServerServices.persistForm(
+        FormServices.persistForm(
         FormExporter.createForm
       ).bind}
       </div>
