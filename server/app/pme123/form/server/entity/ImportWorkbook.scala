@@ -1,6 +1,8 @@
 package pme123.form.server.entity
 
 import org.apache.poi.ss.usermodel._
+import play.api.libs.json.{JsError, JsSuccess, Json}
+import pme123.form.shared.FormContainer
 import pme123.form.shared.services.{Identifiable, Logging, SPAException, User}
 
 import scala.collection.JavaConverters._
@@ -37,6 +39,22 @@ case class ImportWorkbook(wb: Workbook)
         info(rowStrs.mkString("\t: "))
       }
 
+    }
+  }
+
+  lazy val forms: Try[Seq[Try[FormContainer]]] = {
+    getSheet(sheetForms) map { s =>
+      rows(s).map { row =>
+        Try(
+          Json.parse(cellAsString(row.getCell(col1)))
+            .validate[FormContainer] match {
+            case JsSuccess(value, _) =>
+              value
+            case err: JsError =>
+              throw JsonParseException(err)
+          }
+        ) recoverWith failure(sheetForms, row.getRowNum)
+      }
     }
   }
 
@@ -111,8 +129,8 @@ case class ImportWorkbook(wb: Workbook)
 }
 
 object ImportWorkbook {
-  val sheetConfig = "config"
   val sheetUsers = "users"
+  val sheetForms = "forms"
 
 
   val col0 = 0

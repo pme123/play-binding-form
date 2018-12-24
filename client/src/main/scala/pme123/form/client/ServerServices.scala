@@ -11,7 +11,6 @@ import pme123.form.shared.FormContainer
 object ServerServices
   extends HttpServices {
 
-
   def persistForm(formContainer: FormContainer): Binding[HTMLElement] = {
     val path = s"$apiPath/form"
 
@@ -24,5 +23,13 @@ object ServerServices
 
     httpGet(path, (ids: Seq[String]) => UIFormStore.changeFormIds(ids))
   }
+
+  def getForm(formId: String) = {
+    val path = s"$apiPath/form/$formId"
+
+    httpGet(path, (form:FormContainer) => UIFormStore.changeForm(form))
+  }
+
+
 
 }

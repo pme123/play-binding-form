@@ -19,9 +19,8 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
                        (implicit val ec: ExecutionContext)
   extends SPAController(spaComps) {
 
-  def persistForm() = Action.async { implicit request: Request[AnyContent] =>
-    val eventualResult: Future[Result] = request.body.asText.map { body =>
-      val eventualResult: Future[Result] =
+  def persistForm(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    request.body.asText.map { body =>
         Json.parse(body).validate[FormContainer] match {
           case JsSuccess(form, _) =>
             formDBRepo.persist(form)
@@ -30,9 +29,7 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
           case err: JsError =>
             Future.successful(BadRequest(s"Problem parsing Formcontainer: ${err}"))
         }
-      eventualResult
     }.getOrElse(Future.successful(BadRequest("No Form in Body!")))
-    eventualResult
   }
 
   def forms(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
@@ -45,4 +42,8 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
       .map(ids => Ok(Json.toJson(ids)).as(JSON))
   }
 
+  def form(formId: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    formDBRepo.selectForm(formId)
+      .map(form => Ok(Json.toJson(form)).as(JSON))
+  }
 }

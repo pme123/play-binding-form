@@ -13,12 +13,26 @@ import scala.util.Random
 
 object UIFormStore extends Logging {
 
-
   val uiState = UIState()
 
   def changePage(): Unit = {
     uiState.activePropElement.value = uiState.selectedElement.value.value
   }
+
+  def changeForm(form: FormContainer): Unit = {
+    info(s"FormUIStore: changeForm ${form.formId}")
+    changeFormId(form.formId)
+    uiState.formElements.value.clear()
+    val seq = form.elems.map(UIFormElem.apply(_))
+      .map(Var(_))
+    if(seq.nonEmpty){
+      uiState.formElements.value ++= seq
+      changeSelectedElement(seq.head)
+    }else{
+      addFormElement()
+    }
+  }
+
 
   def addFormElement(): Var[UIFormElem] = {
     info(s"FormUIStore: addFormElement")

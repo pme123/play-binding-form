@@ -1,6 +1,6 @@
 package pme123.form.client
 
-import com.thoughtworks.binding.Binding.Constants
+import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.dom.window
@@ -11,6 +11,8 @@ import scala.language.implicitConversions
 
 private[client] object FormHeader
   extends ClientUtils {
+
+  private val changeForm: Var[Option[String]] = Var(None)
 
   // 1. level of abstraction
   // **************************
@@ -26,6 +28,7 @@ private[client] object FormHeader
       languageButton.bind}{//
       editPreviewSwitch.bind}
     </div>
+      {changeFormDiv.bind}
     </div>
 
   }
@@ -91,7 +94,10 @@ private[client] object FormHeader
 
   @dom
   private def formIdLink(formId: String) = {
-    <a href={s"${UIStore.uiState.webContext.value}/auth/logout"} class="item">
+    <a class="item"
+       onclick={_: Event =>
+         changeForm.value = Some(formId)}
+    >
       {formId}
     </a>
   }
@@ -149,5 +155,17 @@ private[client] object FormHeader
     <div class="item" data:data-value={lang.abbreviation}>
       <i class={s"${lang.flag} big flag"}></i>
     </div>
+
+
+  @dom
+  private lazy val changeFormDiv = {
+    val change = changeForm.bind
+    if (change.nonEmpty)
+      <div>
+        {ServerServices.getForm(change.get).bind}
+      </div>
+    else
+      <span/>
+  }
 
 }

@@ -52,7 +52,9 @@ private[client] object FormEditorView
           Form Editor</h3>
       </div>
       <div class="ui right item">
-        {BaseElementDiv(
+        {
+        val formId = UIFormStore.uiState.formId.bind
+        BaseElementDiv(
         UIFormElem(
           BaseElement(
             "form-ident",
@@ -65,7 +67,7 @@ private[client] object FormEditorView
                 EN -> "Form Identity",
               )))
             ),
-            value = Some(UIFormStore.uiState.formId.value)),
+            value = Some(formId)),
           Map.empty,
           Some(UIFormStore.changeFormId),
         )).bind}
