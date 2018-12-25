@@ -14,11 +14,17 @@ GET         /auth/logout                  pme123.form.server.boundary.services.A
 # API to get all the Jobs that are provided
 GET         /api/loggedInUser             pme123.form.server.boundary.services.UserApi.loggedInUser()
 
+# Form API
 GET         /api/forms                    pme123.form.server.boundary.FormApi.forms()
 GET         /api/formIds                  pme123.form.server.boundary.FormApi.formIds()
 GET         /api/form/:formId             pme123.form.server.boundary.FormApi.form(formId:String)
 + nocsrf
 POST        /api/form                     pme123.form.server.boundary.FormApi.persistForm()
+
+# Data API
++ nocsrf
+POST        /api/data/import              pme123.form.server.boundary.DataApi.importDataStructure()
+
 
 # API to get all the Client Configs that are registered for a jobConfig
 #GET        /api/formProducts/:jobIdent                      pme123.form.server.boundary.services.FormController.clientConfigs()

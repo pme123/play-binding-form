@@ -13,6 +13,10 @@ object UIDataStore extends Logging {
 
   val uiState = UIState()
 
+  def changeData(data: DataStructure): Unit = {
+    info(s"FormUIStore: changeData ${data.ident}")
+    uiState.dataStructure.value = data
+  }
 
   case class UIState(
                       dataStructure: Var[DataStructure],

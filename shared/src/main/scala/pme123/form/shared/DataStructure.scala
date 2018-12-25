@@ -1,14 +1,19 @@
 package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
-import play.api.libs.json.{JsValue, Json, OFormat}
+import play.api.libs.json.{JsString, JsValue, Json, OFormat}
+import pme123.form.shared.StructureType.STRING
 
 import scala.collection.immutable
+import scala.util.Random
 
 
 case class DataStructure(ident: String, structureType: StructureType, structure: JsValue)
 
 object DataStructure {
+
+  def apply(): DataStructure =
+    DataStructure(s"ds-${Random.nextInt(10000)}", STRING, JsString(""))
 
   implicit val jsonFormat: OFormat[DataStructure] = Json.format[DataStructure]
 }

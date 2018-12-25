@@ -75,3 +75,16 @@
 .ui.form.success .show-valid {
     display: block;
 }
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.ui.datamenu.menu {
+    margin: 0 7px 12px;
+}
