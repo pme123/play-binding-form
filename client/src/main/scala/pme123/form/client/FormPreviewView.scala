@@ -4,8 +4,10 @@ import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client.services.{I18n, SemanticUI, UIStore}
+import pme123.form.shared.ElementType.TEXTFIELD
+import pme123.form.shared.services.Language.{DE, EN}
 import pme123.form.shared.services.SPAExtensions.StringPos
-import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
+import pme123.form.shared._
 
 import scala.util.matching.Regex
 
@@ -27,6 +29,7 @@ private[client] object FormPreviewView
     <div class="ui container">
       {<div class="ui form">
       {persistFormDiv.bind}{//
+      previewHeader.bind}{//
       previewContent.bind}{//
       initFields.bind //
       }<div class="ui error message"></div>
@@ -36,40 +39,49 @@ private[client] object FormPreviewView
 
   // 2. level of abstraction
   // **************************
+
+
   @dom
-  private lazy val previewContent: Binding[HTMLElement] =
-  <div class="ui grid">
-    {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind //
-    }<div class="sixteen wide column">
-    <div class="ui divider"></div>
-    <div class="items">
-      <div class="item">
-        <div class="extra">
-          <div class="ui right floated button"
-               onclick={_: Event =>
-                 FormExporter.exportForm()}>Export</div>
-        </div>
+  private lazy val previewHeader: Binding[HTMLElement] = {
+    <div class="ui borderless menu">
+      <div class="ui item">
+        <h3 class="header">
+          <i class="newspaper outline icon"></i> &nbsp; &nbsp;
+          Form Preview</h3>
       </div>
-      <div class="item">
-        <div class="extra">
-          <div class="ui right floated button"
-               onclick={_: Event =>
-                 persistForm.value = true}>
-            {s"Save Form"}
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="extra">
-          <div class="ui right floated submit button">Validate</div>
-          <div class="show-valid">
-            <i class="big green check icon"></i>
-          </div>
-        </div>
+      <div class="ui right item">
+        <button class="ui circular show-valid icon submit button"
+                data:data-tooltip="Validate Form"
+                onclick={_: Event =>
+                  persistForm.value = true}>
+          <i class="check icon"></i>
+        </button>
+        &nbsp;
+        &nbsp;
+        <button class="ui circular icon button"
+                data:data-tooltip="Export Form as JSON"
+                onclick={_: Event =>
+                  FormExporter.exportForm()}>
+          <i class="sign-out icon"></i>
+        </button>
+        &nbsp;
+        &nbsp;
+        <button class="ui circular blue icon button"
+                data:data-tooltip="Persist Form on Server"
+                onclick={_: Event =>
+                  persistForm.value = true}>
+          <i class="save outline icon"></i>
+        </button>
       </div>
     </div>
-  </div>
-  </div>
+  }
+
+  @dom
+  private lazy val previewContent: Binding[HTMLElement] =
+    <div class="ui grid">
+      {for (elem <- UIFormStore.uiState.formElements) yield element(elem).bind //
+      }
+    </div>
 
   @dom
   private def element(uiElemVar: Var[UIFormElem]): Binding[HTMLElement] = {
@@ -104,9 +116,8 @@ private[client] object FormPreviewView
     val doPersist = persistForm.bind
     if (doPersist)
       <div>
-        {
-        persistForm.value = false
-        FormServices.persistForm(
+        {persistForm.value = false
+      FormServices.persistForm(
         FormExporter.createForm
       ).bind}
       </div>

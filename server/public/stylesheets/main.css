@@ -3,7 +3,7 @@
 }
 
 .main-content {
-    padding: 24px 20px 0 20px;
+    padding: 10px 0 0;
 }
 
 .ui.main.borderless.menu {
@@ -68,12 +68,9 @@
     background-color: white !important;
 }
 
-.ui.form .show-valid {
-    display: none;
-}
-
 .ui.form.success .show-valid {
-    display: block;
+    color: white;
+    background-color: green;
 }
 
 .inputfile {
