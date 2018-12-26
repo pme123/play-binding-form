@@ -1,6 +1,7 @@
 package pme123.form.server.control
 
 import javax.inject.{Inject, Singleton}
+import pme123.data.server.control.DataDBRepo
 import pme123.form.server.control.services.UserDBRepo
 import pme123.form.shared.services.Logging
 
@@ -10,7 +11,9 @@ import pme123.form.server.entity.ImportWorkbook.workbook
 
 @Singleton
 class ExcelImporter @Inject()(userDBRepo: UserDBRepo,
-                              formDBRepo: FormDBRepo) // to make sure it is initialized
+                              formDBRepo: FormDBRepo,
+                              dataDBRepo: DataDBRepo,
+                             ) // to make sure it is initialized
                              (implicit val ec: ExecutionContext)
   extends Logging {
 
@@ -18,7 +21,9 @@ class ExcelImporter @Inject()(userDBRepo: UserDBRepo,
 
   importObjects(workbook.forms, formDBRepo.insertForm)
 
-  private def importObjects[T](objects: Try[Seq[Try[T]]], insert: T =>  Future[_]) = {
+  importObjects(workbook.data, dataDBRepo.insertData)
+
+  private def importObjects[T](objects: Try[Seq[Try[T]]], insert: T => Future[_]) = {
     objects match {
       case Success(objs) =>
         objs.map {

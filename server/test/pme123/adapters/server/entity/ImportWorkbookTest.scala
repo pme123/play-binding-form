@@ -4,6 +4,7 @@ import java.io.InputStream
 
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import pme123.form.server.entity.ImportWorkbook
+import pme123.form.shared.DataString
 
 
 class ImportWorkbookTest
@@ -25,48 +26,30 @@ class ImportWorkbookTest
     assert(wb.getNumberOfSheets === 3)
   }
 
-  it should "contain a categories sheet" in {
-    assert(wb.getSheet(sheetCategories) != null)
-  }
-  it should "contain a products sheet" in {
-    assert(wb.getSheet(sheetFormProducts) != null)
-  }
   it should "contain a forms sheet" in {
     assert(wb.getSheet(sheetForms) != null)
   }
-
-  "The categories sheet" should "have 5 categrories" in {
-    workbook.categories.get.length should be(5)
-  }
-  "The products sheet" should "have 4 products" in {
-    workbook.formProducts.get.length should be(4)
-  }
-  "The forms sheet" should "have 3 forms" in {
-    val value = workbook.forms.get
-    value.length should be(3)
+  it should "contain a data sheet" in {
+    assert(wb.getSheet(sheetData) != null)
   }
 
-  "The first Category" should "be" in {
-    val category = workbook.categories.get.head.get
-    category.ident should be("fish")
-    category.name should be("Fish")
+  "The forms sheet" should "have 1 forms" in {
+    workbook.forms.get.length should be(1)
   }
-
-  "The first Product" should "be" in {
-    val product = workbook.formProducts.get.head.get
-    product.productIdent should be("FIS-001")
-    product.name should be("Angelfish")
-    product.category.ident should be("fish")
-    product.tags should be(Set("saltwater"))
-
+  "The data sheet" should "have 1 data" in {
+    workbook.data.get.length should be(1)
   }
 
   "The first Form" should "be" in {
     val form = workbook.forms.get.head.get
-    form.itemIdent should be("ANG-0001")
-    form.descr should be("Large Angelfish")
-    form.product.name should be("Angelfish")
-    form.tags should be(Set())
+    form.ident should be("address-form")
+    form.elems.head.ident should be("TITLE-3549")
+  }
+
+  "The first Data" should "be" in {
+    val data = workbook.data.get.head.get
+    data.ident should be("address-data")
+    data.structure.value("street") should be(DataString("Sonnenweg"))
   }
 
 }

@@ -10,7 +10,7 @@ import pme123.form.shared.services.Logging
 trait AcceptanceSpec
   extends WordSpec
    // with AsyncTestSuite
-   // with TestSuite
+    with TestSuite
     with MustMatchers
     with OptionValues
     with WsScalaTestClient

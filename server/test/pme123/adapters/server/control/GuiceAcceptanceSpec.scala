@@ -1,7 +1,6 @@
 package pme123.adapters.server.control
 
 import akka.util.Timeout
-import org.scalatest.TestSuite
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.ws.WSClient
 
