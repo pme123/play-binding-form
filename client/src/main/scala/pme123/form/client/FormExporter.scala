@@ -15,7 +15,7 @@ object FormExporter {
 
    def createForm: FormContainer = {
     FormContainer(
-      UIFormStore.uiState.formId.value,
+      UIFormStore.uiState.ident.value,
       UIFormStore.uiState.formElements.value
         .map { eV =>
           eV.value.elem

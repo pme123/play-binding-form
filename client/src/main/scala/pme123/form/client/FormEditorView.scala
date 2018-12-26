@@ -47,7 +47,7 @@ private[client] object FormEditorView
       </div>
       <div class="ui right item">
         {
-        val formId = UIFormStore.uiState.formId.bind
+        val ident = UIFormStore.uiState.ident.bind
         BaseElementDiv(
         UIFormElem(
           BaseElement(
@@ -61,9 +61,9 @@ private[client] object FormEditorView
                 EN -> "Form Identity",
               )))
             ),
-            value = Some(formId)),
+            value = Some(ident)),
           Map.empty,
-          Some(UIFormStore.changeFormId),
+          Some(UIFormStore.changeIdent),
         )).bind}
       </div>
       <div class="ui right item">

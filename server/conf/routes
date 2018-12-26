@@ -16,12 +16,14 @@ GET         /api/loggedInUser             pme123.form.server.boundary.services.U
 
 # Form API
 GET         /api/forms                    pme123.form.server.boundary.FormApi.forms()
-GET         /api/formIds                  pme123.form.server.boundary.FormApi.formIds()
-GET         /api/form/:formId             pme123.form.server.boundary.FormApi.form(formId:String)
+GET         /api/idents                  pme123.form.server.boundary.FormApi.idents()
+GET         /api/form/:ident             pme123.form.server.boundary.FormApi.form(ident:String)
 + nocsrf
 POST        /api/form                     pme123.form.server.boundary.FormApi.persistForm()
 
 # Data API
++ nocsrf
+POST        /api/data                     pme123.form.server.boundary.DataApi.persistData()
 + nocsrf
 POST        /api/data/import              pme123.form.server.boundary.DataApi.importDataStructure()
 

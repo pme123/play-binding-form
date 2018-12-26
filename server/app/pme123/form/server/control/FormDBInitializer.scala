@@ -20,7 +20,19 @@ class FormDBInitializer @Inject()()
     sql"""
         CREATE TABLE form (
           id   SERIAL,
-          formId VARCHAR NOT NULL UNIQUE,
+          ident VARCHAR NOT NULL UNIQUE,
+          content VARCHAR
+        )"""
+  )
+
+  val initData: Int = initTable(
+    sql"""
+        DROP TABLE IF EXISTS data
+      """,
+    sql"""
+        CREATE TABLE data (
+          id   SERIAL,
+          ident VARCHAR NOT NULL UNIQUE,
           content VARCHAR
         )"""
   )

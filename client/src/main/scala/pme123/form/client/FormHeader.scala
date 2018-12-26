@@ -81,24 +81,24 @@ private[client] object FormHeader
 
   @dom
   private def formsButton = {
-    FormServices.formIds().bind
+    FormServices.idents().bind
     <div class="ui floating dropdown icon button">
       <span class="text">
         Choose Form
       </span>
       <div class="menu">
-        {for (formId <- UIFormStore.uiState.formIds) yield formIdLink(formId).bind}
+        {for (ident <- UIFormStore.uiState.idents) yield identLink(ident).bind}
       </div>
     </div>
   }
 
   @dom
-  private def formIdLink(formId: String) = {
+  private def identLink(ident: String) = {
     <a class="item"
        onclick={_: Event =>
-         changeForm.value = Some(formId)}
+         changeForm.value = Some(ident)}
     >
-      {formId}
+      {ident}
     </a>
   }
 

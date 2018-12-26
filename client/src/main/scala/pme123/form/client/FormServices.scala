@@ -18,14 +18,14 @@ object FormServices
     )
   }
 
-  def formIds(): Binding[HTMLElement] = {
-    val path = s"$apiPath/formIds"
+  def idents(): Binding[HTMLElement] = {
+    val path = s"$apiPath/idents"
 
-    httpGet(path, (ids: Seq[String]) => UIFormStore.changeFormIds(ids))
+    httpGet(path, (ids: Seq[String]) => UIFormStore.changeIdents(ids))
   }
 
-  def getForm(formId: String): Binding[HTMLElement] = {
-    val path = s"$apiPath/form/$formId"
+  def getForm(ident: String): Binding[HTMLElement] = {
+    val path = s"$apiPath/form/$ident"
 
     httpGet(path, (form:FormContainer) => UIFormStore.changeForm(form))
   }

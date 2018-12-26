@@ -37,13 +37,13 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
     Ok(Json.toJson(FormContainer("form-id"))).as(JSON)
   }
 
-  def formIds(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    formDBRepo.formIds()
+  def idents(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    formDBRepo.idents()
       .map(ids => Ok(Json.toJson(ids)).as(JSON))
   }
 
-  def form(formId: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    formDBRepo.selectForm(formId)
+  def form(ident: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    formDBRepo.selectForm(ident)
       .map(form => Ok(Json.toJson(form)).as(JSON))
   }
 }

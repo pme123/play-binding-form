@@ -20,8 +20,8 @@ object UIFormStore extends Logging {
   }
 
   def changeForm(form: FormContainer): Unit = {
-    info(s"FormUIStore: changeForm ${form.formId}")
-    changeFormId(form.formId)
+    info(s"FormUIStore: changeForm ${form.ident}")
+    changeIdent(form.ident)
     uiState.formElements.value.clear()
     val seq = form.elems.map(UIFormElem.apply(_))
       .map(Var(_))
@@ -99,23 +99,23 @@ object UIFormStore extends Logging {
     SemanticUI.initElements()
   }
 
-  def changeFormId(formId: String): Unit = {
-    info(s"FormUIStore: changeFormId $formId")
-    uiState.formId.value = formId
+  def changeIdent(ident: String): Unit = {
+    info(s"FormUIStore: changeIdent $ident")
+    uiState.ident.value = ident
   }
 
-  def changeFormIds(formIds: Seq[String]): Unit = {
-    info(s"FormUIStore: changeFormIds $formIds")
-    uiState.formIds.value.clear()
-    uiState.formIds.value ++= formIds
+  def changeIdents(idents: Seq[String]): Unit = {
+    info(s"FormUIStore: changeIdents $idents")
+    uiState.idents.value.clear()
+    uiState.idents.value ++= idents
   }
 
   case class UIState(formElements: Vars[Var[UIFormElem]],
                      selectedElement: Var[Var[UIFormElem]],
                      activePropElement: Var[UIFormElem],
                      activePropTab: Var[PropTabType],
-                     formId: Var[String],
-                     formIds: Vars[String]
+                     ident: Var[String],
+                     idents: Vars[String]
                     )
 
   object UIState {

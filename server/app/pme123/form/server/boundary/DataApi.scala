@@ -5,6 +5,7 @@ import java.nio.file.Files
 import javax.inject._
 import play.api.libs.json._
 import play.api.mvc._
+import pme123.data.server.control.DataDBRepo
 import pme123.form.server.boundary.services.{SPAComponents, SPAController}
 import pme123.form.server.entity.JsonParseException
 import pme123.form.shared._
@@ -17,11 +18,25 @@ import scala.concurrent.{ExecutionContext, Future}
   * Original see here: https://github.com/playframework/play-scala-websocket-example
   */
 @Singleton
-class DataApi @Inject()(val spaComps: SPAComponents)
+class DataApi @Inject()(dataDBRepo: DataDBRepo,
+                        val spaComps: SPAComponents)
                        (implicit val ec: ExecutionContext)
   extends SPAController(spaComps) {
 
   val fileName = "importDataStructure"
+
+  def persistData(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    request.body.asText.map { body =>
+      Json.parse(body).validate[DataContainer] match {
+        case JsSuccess(data, _) =>
+          dataDBRepo.persist(data)
+            .map(data =>
+              Ok(Json.toJson(data)).as(JSON))
+        case err: JsError =>
+          Future.successful(BadRequest(s"Problem parsing Datacontainer: $err"))
+      }
+    }.getOrElse(Future.successful(BadRequest("No Data in Body!")))
+  }
 
   def importDataStructure(): Action[AnyContent] = Action.async { implicit request =>
     Future(

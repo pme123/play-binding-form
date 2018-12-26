@@ -17,7 +17,7 @@ class FormDBRepo @Inject()()
 
 
   def persist(form: FormContainer): Future[FormContainer] = {
-    selectMaybeForm(form.formId)
+    selectMaybeForm(form.ident)
       .flatMap {
         case Some(sForm) =>
           updateForm(form)
@@ -26,16 +26,16 @@ class FormDBRepo @Inject()()
       }.map(_ => form)
   }
 
-  def formIds(): Future[List[String]] = {
+  def idents(): Future[List[String]] = {
     selectForms()
-      .map(_.map(_.formId))
+      .map(_.map(_.ident))
   }
 
   def insertForm(formCont: FormContainer): Future[Int] = {
     val formContent = Json.toJson(formCont).toString()
     update(
-      sql"""insert into form (formId, content)
-             values (${formCont.formId}, $formContent)""")
+      sql"""insert into form (ident, content)
+             values (${formCont.ident}, $formContent)""")
   }
 
   def updateForm(formCont: FormContainer): Future[Int] = {
@@ -43,23 +43,23 @@ class FormDBRepo @Inject()()
     update(
       sql"""update form
               set content = $formContent
-             where formId = ${formCont.formId}""")
+             where ident = ${formCont.ident}""")
   }
 
-  def selectForm(formId: String): Future[FormContainer] =
-    selectMaybeForm(formId).map(_.get)
+  def selectForm(ident: String): Future[FormContainer] =
+    selectMaybeForm(ident).map(_.get)
 
-  def selectMaybeForm(formId: String): Future[Option[FormContainer]] =
-    selectForms(fr"where f.formId = $formId")
+  def selectMaybeForm(ident: String): Future[Option[FormContainer]] =
+    selectForms(fr"where f.ident = $ident")
       .map(_.headOption)
 
   private def selectForms(where: Fragment = fr""): Future[List[FormContainer]] =
-    select((fr"""select f.formId, f.content
+    select((fr"""select f.ident, f.content
                      from form f
          """ ++ where)
       .query[(String, String)]
-      .map { case (formId, content) =>
-        println(s"Form selected from DB: $formId")
+      .map { case (ident, content) =>
+        println(s"Form selected from DB: $ident")
         Json.parse(content)
           .validate[FormContainer] match {
           case JsSuccess(value, _) =>
