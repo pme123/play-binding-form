@@ -1,22 +1,46 @@
 package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
-import play.api.libs.json.{JsString, JsValue, Json, OFormat}
-import pme123.form.shared.StructureType.STRING
+import julienrf.json.derived
+import play.api.libs.json.{Json, OFormat}
 
 import scala.collection.immutable
 import scala.util.Random
 
+case class DataContainer(ident: String= DataStructure.defaultKey, structure: DataObject = DataObject())
 
-case class DataStructure(ident: String, structureType: StructureType, structure: JsValue)
+object DataContainer {
+  implicit val jsonFormat: OFormat[DataContainer] = derived.oformat[DataContainer]()
+
+}
+
+sealed abstract class DataStructure {
+}
 
 object DataStructure {
 
-  def apply(): DataStructure =
-    DataStructure(s"ds-${Random.nextInt(10000)}", STRING, JsString(""))
+  def defaultKey = s"data-${Random.nextInt(1000)}"
 
-  implicit val jsonFormat: OFormat[DataStructure] = Json.format[DataStructure]
+  implicit val jsonFormat: OFormat[DataStructure] = derived.oformat[DataStructure]()
+
 }
+
+case class DataObject(value: Map[String, DataStructure] = Map.empty)
+  extends DataStructure
+
+object DataObject {
+
+  implicit val jsonFormat: OFormat[DataObject] = derived.oformat[DataObject]()
+}
+
+case class DataString(value: String = "")
+  extends DataStructure
+
+case class DataNumber(value: BigDecimal = 0)
+  extends DataStructure
+
+case class DataBoolean(value: Boolean = false)
+  extends DataStructure
 
 sealed trait StructureType
   extends EnumEntry {

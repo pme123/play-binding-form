@@ -1,10 +1,9 @@
 package pme123.form.client
 
-import com.thoughtworks.binding.Binding.Var
+import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
-import org.scalajs.jquery
-import play.api.libs.json.{JsBoolean, JsNumber}
+import pme123.form.client.UIDataStore._
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{I18n, SemanticUI}
 import pme123.form.shared.DataType.STRING
@@ -12,16 +11,10 @@ import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
 import pme123.form.shared._
 import pme123.form.shared.services.Language.{DE, EN}
 
-import scala.util.matching.Regex
-
 private[client] object DataView
   extends MainView {
 
-  val hashRegex: Regex = """#data""".r
-
-  def name: String = "data"
-
-  val link: String = name
+  val link: String = "data"
 
   val persistData = Var(false)
 
@@ -46,153 +39,193 @@ private[client] object DataView
 
   @dom
   private lazy val dataHeader: Binding[HTMLElement] = {
-      <div class="ui borderless datamenu menu">
-        <div class="ui item">
-          <h3 class="header">
-            <i class="edit outline icon"></i> &nbsp; &nbsp;
-            Data Editor</h3>
-        </div>
-        <div class="ui right item">
-          <form id="dataHeaderForm">
-            <input
-            id="importDataStructure"
-            name="importDataStructure"
-            type="file"
-            class="inputfile"
-            onchange={ev: Event =>
-              val aIn: HTMLInputElement = importDataStructure.asInstanceOf[HTMLInputElement]
-              if (aIn.files.length > 0)
-                submitForm.value = Some(new FormData(dataHeaderForm))}/>
-
-            <label for="importDataStructure"
-                   class="ui right floated button">
-              <i class="ui upload icon"></i>
-              Import Data Structure
-            </label>
-          </form>
-
-        </div>
+    <div class="ui borderless datamenu menu">
+      <div class="ui item">
+        <h3 class="header">
+          <i class="edit outline icon"></i> &nbsp; &nbsp;
+          Data Editor</h3>
       </div>
+      <div class="ui right item">
+        <form id="dataHeaderForm">
+          <input
+          id="importDataStructure"
+          name="importDataStructure"
+          type="file"
+          class="inputfile"
+          onchange={ev: Event =>
+            val aIn: HTMLInputElement = importDataStructure.asInstanceOf[HTMLInputElement]
+            if (aIn.files.length > 0)
+              submitForm.value = Some(new FormData(dataHeaderForm))}/>
+
+          <label for="importDataStructure"
+                 class="ui right floated button">
+            <i class="ui upload icon"></i>
+            Import Data Structure
+          </label>
+        </form>
+
+      </div>
+    </div>
   }
 
   @dom
   private lazy val dataContent: Binding[HTMLElement] = {
-    val ds = UIDataStore.uiState.dataStructure.bind
+    val ds = UIDataStore.uiState.data.bind
     <div class="ui one column cards">
-      {dataCard(ds, "").bind}
+      {dataObjectContent(ds.structure).bind}
     </div>
   }
 
   @dom
-  private def dataCard(data: DataStructure, path: String): Binding[HTMLElement] = {
-    println(s"PATH: $path")
-    val structureType = Var(data.structureType)
-    val strType = structureType.bind
-    SemanticUI.initElements()
+  private def dataObjectContent(data: VarDataObject): Binding[HTMLElement] = {
     <div class="ui fluid card">
-      <div class="ui grid content">
-        <div class="six wide column">
-          {BaseElementDiv(
-          UIFormElem(
-            BaseElement(
-              s"ds-ident-$path",
-              TEXTFIELD,
-              STRING,
-              ElementTexts.label(Map(EN -> "Ident", DE -> "Ident")),
-              value = Some(data.ident),
-              required = true,
-            ),
-          )
-        ).bind}
-        </div> <div class="five wide column">
         {//
-        BaseElementDiv(
-          UIFormElem(BaseElement(
-            s"ds-type$path",
-            DROPDOWN,
-            DataType.STRING,
-            ElementTexts.label(Map(DE -> "Struktur Typ", EN -> "Structure Type")),
-            elemEntries = ElementEntries(
-              StructureType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
-            ),
-            value = Some(data.structureType.entryName)
-          ),
-            changeEvent = Some((str: String) => structureType.value =
-              StructureType.withNameInsensitive(str)),
-            extras = Map.empty
-          )
-        ).bind}
-      </div> <div class="five wide column">
-        {strType match {
-          case StructureType.STRING => {
-            BaseElementDiv(
-              UIFormElem(
-                BaseElement(
-                  s"ds-value-$path",
-                  TEXTFIELD,
-                  STRING,
-                  ElementTexts.label(Map(EN -> "String value", DE -> "Text")),
-                  value = Some(data.structure.validate[String].getOrElse("")),
-                  required = true,
-                ),
-              )
-            ).bind
-          }
-          case StructureType.NUMBER => {
-            BaseElementDiv(
-              UIFormElem(
-                BaseElement(
-                  s"ds-value-$path",
-                  TEXTFIELD,
-                  STRING,
-                  ElementTexts.label(Map(EN -> "Number value", DE -> "Nummer")),
-                  value = Some(data.structure.validate[JsNumber].map(_.value.toString).getOrElse("0")),
-                  required = true,
-                ),
-              )
-            ).bind
-          }
-          case StructureType.BOOLEAN => {
-            BaseElementDiv(
-              UIFormElem(
-                BaseElement(
-                  s"ds-value-$path",
-                  CHECKBOX,
-                  STRING,
-                  ElementTexts.label(Map(EN -> "Boolean value", DE -> "Ja / Nein")),
-                  value = Some(data.structure.validate[JsBoolean].map(_.value.toString).getOrElse("false")),
-                ),
-              )
-            ).bind
-          }
-          case StructureType.OBJECT =>
-
-            objectButtons().bind
-          case other => <span>not implemented</span>
-        }}
-      </div>{//
-        if (strType == StructureType.OBJECT)
-          nextDataStructure(data, path).bind
-        else
-            <span/>}
+        val childMap = data.content.bind
+        Constants(childMap.map { case (i, content) => dataStructureContent(i, content) }.toSeq: _*).map(_.bind)}
+      <div class="extra content">{
+        objectButtons(data).bind
+        }
       </div>
     </div>
   }
 
   @dom
-  private def objectButtons(): Binding[HTMLElement] = {
+  private def dataStructureContent(ident: String, data: VarDataStructure): Binding[HTMLElement] = {
+   // val elem: Binding[HTMLElement] = dataContent(ident, data)
+    <div class="ui grid content">
+      {identDiv(ident).bind}{//
+      structureTypeDiv(data.structureType).bind}{//
+      dataContent(ident, data).bind
+    }
+    </div>
+  }
+
+  private def dataContent(ident: String, data: VarDataStructure) = {
+    data match {
+      case VarDataString(content) =>
+        dataStringContent(content)
+      case VarDataNumber(content) =>
+        dataNumberContent(content)
+      case VarDataBoolean(content) =>
+        dataBooleanContent(content)
+      case dataObj: VarDataObject =>
+        dataObjectContent(dataObj)
+    }
+  }
+
+  @dom
+  private def dataStringContent(data: Var[String]): Binding[HTMLElement] = {
     <div class="five wide column">
-      {"buttons"}
+      {BaseElementDiv(
+      UIFormElem(
+        BaseElement(
+          s"ds-value-TODO",
+          TEXTFIELD,
+          STRING,
+          ElementTexts.label(Map(EN -> "String value", DE -> "Text")),
+          value = Some(data.value),
+          required = true,
+        ),
+      )
+    ).bind}
     </div>
   }
 
   @dom
-  private def nextDataStructure(data: DataStructure, path: String): Binding[HTMLElement] = {
-    <div class="sixteen wide column">
-      {dataCard(
-      data.structure.validate[DataStructure].getOrElse(DataStructure()),
-      s"$path--${data.ident}"
+  private def dataNumberContent(data: Var[BigDecimal]): Binding[HTMLElement] = {
+    <div class="five wide column">
+      {BaseElementDiv(
+      UIFormElem(
+        BaseElement(
+          s"ds-value-TODO",
+          TEXTFIELD,
+          STRING,
+          ElementTexts.label(Map(EN -> "Number value", DE -> "Nummer")),
+          value = Some(data.value.toString),
+          required = true,
+        ),
+      )
     ).bind}
+    </div>
+  }
+
+  @dom
+  private def dataBooleanContent(data: Var[Boolean]): Binding[HTMLElement] = {
+    <div class="five wide column">
+      {BaseElementDiv(
+      UIFormElem(
+        BaseElement(
+          s"ds-value-TODO",
+          CHECKBOX,
+          STRING,
+          ElementTexts.label(Map(EN -> "Boolean value", DE -> "Ja / Nein")),
+          value = Some(data.value.toString),
+        ),
+      )
+    ).bind}
+    </div>
+  }
+
+  @dom
+  private def identDiv(ident: String): Binding[HTMLElement] = {
+    <div class="six wide column">
+      {BaseElementDiv(
+      UIFormElem(
+        BaseElement(
+          s"ds-ident-TODO",
+          TEXTFIELD,
+          STRING,
+          ElementTexts.label(Map(EN -> "Ident", DE -> "Ident")),
+          value = Some(ident),
+          required = true,
+        ),
+      )
+    ).bind}
+    </div>
+  }
+
+  @dom
+  private def structureTypeDiv(structureType: StructureType): Binding[HTMLElement] = {
+    <div class="five wide column">
+      {//
+      BaseElementDiv(
+        UIFormElem(BaseElement(
+          s"ds-type-TODO",
+          DROPDOWN,
+          DataType.STRING,
+          ElementTexts.label(Map(DE -> "Struktur Typ", EN -> "Structure Type")),
+          elemEntries = ElementEntries(
+            StructureType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
+          ),
+          value = Some(structureType.entryName)
+        ),
+          changeEvent = Some((str: String) => () /*structureType.value =
+            StructureType.withNameInsensitive(str)*/),
+          extras = Map.empty
+        )
+      ).bind}
+    </div>
+  }
+
+  @dom
+  private def objectButtons(data: VarDataStructure): Binding[HTMLElement] = {
+    <div class="five wide column">
+      <div class="right floated">
+
+        <button class="mini ui circular blue icon button"
+                data:data-tooltip="Add Data Object"
+                onclick={_: Event =>
+                  UIDataStore.addDataObject(data)}>
+          <i class="add icon"></i>
+        </button>
+        <button class="mini ui circular red icon button"
+                data:data-tooltip="Delete Data Object"
+                onclick={_: Event =>
+                //  UIFormStore.deleteDataObject(path)
+                }>
+          <i class="trash icon"></i>
+        </button>
+      </div>
     </div>
   }
 
@@ -203,7 +236,7 @@ private[client] object DataView
       <div>
         {persistData.value = false
       DataServices.persistData(
-        UIDataStore.uiState.dataStructure.value
+        UIDataStore.uiState.data.value.toData
       ).bind}
       </div>
     else
@@ -220,7 +253,6 @@ private[client] object DataView
       </div>
     else
         <span/>
-
   }
 
 }

@@ -8,16 +8,10 @@ import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.services.Language.{DE, EN}
 import pme123.form.shared.{BaseElement, DataType, ElementText, ElementTexts}
 
-import scala.util.matching.Regex
-
 private[client] object FormEditorView
   extends MainView {
 
-  val hashRegex: Regex = """#editor""".r
-
-  def name: String = "editor"
-
-  val link: String = name
+  val link: String = "editor"
 
   // 1. level of abstraction
   // **************************

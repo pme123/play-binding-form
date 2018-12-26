@@ -4,21 +4,13 @@ import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client.services.{I18n, SemanticUI, UIStore}
-import pme123.form.shared.ElementType.TEXTFIELD
-import pme123.form.shared.services.Language.{DE, EN}
-import pme123.form.shared.services.SPAExtensions.StringPos
 import pme123.form.shared._
-
-import scala.util.matching.Regex
+import pme123.form.shared.services.SPAExtensions.StringPos
 
 private[client] object FormPreviewView
   extends MainView {
 
-  val hashRegex: Regex = """#preview""".r
-
-  def name: String = "preview"
-
-  val link: String = name
+  val link: String = "preview"
 
   val persistForm = Var(false)
 

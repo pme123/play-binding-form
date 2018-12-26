@@ -26,7 +26,7 @@ class DataApi @Inject()(val spaComps: SPAComponents)
   def importDataStructure(): Action[AnyContent] = Action.async { implicit request =>
     Future(
       extractFile(request)
-        .getOrElse(DataStructure()))
+        .getOrElse(DataContainer()))
       .map(ds =>
         Ok(Json.toJson(ds)).as(JSON)
       )
@@ -42,7 +42,7 @@ class DataApi @Inject()(val spaComps: SPAComponents)
             else {
               val lines = Files.readAllLines(file.ref.path).asScala
               Some(
-                Json.parse(lines.mkString("\n")).validate[DataStructure] match {
+                Json.parse(lines.mkString("\n")).validate[DataContainer] match {
                   case JsSuccess(ds, _) => ds
                   case err: JsError => throw JsonParseException(err)
                 }
