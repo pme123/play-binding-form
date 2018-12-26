@@ -32,11 +32,6 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
     }.getOrElse(Future.successful(BadRequest("No Form in Body!")))
   }
 
-  def forms(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-
-    Ok(Json.toJson(FormContainer("form-id"))).as(JSON)
-  }
-
   def idents(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     formDBRepo.idents()
       .map(ids => Ok(Json.toJson(ids)).as(JSON))

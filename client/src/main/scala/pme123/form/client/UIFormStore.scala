@@ -108,6 +108,7 @@ object UIFormStore extends Logging {
     info(s"FormUIStore: changeIdents $idents")
     uiState.idents.value.clear()
     uiState.idents.value ++= idents
+    SemanticUI.initElements()
   }
 
   case class UIState(formElements: Vars[Var[UIFormElem]],

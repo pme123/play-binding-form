@@ -11,7 +11,9 @@ import pme123.form.shared.{BaseElement, DataType, ElementText, ElementTexts}
 private[client] object FormEditorView
   extends MainView {
 
-  val link: String = "editor"
+  val link = "editor"
+
+  val icon = "edit outline"
 
   // 1. level of abstraction
   // **************************
@@ -42,7 +44,7 @@ private[client] object FormEditorView
     <div class="ui borderless menu">
       <div class="ui item">
         <h3 class="header">
-          <i class="edit outline icon"></i> &nbsp; &nbsp;
+          <i class={s"$icon icon"}></i> &nbsp; &nbsp;
           Form Editor</h3>
       </div>
       <div class="ui right item">

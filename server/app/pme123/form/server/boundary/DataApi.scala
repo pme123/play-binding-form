@@ -38,6 +38,16 @@ class DataApi @Inject()(dataDBRepo: DataDBRepo,
     }.getOrElse(Future.successful(BadRequest("No Data in Body!")))
   }
 
+  def idents(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    dataDBRepo.idents()
+      .map(ids => Ok(Json.toJson(ids)).as(JSON))
+  }
+
+  def data(ident: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    dataDBRepo.selectData(ident)
+      .map(data => Ok(Json.toJson(data)).as(JSON))
+  }
+
   def importDataStructure(): Action[AnyContent] = Action.async { implicit request =>
     Future(
       extractFile(request)

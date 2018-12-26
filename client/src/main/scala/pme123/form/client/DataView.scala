@@ -15,6 +15,7 @@ private[client] object DataView
   extends MainView {
 
   val link: String = "data"
+  val icon = "database"
 
   val persistData = Var(false)
 
@@ -42,7 +43,7 @@ private[client] object DataView
     <div class="ui borderless datamenu menu">
       <div class="ui item">
         <h3 class="header">
-          <i class="edit outline icon"></i> &nbsp; &nbsp;
+          <i class={s"$icon icon"}></i> &nbsp; &nbsp;
           Data Editor</h3>
       </div>
       <div class="ui right item">

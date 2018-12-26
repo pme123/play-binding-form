@@ -48,3 +48,6 @@ enum.structure-type.string=String
 enum.structure-type.number=Number
 enum.structure-type.boolean=Boolean
 enum.structure-type.object=Object
+menu.view.preview=Form Preview
+menu.view.editor=Form Editor
+menu.view.data=Data Editor

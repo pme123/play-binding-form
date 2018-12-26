@@ -20,14 +20,24 @@ object DataServices
     )
   }
 
+  def idents(): Binding[HTMLElement] = {
+    val path = s"$apiPath/data/idents"
+
+    httpGet(path, (ids: Seq[String]) => UIDataStore.changeIdents(ids))
+  }
+
+  def getData(ident: String): Binding[HTMLElement] = {
+    val path = s"$apiPath/data/$ident"
+
+    httpGet(path, (data: DataContainer) => UIDataStore.changeData(data))
+  }
 
   def submitForm(form: FormData): Binding[HTMLElement] = {
     val path = s"$apiPath/data/import"
 
     callService(path, Ajax.post(path, form),
-      (dc: DataContainer) => UIDataStore.changeData(dc)   )
+      (dc: DataContainer) => UIDataStore.changeData(dc))
   }
-
 
 
 }

@@ -10,7 +10,8 @@ import pme123.form.shared.services.SPAExtensions.StringPos
 private[client] object FormPreviewView
   extends MainView {
 
-  val link: String = "preview"
+  val link = "preview"
+  val icon = "newspaper outline"
 
   val persistForm = Var(false)
 
@@ -38,7 +39,7 @@ private[client] object FormPreviewView
     <div class="ui borderless menu">
       <div class="ui item">
         <h3 class="header">
-          <i class="newspaper outline icon"></i> &nbsp; &nbsp;
+          <i class={s"$icon icon"}></i> &nbsp; &nbsp;
           Form Preview</h3>
       </div>
       <div class="ui right item">

@@ -1,7 +1,7 @@
 package pme123.form.client
 
 import com.softwaremill.quicklens._
-import com.thoughtworks.binding.Binding.Var
+import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
@@ -20,6 +20,12 @@ object UIDataStore extends Logging {
     SemanticUI.initElements()
   }
 
+  def changeIdents(idents: Seq[String]): Unit = {
+    info(s"FormUIStore: changeIdents $idents")
+    uiState.idents.value.clear()
+    uiState.idents.value ++= idents
+    SemanticUI.initElements()
+  }
   def changeData(data: DataContainer): Unit = {
     info(s"DataUIStore: changeData ${data.ident}")
     uiState.data.value = VarDataContainer(data)
@@ -55,12 +61,14 @@ object UIDataStore extends Logging {
 
   case class UIState(
                       data: Var[VarDataContainer],
+                      idents: Vars[String]
                     )
 
   object UIState {
     def apply(): UIState = {
       UIState(
         Var(VarDataContainer()),
+        Vars.empty
       )
     }
   }

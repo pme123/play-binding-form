@@ -11,6 +11,8 @@ trait MainView
 
   def link: String
 
+  def icon: String
+
   lazy val hashRegex: Regex = s"""#$link""".r
 
   def create(): Binding[HTMLElement]

@@ -26,7 +26,7 @@ class DataDBRepo @Inject()()
       }.map(_ => data)
   }
 
-  def dataIds(): Future[List[String]] = {
+  def idents(): Future[List[String]] = {
     selectDatas()
       .map(_.map(_.ident))
   }

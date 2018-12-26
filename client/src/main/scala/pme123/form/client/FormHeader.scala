@@ -1,10 +1,10 @@
 package pme123.form.client
 
-import com.thoughtworks.binding.Binding.{Constants, Var}
+import com.thoughtworks.binding.Binding.{Constants, Var, Vars}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.dom.window
-import pme123.form.client.services.{ClientUtils, UIStore}
+import pme123.form.client.services.{ClientUtils, Messages, UIStore}
 import pme123.form.shared.services.Language
 
 import scala.language.implicitConversions
@@ -24,11 +24,11 @@ private[client] object FormHeader
       }{spacer.bind}<div class="ui right item">
       {//
       formsButton.bind}{//
-      logInButton.bind}{//
+      editPreviewSwitch.bind}{//
+      menuButton.bind}{//
       languageButton.bind}{//
-      editPreviewSwitch.bind}
-    </div>
-      {changeFormDiv.bind}
+      logInButton.bind}
+    </div>{changeFormDiv.bind}
     </div>
 
   }
@@ -61,43 +61,62 @@ private[client] object FormHeader
   @dom
   private def editPreviewSwitch = {
     val mainView = UIRoute.route.state.bind
-    if (mainView.link == FormEditorView.link)
-      <button class="ui circular blue icon button"
-              data:data-tooltip="Show Form Preview"
-              data:data-position="bottom right"
-              onclick={_: Event =>
-                UIRoute.changeRoute(FormPreviewView)}>
-        <i class="file alternate outline icon"></i>
-      </button>
-    else
-      <button class="ui circular blue icon button"
-              data:data-tooltip="Edit Form Elements"
-              data:data-position="bottom right"
-              onclick={_: Event =>
-                UIRoute.changeRoute(FormEditorView)}>
-        <i class="edit icon"></i>
-      </button>
+    mainView match {
+      case FormEditorView =>
+        <button class="ui circular blue icon button"
+                data:data-tooltip="Show Form Preview"
+                data:data-position="bottom right"
+                onclick={_: Event =>
+                  UIRoute.changeRoute(FormPreviewView)}>
+          <i class="file alternate outline icon"></i>
+        </button>
+      case FormPreviewView =>
+        <button class="ui circular blue icon button"
+                data:data-tooltip="Edit Form Elements"
+                data:data-position="bottom right"
+                onclick={_: Event =>
+                  UIRoute.changeRoute(FormEditorView)}>
+          <i class="edit icon"></i>
+        </button>
+      case _ =>
+          <span/>
+    }
+
   }
 
+
   @dom
-  private def formsButton = {
-    FormServices.idents().bind
-    <div class="ui floating dropdown icon button">
-      <span class="text">
-        Choose Form
-      </span>
-      <div class="menu">
-        {for (ident <- UIFormStore.uiState.idents) yield identLink(ident).bind}
-      </div>
+  private def formsButton: Binding[HTMLElement] = {
+    val mainView = UIRoute.route.state.bind
+    <div>
+      {mainView match {
+      case DataView =>
+        DataServices.idents().bind
+        identDropdown("Choose Data", UIDataStore.uiState.idents).bind
+
+      case _ =>
+        FormServices.idents().bind
+        identDropdown("Choose Form", UIFormStore.uiState.idents).bind
+    }}
     </div>
   }
 
   @dom
-  private def identLink(ident: String) = {
+  private def identDropdown(label: String, idents: Vars[String]): Binding[HTMLElement] =
+    <div class="ui floating dropdown icon button">
+      <span class="text">
+        {label}
+      </span>
+      <div class="menu">
+        {for (ident <- idents) yield identLink(ident).bind}
+      </div>
+    </div>
+
+  @dom
+  private def identLink(ident: String): Binding[HTMLElement] = {
     <a class="item"
        onclick={_: Event =>
-         changeForm.value = Some(ident)}
-    >
+         changeForm.value = Some(ident)}>
       {ident}
     </a>
   }
@@ -162,10 +181,35 @@ private[client] object FormHeader
     val change = changeForm.bind
     if (change.nonEmpty)
       <div>
-        {FormServices.getForm(change.get).bind}
+        {changeForm.value = None
+      UIRoute.route.state.value match {
+        case DataView =>
+          DataServices.getData(change.get).bind
+        case _ =>
+          FormServices.getForm(change.get).bind
+      }}
       </div>
     else
-      <span/>
+        <span/>
+  }
+
+  @dom
+  private def menuButton = {
+    <div class="ui pointing top left dropdown item">
+      <i class="big bars icon"></i>
+      <div class="menu">
+        {Constants(Seq(FormPreviewView, FormEditorView, DataView).map(menuLink): _*).map(_.bind)}
+      </div>
+    </div>
+  }
+
+  @dom
+  private def menuLink(view: MainView) = {
+    val lang = UIStore.uiState.activeLanguage.bind
+    <a class="item"
+       href={s"#${view.link}"}>
+      <i class={s"${view.icon} icon"}></i>{Messages(lang.entryName, s"menu.view.${view.link}")}
+    </a>
   }
 
 }

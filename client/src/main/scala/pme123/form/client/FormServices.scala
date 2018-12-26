@@ -19,7 +19,7 @@ object FormServices
   }
 
   def idents(): Binding[HTMLElement] = {
-    val path = s"$apiPath/idents"
+    val path = s"$apiPath/form/idents"
 
     httpGet(path, (ids: Seq[String]) => UIFormStore.changeIdents(ids))
   }
