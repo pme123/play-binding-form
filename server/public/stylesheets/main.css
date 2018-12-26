@@ -85,3 +85,7 @@
 .ui.datamenu.menu {
     margin: 10px 7px 12px;
 }
+
+.ui.datamenu label {
+    padding: 10px 4px 10px 14px;
+}

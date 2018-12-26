@@ -1,5 +1,34 @@
 {
-  "ident": "ds-9460",
-  "structureType": "STRING",
-  "structure": "oki doki"
+  "ident": "data-446",
+  "structure": {
+    "value": {
+      "data-851": {
+        "DataObject": {
+          "value": {
+            "data-774": {
+              "DataObject": {
+                "value": {
+                  "data-870": {
+                    "DataString": {
+                      "value": ""
+                    }
+                  },
+                  "data-924": {
+                    "DataString": {
+                      "value": ""
+                    }
+                  }
+                }
+              }
+            },
+            "data-778": {
+              "DataString": {
+                "value": ""
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

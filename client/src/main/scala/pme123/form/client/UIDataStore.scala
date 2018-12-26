@@ -1,5 +1,6 @@
 package pme123.form.client
 
+import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Var
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared._
@@ -12,21 +13,45 @@ object UIDataStore extends Logging {
 
   val uiState = UIState()
 
+  def changeIdent(parent: Var[VarDataObject], oldIdent: String)(newIdent: String): Unit = {
+    info(s"DataUIStore: changeIdent $newIdent")
+    val oldValue = parent.value.content(oldIdent)
+    parent.value = VarDataObject((parent.value.content - oldIdent).updated(newIdent, oldValue))
+    SemanticUI.initElements()
+  }
+
   def changeData(data: DataContainer): Unit = {
-    info(s"FormUIStore: changeData ${data.ident}")
+    info(s"DataUIStore: changeData ${data.ident}")
     uiState.data.value = VarDataContainer(data)
   }
 
-  def addDataObject(parentDS: VarDataStructure): Unit = {
-    parentDS match {
-      case VarDataObject(content) =>
-        info(s"FormUIStore: addDataObject $content".take(100))
-        content.value = content.value.updated(DataStructure.defaultKey, VarDataString())
-      case other =>
-        error(s"Unexpected parent: $other") // unexpected
-    }
+  def changeDataIdent(ident: String): Unit = {
+    info(s"DataUIStore: changeDataIdent $ident")
+    uiState.data.value = uiState.data.value.modify(_.ident).setTo(ident)
     SemanticUI.initElements()
   }
+
+  def changeStructureType(data: Var[VarDataStructure])(strTypeStr: String): Unit = {
+    info(s"DataUIStore: changeStructureType $strTypeStr")
+    val structureType = StructureType.withNameInsensitive(strTypeStr)
+
+    data.value = VarDataStructure(DataStructure(structureType))
+    SemanticUI.initElements()
+  }
+
+  def addDataObject(parentDS: Var[VarDataObject]): Unit = {
+    val parentContent = parentDS.value.content
+    info(s"DataUIStore: addDataObject $parentContent".take(100))
+    parentDS.value = parentDS.value.modify(_.content).setTo(parentContent.updated(DataStructure.defaultKey, Var(VarDataString())))
+    SemanticUI.initElements()
+  }
+
+  def deleteDataObject(dataIdent: String, parent: Var[UIDataStore.VarDataObject]): Unit = {
+    info(s"DataUIStore: deleteDataObject $dataIdent")
+    parent.value = VarDataObject(parent.value.content - dataIdent)
+    SemanticUI.initElements()
+  }
+
 
   case class UIState(
                       data: Var[VarDataContainer],
@@ -40,18 +65,17 @@ object UIDataStore extends Logging {
     }
   }
 
-  case class VarDataContainer(ident: String= DataStructure.defaultKey, structure: VarDataObject = VarDataObject()) {
-    lazy val toData: DataContainer = DataContainer(ident, structure.toData)
+  case class VarDataContainer(ident: String = DataStructure.defaultKey, structure: Var[VarDataObject] = Var(VarDataObject())) {
+    lazy val toData: DataContainer = DataContainer(ident, structure.value.toData)
 
   }
 
   object VarDataContainer {
     def apply(data: DataContainer): VarDataContainer =
-      VarDataContainer(data.ident, VarDataObject(data.structure.value))
+      VarDataContainer(data.ident, Var(VarDataObject.create(data.structure.value)))
   }
 
   sealed abstract class VarDataStructure {
-    def content: Var[_]
 
     def structureType: StructureType
 
@@ -64,22 +88,22 @@ object UIDataStore extends Logging {
       case DataBoolean(value) => VarDataBoolean(Var(value))
       case DataString(value) => VarDataString(Var(value))
       case DataNumber(value) => VarDataNumber(Var(value))
-      case DataObject(value) => VarDataObject(value)
+      case DataObject(value) => VarDataObject.create(value)
     }
   }
 
-  case class VarDataObject(content: Var[Map[String, VarDataStructure]] = Var(Map.empty))
+  case class VarDataObject(content: Map[String, Var[VarDataStructure]] = Map.empty, level: Int = 0)
     extends VarDataStructure {
     val structureType: StructureType = StructureType.OBJECT
 
-    def toData: DataObject = DataObject(content.value.map { case (k, v) => k -> v.toData })
+    def toData: DataObject = DataObject(content.map { case (k, v) => k -> v.value.toData })
 
   }
 
   object VarDataObject {
-    def apply(content:  Map[String, DataStructure]): VarDataObject = {
-      val map: Map[String, VarDataStructure] = content.map(entry => (entry._1, VarDataStructure(entry._2)))
-      VarDataObject(Var(map))
+    def create(content: Map[String, DataStructure]): VarDataObject = {
+      val map = content.map(entry => (entry._1, Var(VarDataStructure(entry._2))))
+      VarDataObject(map)
     }
   }
 

@@ -19,7 +19,16 @@ sealed abstract class DataStructure {
 
 object DataStructure {
 
+  import StructureType._
+
   def defaultKey = s"data-${Random.nextInt(1000)}"
+
+  def apply(structureType: StructureType): DataStructure = structureType match {
+    case STRING => DataString()
+    case BOOLEAN => DataBoolean()
+    case NUMBER => DataNumber()
+    case OBJECT => DataObject()
+  }
 
   implicit val jsonFormat: OFormat[DataStructure] = derived.oformat[DataStructure]()
 
@@ -41,6 +50,7 @@ case class DataNumber(value: BigDecimal = 0)
 
 case class DataBoolean(value: Boolean = false)
   extends DataStructure
+
 
 sealed trait StructureType
   extends EnumEntry {

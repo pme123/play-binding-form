@@ -4,8 +4,8 @@ import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
 import pme123.form.client.UIDataStore._
+import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
-import pme123.form.client.services.{I18n, SemanticUI}
 import pme123.form.shared.DataType.STRING
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
 import pme123.form.shared._
@@ -46,24 +46,62 @@ private[client] object DataView
           Data Editor</h3>
       </div>
       <div class="ui right item">
+        {val data = UIDataStore.uiState.data.bind
+      BaseElementDiv(
+        UIFormElem(
+          BaseElement(
+            "form-ident",
+            TEXTFIELD,
+            DataType.STRING,
+            ElementTexts(
+              None,
+              Some(ElementText.placeholder(Map(
+                DE -> "Daten Identität",
+                EN -> "Data Identity",
+              ))),
+              Some(ElementText.tooltip(Map(
+                DE -> "Daten Identität",
+                EN -> "Data Identity",
+              )))
+            ),
+            value = Some(data.ident)),
+          Map.empty,
+          Some(UIDataStore.changeDataIdent),
+        )).bind}&nbsp;
+        &nbsp;
         <form id="dataHeaderForm">
           <input
           id="importDataStructure"
           name="importDataStructure"
           type="file"
           class="inputfile"
-          onchange={ev: Event =>
+          onchange={_: Event =>
             val aIn: HTMLInputElement = importDataStructure.asInstanceOf[HTMLInputElement]
             if (aIn.files.length > 0)
               submitForm.value = Some(new FormData(dataHeaderForm))}/>
 
           <label for="importDataStructure"
-                 class="ui right floated button">
+                 data:data-tooltip="Import Data from JSON"
+                 class="ui circular button">
             <i class="ui upload icon"></i>
-            Import Data Structure
           </label>
         </form>
-
+        &nbsp;
+        &nbsp;
+        <button class="ui circular icon button"
+                data:data-tooltip="Export Data as JSON"
+                onclick={_: Event =>
+                  DataExporter.exportData()}>
+          <i class="sign-out icon"></i>
+        </button>
+        &nbsp;
+        &nbsp;
+        <button class="ui circular blue icon button"
+                data:data-tooltip="Persist Data on Server"
+                onclick={_: Event =>
+                  persistData.value = true}>
+          <i class="save outline icon"></i>
+        </button>
       </div>
     </div>
   }
@@ -72,135 +110,148 @@ private[client] object DataView
   private lazy val dataContent: Binding[HTMLElement] = {
     val ds = UIDataStore.uiState.data.bind
     <div class="ui one column cards">
-      {dataObjectContent(ds.structure).bind}
+      {dataObjectContent(ds.ident, ds.structure, None).bind}
     </div>
   }
 
   @dom
-  private def dataObjectContent(data: VarDataObject): Binding[HTMLElement] = {
+  private def dataObjectContent(ident: String, data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
     <div class="ui fluid card">
-        {//
-        val childMap = data.content.bind
-        Constants(childMap.map { case (i, content) => dataStructureContent(i, content) }.toSeq: _*).map(_.bind)}
-      <div class="extra content">{
-        objectButtons(data).bind
-        }
-      </div>
+      {//
+      val obj = data.bind
+      Constants(obj.content.map { case (i, content) => dataStructureContent(i, content, data) }.toSeq: _*).map(_.bind)}<div class="extra content">
+      {objectButtons(ident, data, parent).bind}
+    </div>
     </div>
   }
 
   @dom
-  private def dataStructureContent(ident: String, data: VarDataStructure): Binding[HTMLElement] = {
-   // val elem: Binding[HTMLElement] = dataContent(ident, data)
+  private def dataStructureContent(ident: String, data: Var[VarDataStructure], parent: Var[VarDataObject]): Binding[HTMLElement] = {
+    val _ = data.bind
     <div class="ui grid content">
-      {identDiv(ident).bind}{//
-      structureTypeDiv(data.structureType).bind}{//
-      dataContent(ident, data).bind
-    }
+      {identDiv(ident, parent).bind}{//
+      structureTypeDiv(ident, data).bind}{//
+      dataContent(ident, data, parent).bind}
     </div>
   }
 
-  private def dataContent(ident: String, data: VarDataStructure) = {
-    data match {
+  private def dataContent(ident: String, data: Var[VarDataStructure], parent: Var[VarDataObject]) = {
+    data.value match {
       case VarDataString(content) =>
-        dataStringContent(content)
+        dataStringContent(ident, content)
       case VarDataNumber(content) =>
-        dataNumberContent(content)
+        dataNumberContent(ident, content)
       case VarDataBoolean(content) =>
-        dataBooleanContent(content)
-      case dataObj: VarDataObject =>
-        dataObjectContent(dataObj)
+        dataBooleanContent(ident, content)
+      case _: VarDataObject =>
+        dataObjectContent(ident, data.asInstanceOf[Var[VarDataObject]], Some(parent))
     }
   }
 
   @dom
-  private def dataStringContent(data: Var[String]): Binding[HTMLElement] = {
+  private def dataStringContent(ident: String, data: Var[String]): Binding[HTMLElement] = {
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
         BaseElement(
-          s"ds-value-TODO",
+          s"ds-value-$ident",
           TEXTFIELD,
           STRING,
           ElementTexts.label(Map(EN -> "String value", DE -> "Text")),
           value = Some(data.value),
           required = true,
         ),
+        changeEvent = Some(
+          str => data.value = str
+        ),
+        extras = Map.empty
       )
     ).bind}
     </div>
   }
 
   @dom
-  private def dataNumberContent(data: Var[BigDecimal]): Binding[HTMLElement] = {
+  private def dataNumberContent(ident: String, data: Var[BigDecimal]): Binding[HTMLElement] = {
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
         BaseElement(
-          s"ds-value-TODO",
+          s"ds-value-$ident",
           TEXTFIELD,
           STRING,
           ElementTexts.label(Map(EN -> "Number value", DE -> "Nummer")),
           value = Some(data.value.toString),
           required = true,
         ),
+        changeEvent = Some(
+          str => data.value = BigDecimal(str)
+        ),
+        extras = Map.empty
       )
     ).bind}
     </div>
   }
 
   @dom
-  private def dataBooleanContent(data: Var[Boolean]): Binding[HTMLElement] = {
+  private def dataBooleanContent(ident: String, data: Var[Boolean]): Binding[HTMLElement] = {
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
         BaseElement(
-          s"ds-value-TODO",
+          s"ds-value-$ident",
           CHECKBOX,
           STRING,
           ElementTexts.label(Map(EN -> "Boolean value", DE -> "Ja / Nein")),
           value = Some(data.value.toString),
         ),
+        changeEvent = Some(
+          str => data.value = str.toBoolean
+        ),
+        extras = Map.empty
       )
     ).bind}
     </div>
   }
 
   @dom
-  private def identDiv(ident: String): Binding[HTMLElement] = {
+  private def identDiv(ident: String, parent: Var[VarDataObject]): Binding[HTMLElement] = {
     <div class="six wide column">
       {BaseElementDiv(
       UIFormElem(
         BaseElement(
-          s"ds-ident-TODO",
+          s"ds-ident-$ident",
           TEXTFIELD,
           STRING,
           ElementTexts.label(Map(EN -> "Ident", DE -> "Ident")),
           value = Some(ident),
           required = true,
+        ), changeEvent = Some(
+          UIDataStore.changeIdent(parent, ident)
         ),
+        extras = Map.empty
       )
     ).bind}
     </div>
   }
 
   @dom
-  private def structureTypeDiv(structureType: StructureType): Binding[HTMLElement] = {
+  private def structureTypeDiv(ident: String, data: Var[VarDataStructure]): Binding[HTMLElement] = {
     <div class="five wide column">
       {//
       BaseElementDiv(
         UIFormElem(BaseElement(
-          s"ds-type-TODO",
+          s"ds-type-$ident",
           DROPDOWN,
           DataType.STRING,
           ElementTexts.label(Map(DE -> "Struktur Typ", EN -> "Structure Type")),
           elemEntries = ElementEntries(
             StructureType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
           ),
-          value = Some(structureType.entryName)
+          value = Some(data.value.structureType.entryName)
         ),
-          changeEvent = Some((str: String) => () /*structureType.value =
-            StructureType.withNameInsensitive(str)*/),
+          changeEvent = Some(
+            UIDataStore.changeStructureType(data)
+          ),
           extras = Map.empty
         )
       ).bind}
@@ -208,7 +259,7 @@ private[client] object DataView
   }
 
   @dom
-  private def objectButtons(data: VarDataStructure): Binding[HTMLElement] = {
+  private def objectButtons(ident:String, data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
     <div class="five wide column">
       <div class="right floated">
 
@@ -217,14 +268,17 @@ private[client] object DataView
                 onclick={_: Event =>
                   UIDataStore.addDataObject(data)}>
           <i class="add icon"></i>
-        </button>
-        <button class="mini ui circular red icon button"
-                data:data-tooltip="Delete Data Object"
-                onclick={_: Event =>
-                //  UIFormStore.deleteDataObject(path)
-                }>
-          <i class="trash icon"></i>
-        </button>
+        </button>{//
+        if (parent.nonEmpty)
+          <button class="mini ui circular red icon button"
+                  data:data-tooltip="Delete Data Object"
+                  onclick={_: Event =>
+                   UIDataStore.deleteDataObject(ident, parent.get)
+                  }>
+            <i class="trash icon"></i>
+          </button>
+        else
+            <span/>}
       </div>
     </div>
   }
