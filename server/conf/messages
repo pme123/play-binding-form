@@ -51,3 +51,4 @@ enum.structure-type.object=Object
 menu.view.preview=Form Preview
 menu.view.editor=Form Editor
 menu.view.data=Data Editor
+menu.view.mapping=Mapping Editor

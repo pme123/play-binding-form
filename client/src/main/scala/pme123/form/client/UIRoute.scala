@@ -11,14 +11,13 @@ object UIRoute {
   def createView(hashText: String): MainView = {
     hashText match {
       case FormEditorView.hashRegex() =>
-        info(s"FormEditorView")
         FormEditorView
       case FormPreviewView.hashRegex() =>
-        info(s"FormPreviewView")
         FormPreviewView
       case DataView.hashRegex() =>
-        info(s"DataView")
         DataView
+      case MappingView.hashRegex() =>
+        MappingView
       case _ =>
         info(s"FormEditorView!!: $hashText")
         FormEditorView

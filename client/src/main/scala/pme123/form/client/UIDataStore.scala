@@ -21,7 +21,7 @@ object UIDataStore extends Logging {
   }
 
   def changeIdents(idents: Seq[String]): Unit = {
-    info(s"FormUIStore: changeIdents $idents")
+    info(s"DataUIStore: changeIdents $idents")
     uiState.idents.value.clear()
     uiState.idents.value ++= idents
     SemanticUI.initElements()
@@ -29,6 +29,7 @@ object UIDataStore extends Logging {
   def changeData(data: DataContainer): Unit = {
     info(s"DataUIStore: changeData ${data.ident}")
     uiState.data.value = VarDataContainer(data)
+    SemanticUI.initElements()
   }
 
   def changeDataIdent(ident: String): Unit = {

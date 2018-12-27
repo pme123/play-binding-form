@@ -4,7 +4,7 @@ import com.thoughtworks.binding.Binding.{Constants, Var, Vars}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.dom.window
-import pme123.form.client.services.{ClientUtils, Messages, UIStore}
+import pme123.form.client.services.{ClientUtils, I18n, Messages, UIStore}
 import pme123.form.shared.services.Language
 
 import scala.language.implicitConversions
@@ -103,7 +103,7 @@ private[client] object FormHeader
 
   @dom
   private def identDropdown(label: String, idents: Vars[String]): Binding[HTMLElement] =
-    <div class="ui floating dropdown icon button">
+    <div class="ui left top pointing dropdown icon button">
       <span class="text">
         {label}
       </span>
@@ -125,7 +125,7 @@ private[client] object FormHeader
   private def logInButton = {
     val user = UIStore.uiState.loggedInUser.bind
     if (user.isDefined)
-      <div class="ui floating dropdown icon button">
+      <div class="ui left top pointing dropdown icon button">
         <div class="ui mini circular image">
           <img src={staticAsset(user.avatar)}/>
         </div>
@@ -198,7 +198,7 @@ private[client] object FormHeader
     <div class="ui pointing top left dropdown item">
       <i class="big bars icon"></i>
       <div class="menu">
-        {Constants(Seq(FormPreviewView, FormEditorView, DataView).map(menuLink): _*).map(_.bind)}
+        {Constants(Seq(FormPreviewView, FormEditorView, DataView, MappingView).map(menuLink): _*).map(_.bind)}
       </div>
     </div>
   }
@@ -208,7 +208,7 @@ private[client] object FormHeader
     val lang = UIStore.uiState.activeLanguage.bind
     <a class="item"
        href={s"#${view.link}"}>
-      <i class={s"${view.icon} icon"}></i>{Messages(lang.entryName, s"menu.view.${view.link}")}
+      <i class={s"${view.icon} icon"}></i>{I18n(lang, s"menu.view.${view.link}")}
     </a>
   }
 

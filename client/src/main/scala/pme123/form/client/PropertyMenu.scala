@@ -3,7 +3,7 @@ package pme123.form.client
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
-import pme123.form.client.services.{ClientUtils, Messages, UIStore}
+import pme123.form.client.services.{ClientUtils, I18n, UIStore}
 import pme123.form.shared.PropTabType
 import pme123.form.shared.PropTabType.{ENTRIES, TEXTS, VALIDATIONS}
 
@@ -55,7 +55,7 @@ private[client] object PropertyMenu
     <a class={s"${activePropTab(propTabType, activeType)} item"}
        onclick={_: Event =>
          UIFormStore.changeActivePropTab(propTabType)}>
-      {Messages(activeLang.entryName, propTabType.i18nKey)}
+      {I18n(activeLang, propTabType.i18nKey)}
     </a>
   }
 

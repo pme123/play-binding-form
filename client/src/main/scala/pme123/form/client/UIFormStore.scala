@@ -31,6 +31,7 @@ object UIFormStore extends Logging {
     }else{
       addFormElement()
     }
+    SemanticUI.initElements()
   }
 
 

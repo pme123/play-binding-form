@@ -3,7 +3,7 @@ package pme123.form.client.services
 import scala.scalajs.js
 
 @js.native
-object Messages extends js.Object {
+private[services] object Messages extends js.Object {
 
   def apply(key: String): String = js.native
 
