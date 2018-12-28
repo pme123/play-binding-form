@@ -37,14 +37,17 @@ object SemanticUI {
 
   def initElements(): Unit ={
     setTimeout(100) {
-      jQuery(".ui.dropdown").dropdown(js.Dynamic.literal(on = "hover"))
+      jQuery(".ui.dropdown")
+        .dropdown(js.Dynamic.literal(on = "hover"))
       jQuery(".ui.clearable.dropdown")
         .dropdown(
           js.Dynamic.literal(on = "hover",
             clearable = true)
         )
-      jQuery(".ui.checkbox").checkbox()
-      jQuery(".ui.tooltip").popup()
+      jQuery(".ui.checkbox")
+        .checkbox()
+      jQuery(".ui.tooltip")
+        .popup()
     }
   }
 

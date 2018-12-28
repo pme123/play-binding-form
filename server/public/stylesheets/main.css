@@ -7,6 +7,15 @@
     min-width: 800px;
 }
 
+.ui.grid {
+    margin: 0;
+    padding: 0;
+}
+
+.ui.container{
+    padding-top: 14px;
+}
+
 .ui.main.borderless.menu {
     margin: -2px;
 }
@@ -84,7 +93,7 @@
 }
 
 .ui.datamenu.menu {
-    margin: 10px 7px 12px;
+    margin: 0;
 }
 
 .ui.datamenu label {

@@ -1,4 +1,4 @@
-package pme123.form.client
+package pme123.form.client.mapping
 
 import com.thoughtworks.binding.Binding
 import org.scalajs.dom.raw.HTMLElement

@@ -1,8 +1,9 @@
-package pme123.form.client
+package pme123.form.client.mapping
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
+import pme123.form.client._
 import pme123.form.shared.MappingEntry
 
 private[client] object MappingView

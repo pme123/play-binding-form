@@ -4,6 +4,8 @@ import com.thoughtworks.binding.Binding.{Constants, Var, Vars}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.dom.window
+import pme123.form.client.data.{DataServices, DataView, UIDataStore}
+import pme123.form.client.mapping.MappingView
 import pme123.form.client.services.{ClientUtils, I18n, Messages, UIStore}
 import pme123.form.shared.services.Language
 

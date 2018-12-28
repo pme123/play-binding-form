@@ -1,4 +1,4 @@
-package pme123.form.client
+package pme123.form.client.data
 
 import com.thoughtworks.binding.Binding
 import org.scalajs.dom.FormData

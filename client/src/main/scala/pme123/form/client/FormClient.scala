@@ -2,11 +2,9 @@ package pme123.form.client
 
 import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
-import javax.swing.plaf.FontUIResource
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
-import pme123.form.client.services.{I18n, SPAClient, SemanticUI, UIStore}
-import pme123.form.shared.{SemanticField, SemanticForm, SemanticRule}
+import pme123.form.client.services.{SPAClient, SemanticUI}
 
 import scala.language.implicitConversions
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -49,7 +47,7 @@ object FormClient
       {//
       val main = mainView.bind
       UIFormStore.changePage()
-        main.create().bind}
+      main.create().bind}
     </div>
     </div>
 

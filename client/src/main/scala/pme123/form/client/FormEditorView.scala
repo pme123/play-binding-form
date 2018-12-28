@@ -15,14 +15,12 @@ private[client] object FormEditorView
   // **************************
   @dom
   def create(): Binding[HTMLElement] =
-    <div class="ui four column doubling stackable grid">
+    <div class="ui grid">
       <div class="ten wide column">
-        <div class="ui basic segment">
-          <div class="ui form">
-            {//
-            header(UIFormStore.uiState.ident, Some(UIFormStore.changeIdent), headerButtons).bind}{//
-            editorContent.bind}
-          </div>
+        <div class="ui form">
+          {//
+          header(UIFormStore.uiState.ident, Some(UIFormStore.changeIdent), headerButtons).bind}{//
+          editorContent.bind}
         </div>
       </div>
       <div class="six wide column">

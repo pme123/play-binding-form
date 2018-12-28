@@ -1,9 +1,8 @@
-package pme123.form.client
+package pme123.form.client.data
 
 import org.scalajs.dom.window
 import play.api.libs.json.Json
-import pme123.form.shared.{DataContainer, FormContainer}
-
+import pme123.form.shared.DataContainer
 
 object DataExporter {
 

@@ -1,13 +1,10 @@
-package pme123.form.client
+package pme123.form.client.data
 
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
-
-import scala.language.implicitConversions
-
 
 object UIDataStore extends Logging {
 
