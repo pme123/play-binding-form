@@ -52,3 +52,6 @@ menu.view.preview=Form Preview
 menu.view.editor=Form Editor
 menu.view.data=Data Editor
 menu.view.mapping=Mapping Editor
+view.form.ident=Form Identity
+view.data.ident=Data Identity
+view.mapping.ident=Mapping Identity

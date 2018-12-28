@@ -75,7 +75,7 @@ object DropdownDiv extends BaseElementDiv {
     val elem = uiFormElem.elem
     val clearableClass = if (elem.extras.valueFor(CLEARABLE).contains("true")) "clearable" else ""
     val texts = elem.texts
-    <div class="field">
+    <div class={s"${elem.inlineClass} field"}>
       {label(texts, activeLanguage, elem.required).bind //
       }<div class={s"ui $clearableClass selection dropdown"}>
       <input id={elem.ident}
@@ -112,7 +112,7 @@ object TextFieldDiv extends BaseElementDiv {
     val elem = uiFormElem.elem
     val texts = elem.texts
     val size = elem.extras.valueFor(SIZE).map(_.toInt).getOrElse(20)
-    <div class="field">
+    <div class={s"${elem.inlineClass} field"}>
       {if (texts.hasTexts) label(texts, activeLanguage, elem.required).bind else <span/> //
       }<div class="ui input">
       <input id={elem.ident}
@@ -136,7 +136,7 @@ object TextAreaDiv extends BaseElementDiv {
     val activeLanguage = UIStore.activeLanguage.bind
     val elem = uiFormElem.elem
     val texts = elem.texts
-    <div class="field">
+    <div class={s"${elem.inlineClass} field"}>
       {label(texts, activeLanguage, elem.required).bind //
       }<div class="ui input">
       <textarea id={elem.ident}
@@ -163,7 +163,7 @@ object CheckboxDiv extends BaseElementDiv {
     val checkedClass = if (elem.value.contains("true")) "checked" else ""
     val checked = elem.value.contains("true")
     val texts = elem.texts
-    <div class="field">
+    <div class={s"${elem.inlineClass} field"}>
       {label(texts, activeLanguage, elem.required).bind //
       }<div class={s"ui $typeClass checkbox $checkedClass"}>
         <input id={elem.ident}
@@ -192,7 +192,7 @@ object TitleDiv extends BaseElementDiv {
     val elem = uiFormElem.elem
     val sizeClass = elem.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
     val texts = elem.texts
-    <div class="field">
+    <div class={s"${elem.inlineClass} field"}>
       <div class={s"ui $sizeClass header"}>
         {texts.textForLabel(activeLanguage) //
         }

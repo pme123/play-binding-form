@@ -4,6 +4,7 @@
 
 .main-content {
     padding: 10px 0 0;
+    min-width: 800px;
 }
 
 .ui.main.borderless.menu {

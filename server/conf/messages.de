@@ -1,3 +1,4 @@
+view.form.ident=Formular Identität
 enum.checkbox-type.slider=Schieber
 enum.checkbox-type.standard=Standart
 enum.checkbox-type.toggle=Schalter
@@ -48,7 +49,9 @@ enum.structure-type.string=Text
 enum.structure-type.number=Nummer
 enum.structure-type.boolean=Ja / Nein
 enum.structure-type.object=Objekt
-menu.view.preview=Form Vorschau
-menu.view.editor=Form Editor
+menu.view.preview=Formular Vorschau
+menu.view.editor=Formular Editor
 menu.view.data=Data Editor
 menu.view.mapping=Mapping Editor
+view.data.ident=Daten Identität
+view.mapping.ident=Mapping Identität

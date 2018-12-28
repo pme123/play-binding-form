@@ -26,7 +26,13 @@ private[client] object DataView
   @dom
   def create(): Binding[HTMLElement] =
     <div class="ui container">
-      {dataHeader.bind}<div class="ui form">
+      {//
+      header(
+        UIDataStore.uiState.data.value.identVar,
+        Some(UIFormStore.changeIdent),
+        uploadButton,
+        headerButtons).bind //
+      }<div class="ui form">
       {//
       submitFormDiv.bind}{//
       persistDataDiv.bind}{//
@@ -39,71 +45,44 @@ private[client] object DataView
   // **************************
 
   @dom
-  private lazy val dataHeader: Binding[HTMLElement] = {
-    <div class="ui borderless datamenu menu">
-      <div class="ui item">
-        <h3 class="header">
-          <i class={s"$icon icon"}></i> &nbsp; &nbsp;
-          Data Editor</h3>
-      </div>
-      <div class="ui right item">
-        {val data = UIDataStore.uiState.data.bind
-      BaseElementDiv(
-        UIFormElem(
-          BaseElement(
-            "form-ident",
-            TEXTFIELD,
-            DataType.STRING,
-            ElementTexts(
-              None,
-              Some(ElementText.placeholder(Map(
-                DE -> "Daten Identität",
-                EN -> "Data Identity",
-              ))),
-              Some(ElementText.tooltip(Map(
-                DE -> "Daten Identität",
-                EN -> "Data Identity",
-              )))
-            ),
-            value = Some(data.ident)),
-          Map.empty,
-          Some(UIDataStore.changeDataIdent),
-        )).bind}&nbsp;
-        &nbsp;
-        <form id="dataHeaderForm">
-          <input
-          id="importDataStructure"
-          name="importDataStructure"
-          type="file"
-          class="inputfile"
-          onchange={_: Event =>
-            val aIn: HTMLInputElement = importDataStructure.asInstanceOf[HTMLInputElement]
-            if (aIn.files.length > 0)
-              submitForm.value = Some(new FormData(dataHeaderForm))}/>
+  private lazy val uploadButton: Binding[HTMLElement] = {
+    <form id="dataHeaderForm">
+      <input
+      id="importDataStructure"
+      name="importDataStructure"
+      type="file"
+      class="inputfile"
+      onchange={_: Event =>
+        val aIn: HTMLInputElement = importDataStructure.asInstanceOf[HTMLInputElement]
+        if (aIn.files.length > 0)
+          submitForm.value = Some(new FormData(dataHeaderForm))}/>
 
-          <label for="importDataStructure"
-                 data:data-tooltip="Import Data from JSON"
-                 class="ui circular button">
-            <i class="ui upload icon"></i>
-          </label>
-        </form>
-        &nbsp;
-        &nbsp;
-        <button class="ui circular icon button"
-                data:data-tooltip="Export Data as JSON"
-                onclick={_: Event =>
-                  DataExporter.exportData()}>
-          <i class="sign-out icon"></i>
-        </button>
-        &nbsp;
-        &nbsp;
-        <button class="ui circular blue icon button"
-                data:data-tooltip="Persist Data on Server"
-                onclick={_: Event =>
-                  persistData.value = true}>
-          <i class="save outline icon"></i>
-        </button>
-      </div>
+      <label for="importDataStructure"
+             data:data-tooltip="Import Data from JSON"
+             class="ui circular button">
+        <i class="ui upload icon"></i>
+      </label>
+    </form>
+  }
+  @dom
+  private lazy val headerButtons: Binding[HTMLElement] = {
+    <div class="">
+      &nbsp;
+      &nbsp;
+      <button class="ui circular icon button"
+              data:data-tooltip="Export Data as JSON"
+              onclick={_: Event =>
+                DataExporter.exportData()}>
+        <i class="sign-out icon"></i>
+      </button>
+      &nbsp;
+      &nbsp;
+      <button class="ui circular blue icon button"
+              data:data-tooltip="Persist Data on Server"
+              onclick={_: Event =>
+                persistData.value = true}>
+        <i class="save outline icon"></i>
+      </button>
     </div>
   }
 
@@ -111,7 +90,7 @@ private[client] object DataView
   private lazy val dataContent: Binding[HTMLElement] = {
     val ds = UIDataStore.uiState.data.bind
     <div class="ui one column cards">
-      {dataObjectContent(ds.ident, ds.structure, None).bind}
+      {dataObjectContent(ds.identVar.value, ds.structure, None).bind}
     </div>
   }
 
@@ -260,7 +239,7 @@ private[client] object DataView
   }
 
   @dom
-  private def objectButtons(ident:String, data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
+  private def objectButtons(ident: String, data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
     <div class="five wide column">
       <div class="right floated">
 
@@ -274,8 +253,7 @@ private[client] object DataView
           <button class="mini ui circular red icon button"
                   data:data-tooltip="Delete Data Object"
                   onclick={_: Event =>
-                   UIDataStore.deleteDataObject(ident, parent.get)
-                  }>
+                    UIDataStore.deleteDataObject(ident, parent.get)}>
             <i class="trash icon"></i>
           </button>
         else

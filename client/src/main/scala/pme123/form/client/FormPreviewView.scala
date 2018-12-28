@@ -11,6 +11,7 @@ private[client] object FormPreviewView
   extends MainView {
 
   val link = "preview"
+  override val domain = "form"
   val icon = "newspaper outline"
 
   val persistForm = Var(false)
@@ -22,7 +23,7 @@ private[client] object FormPreviewView
     <div class="ui container">
       {<div class="ui form">
       {persistFormDiv.bind}{//
-      previewHeader.bind}{//
+      header(UIFormStore.uiState.ident, Some(UIFormStore.changeIdent), headerButtons).bind}{//
       previewContent.bind}{//
       initFields.bind //
       }<div class="ui error message"></div>
@@ -35,37 +36,30 @@ private[client] object FormPreviewView
 
 
   @dom
-  private lazy val previewHeader: Binding[HTMLElement] = {
-    <div class="ui borderless menu">
-      <div class="ui item">
-        <h3 class="header">
-          <i class={s"$icon icon"}></i> &nbsp; &nbsp;
-          Form Preview</h3>
-      </div>
-      <div class="ui right item">
-        <button class="ui circular show-valid icon submit button"
-                data:data-tooltip="Validate Form"
-                onclick={_: Event =>
-                  persistForm.value = true}>
-          <i class="check icon"></i>
-        </button>
-        &nbsp;
-        &nbsp;
-        <button class="ui circular icon button"
-                data:data-tooltip="Export Form as JSON"
-                onclick={_: Event =>
-                  FormExporter.exportForm()}>
-          <i class="sign-out icon"></i>
-        </button>
-        &nbsp;
-        &nbsp;
-        <button class="ui circular blue icon button"
-                data:data-tooltip="Persist Form on Server"
-                onclick={_: Event =>
-                  persistForm.value = true}>
-          <i class="save outline icon"></i>
-        </button>
-      </div>
+  private lazy val headerButtons: Binding[HTMLElement] = {
+    <div class="">
+      <button class="ui circular show-valid icon submit button"
+              data:data-tooltip="Validate Form"
+              onclick={_: Event =>
+                persistForm.value = true}>
+        <i class="check icon"></i>
+      </button>
+      &nbsp;
+      &nbsp;
+      <button class="ui circular icon button"
+              data:data-tooltip="Export Form as JSON"
+              onclick={_: Event =>
+                FormExporter.exportForm()}>
+        <i class="sign-out icon"></i>
+      </button>
+      &nbsp;
+      &nbsp;
+      <button class="ui circular blue icon button"
+              data:data-tooltip="Persist Form on Server"
+              onclick={_: Event =>
+                persistForm.value = true}>
+        <i class="save outline icon"></i>
+      </button>
     </div>
   }
 
@@ -86,7 +80,7 @@ private[client] object FormPreviewView
 
   @dom
   private lazy val initFields = {
-    UIRoute.route.state.bind
+    UIRoute.route.state.watch()
     val activeLang = UIStore.uiState.activeLanguage.bind
     val fields = UIFormStore.uiState.formElements.value
       .map { eV =>

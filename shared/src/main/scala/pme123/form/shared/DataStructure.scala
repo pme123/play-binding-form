@@ -2,7 +2,7 @@ package pme123.form.shared
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 import julienrf.json.derived
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.OFormat
 
 import scala.collection.immutable
 import scala.util.Random

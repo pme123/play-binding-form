@@ -13,6 +13,7 @@ case class BaseElement(ident: String,
                        extras: ExtraProperties = ExtraProperties(),
                        value: Option[String] = Some(""),
                        required: Boolean = false,
+                       inline: Boolean = false,
                        layoutWide: LayoutWide = EIGHT,
                        elemEntries: ElementEntries = ElementEntries(),
                        validations: Validations = Validations(),
@@ -22,6 +23,8 @@ case class BaseElement(ident: String,
   val hasExtras: Boolean = extras.hasExtras
   val hasEntries: Boolean = elemEntries.hasEntries
   val hasValidations: Boolean = validations.hasValidations
+
+  lazy val inlineClass: String = if(inline) "inline" else ""
 
 }
 
@@ -42,7 +45,7 @@ object BaseElement {
     )
   }
 
-  implicit val jsonFormat: OFormat[BaseElement] = Json.format[BaseElement]
+  implicit val jsonFormat: OFormat[BaseElement] = Json.using[Json.WithDefaultValues].format[BaseElement]
 
 }
 

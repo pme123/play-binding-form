@@ -3,16 +3,12 @@ package pme123.form.client
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
-import pme123.form.client.services.UIStore.supportedLangs
-import pme123.form.shared.ElementType.TEXTFIELD
-import pme123.form.shared.services.Language.{DE, EN}
-import pme123.form.shared.{BaseElement, DataType, ElementText, ElementTexts}
 
 private[client] object FormEditorView
   extends MainView {
 
   val link = "editor"
-
+  override val domain = "form"
   val icon = "edit outline"
 
   // 1. level of abstraction
@@ -24,7 +20,7 @@ private[client] object FormEditorView
         <div class="ui basic segment">
           <div class="ui form">
             {//
-            editorHeader.bind}{//
+            header(UIFormStore.uiState.ident, Some(UIFormStore.changeIdent), headerButtons).bind}{//
             editorContent.bind}
           </div>
         </div>
@@ -40,43 +36,13 @@ private[client] object FormEditorView
   // **************************
 
   @dom
-  private lazy val editorHeader: Binding[HTMLElement] = {
-    <div class="ui borderless menu">
-      <div class="ui item">
-        <h3 class="header">
-          <i class={s"$icon icon"}></i> &nbsp; &nbsp;
-          Form Editor</h3>
-      </div>
-      <div class="ui right item">
-        {
-        val ident = UIFormStore.uiState.ident.bind
-        BaseElementDiv(
-        UIFormElem(
-          BaseElement(
-            "form-ident",
-            TEXTFIELD,
-            DataType.STRING,
-            ElementTexts(
-              None,
-              Some(ElementText.placeholder(Map(
-                DE -> "Form Identität",
-                EN -> "Form Identity",
-              )))
-            ),
-            value = Some(ident)),
-          Map.empty,
-          Some(UIFormStore.changeIdent),
-        )).bind}
-      </div>
-      <div class="ui right item">
-        <button class="ui circular blue icon button"
-                data:data-tooltip="Add Form Element"
-                onclick={_: Event =>
-                  UIFormStore.addFormElement()}>
-          <i class="add icon"></i>
-        </button>
-      </div>
-    </div>
+  private lazy val headerButtons: Binding[HTMLElement] = {
+    <button class="ui circular blue icon button"
+            data:data-tooltip="Add Form Element"
+            onclick={_: Event =>
+              UIFormStore.addFormElement()}>
+      <i class="add icon"></i>
+    </button>
   }
 
   @dom

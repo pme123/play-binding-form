@@ -34,7 +34,7 @@ object UIDataStore extends Logging {
 
   def changeDataIdent(ident: String): Unit = {
     info(s"DataUIStore: changeDataIdent $ident")
-    uiState.data.value = uiState.data.value.modify(_.ident).setTo(ident)
+    uiState.data.value.identVar.value = ident
     SemanticUI.initElements()
   }
 
@@ -74,14 +74,14 @@ object UIDataStore extends Logging {
     }
   }
 
-  case class VarDataContainer(ident: String = DataStructure.defaultKey, structure: Var[VarDataObject] = Var(VarDataObject())) {
-    lazy val toData: DataContainer = DataContainer(ident, structure.value.toData)
+  case class VarDataContainer(identVar: Var[String] = Var(DataStructure.defaultKey), structure: Var[VarDataObject] = Var(VarDataObject())) {
+    lazy val toData: DataContainer = DataContainer(identVar.value, structure.value.toData)
 
   }
 
   object VarDataContainer {
     def apply(data: DataContainer): VarDataContainer =
-      VarDataContainer(data.ident, Var(VarDataObject.create(data.structure.value)))
+      VarDataContainer(Var(data.ident), Var(VarDataObject.create(data.structure.value)))
   }
 
   sealed abstract class VarDataStructure {
