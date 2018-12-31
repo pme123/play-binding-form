@@ -23,7 +23,7 @@ private[client] object FormPreviewView
     <div class="ui container">
       {<div class="ui form">
       {persistFormDiv.bind}{//
-      header(UIFormStore.uiState.ident, Some(UIFormStore.changeIdent), headerButtons).bind}{//
+      header(UIFormStore.uiState.identVar, Some(UIFormStore.changeIdent), headerButtons).bind}{//
       previewContent.bind}{//
       initFields.bind //
       }<div class="ui error message"></div>

@@ -2,7 +2,7 @@ package pme123.form.server.entity
 
 import org.apache.poi.ss.usermodel._
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import pme123.form.shared.{DataContainer, FormContainer}
+import pme123.form.shared.{DataContainer, FormContainer, MappingContainer}
 import pme123.form.shared.services.{Identifiable, Logging, SPAException, User}
 
 import scala.collection.JavaConverters._
@@ -70,6 +70,22 @@ case class ImportWorkbook(wb: Workbook)
               throw JsonParseException(err)
           }
         ) recoverWith failure(sheetData, row.getRowNum)
+      }
+    }
+  }
+
+  lazy val mappings: Try[Seq[Try[MappingContainer]]] = {
+    getSheet(sheetMappings) map { s =>
+      rows(s).map { row =>
+        Try(
+          Json.parse(cellAsString(row.getCell(col1)))
+            .validate[MappingContainer] match {
+            case JsSuccess(value, _) =>
+              value
+            case err: JsError =>
+              throw JsonParseException(err)
+          }
+        ) recoverWith failure(sheetMappings, row.getRowNum)
       }
     }
   }
@@ -148,6 +164,7 @@ object ImportWorkbook {
   val sheetUsers = "users"
   val sheetForms = "forms"
   val sheetData = "data"
+  val sheetMappings = "mappings"
 
 
   val col0 = 0

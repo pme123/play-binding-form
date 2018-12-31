@@ -37,6 +37,9 @@ object ElementEntry {
   def apply()(implicit supportedLangs: Seq[Language]): ElementEntry =
     ElementEntry("", ElementText.emptyLabel)
 
+  def apply(key: String)(implicit supportedLangs: Seq[Language]): ElementEntry =
+    ElementEntry(key, ElementText.simple(key))
+
   implicit val jsonFormat: OFormat[ElementEntry] = Json.format[ElementEntry]
 
 }

@@ -1,20 +1,20 @@
 package pme123.form.client
 
-import com.thoughtworks.binding.Binding.{Constants, Var, Vars}
+import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.dom.window
+import org.scalajs.jquery.jQuery
+import pme123.form.client.UIRoute.route
 import pme123.form.client.data.{DataServices, DataView, UIDataStore}
-import pme123.form.client.mapping.MappingView
-import pme123.form.client.services.{ClientUtils, I18n, Messages, UIStore}
+import pme123.form.client.mapping.{MappingServices, MappingView, UIMappingStore}
+import pme123.form.client.services.{ClientUtils, I18n, UIStore}
 import pme123.form.shared.services.Language
 
 import scala.language.implicitConversions
 
 private[client] object FormHeader
   extends ClientUtils {
-
-  private val changeForm: Var[Option[String]] = Var(None)
 
   // 1. level of abstraction
   // **************************
@@ -88,40 +88,45 @@ private[client] object FormHeader
 
 
   @dom
-  private def formsButton: Binding[HTMLElement] = {
+  private lazy val formsButton: Binding[HTMLElement] = {
     val mainView = UIRoute.route.state.bind
     <div>
       {mainView match {
       case DataView =>
         DataServices.idents().bind
-        identDropdown("Choose Data", UIDataStore.uiState.idents).bind
+        identDropdown("Choose Data", UIDataStore.uiState.idents, changeIdent).bind
+
+      case MappingView =>
+        MappingServices.idents().bind
+        identDropdown("Choose Mapping", UIMappingStore.uiState.idents, changeIdent).bind
 
       case _ =>
         FormServices.idents().bind
-        identDropdown("Choose Form", UIFormStore.uiState.idents).bind
+        identDropdown("Choose Form", UIFormStore.uiState.idents, changeIdent).bind
     }}
     </div>
   }
+  val changeIdent: Var[Option[String]] = Var(None)
 
   @dom
-  private def identDropdown(label: String, idents: Vars[String]): Binding[HTMLElement] =
-    <div class="ui left top pointing dropdown icon button">
-      <span class="text">
-        {label}
-      </span>
-      <div class="menu">
-        {for (ident <- idents) yield identLink(ident).bind}
+  lazy val changeFormDiv: Binding[HTMLElement] = {
+    val change = changeIdent.bind
+    if (change.nonEmpty)
+      <div>
+        {changeIdent.value = None
+      route.state.value match {
+        case DataView =>
+          DataServices.getData(change.get).bind
+        case MappingView =>
+          MappingServices.getMapping(change.get).bind
+        case _ =>
+          FormServices.getForm(change.get).bind
+      }}
       </div>
-    </div>
-
-  @dom
-  private def identLink(ident: String): Binding[HTMLElement] = {
-    <a class="item"
-       onclick={_: Event =>
-         changeForm.value = Some(ident)}>
-      {ident}
-    </a>
+    else
+        <span/>
   }
+
 
   @dom
   private def logInButton = {
@@ -161,7 +166,7 @@ private[client] object FormHeader
              id="languageId"
              value={language.entryName}
              onchange={_: Event =>
-               UIStore.changeLanguage(languageId.value)}/>
+               UIStore.changeLanguage(jQuery("languageId").text())}/>
       <div class="default text">
         <i class={s"${language.flag} big flag"}></i>
       </div>
@@ -176,24 +181,6 @@ private[client] object FormHeader
     <div class="item" data:data-value={lang.abbreviation}>
       <i class={s"${lang.flag} big flag"}></i>
     </div>
-
-
-  @dom
-  private lazy val changeFormDiv = {
-    val change = changeForm.bind
-    if (change.nonEmpty)
-      <div>
-        {changeForm.value = None
-      UIRoute.route.state.value match {
-        case DataView =>
-          DataServices.getData(change.get).bind
-        case _ =>
-          FormServices.getForm(change.get).bind
-      }}
-      </div>
-    else
-        <span/>
-  }
 
   @dom
   private def menuButton = {

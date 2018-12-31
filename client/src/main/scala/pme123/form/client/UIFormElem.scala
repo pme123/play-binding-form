@@ -11,8 +11,6 @@ case class UIFormElem(
                        extras: Map[ExtraProp, UIFormElem] = Map.empty,
                        changeEvent: ChangeEvent = None,
                      ) {
-  // if the value is not set the element is read only like title
-  val isEditable: Boolean = elem.value.nonEmpty
 
   def isViewable: Boolean = elem.elementType match {
     case SPACER => false

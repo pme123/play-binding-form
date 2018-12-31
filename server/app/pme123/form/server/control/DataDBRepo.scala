@@ -1,4 +1,4 @@
-package pme123.data.server.control
+package pme123.form.server.control
 
 import doobie.implicits._
 import doobie.util.fragment.Fragment
@@ -43,23 +43,22 @@ class DataDBRepo @Inject()()
     update(
       sql"""update data
               set content = $dataContent
-             where dataId = ${dataCont.ident}""")
+             where ident = ${dataCont.ident}""")
   }
 
   def selectData(ident: String): Future[DataContainer] =
     selectMaybeData(ident).map(_.get)
 
   def selectMaybeData(ident: String): Future[Option[DataContainer]] =
-    selectDatas(fr"where f.ident = $ident")
+    selectDatas(fr"where d.ident = $ident")
       .map(_.headOption)
 
   private def selectDatas(where: Fragment = fr""): Future[List[DataContainer]] =
-    select((fr"""select f.ident, f.content
-                     from data f
+    select((fr"""select d.ident, d.content
+                     from data d
          """ ++ where)
       .query[(String, String)]
-      .map { case (ident, content) =>
-        println(s"Data selected from DB: $ident")
+      .map { case (_, content) =>
         Json.parse(content)
           .validate[DataContainer] match {
           case JsSuccess(value, _) =>

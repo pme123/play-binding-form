@@ -17,26 +17,26 @@ trait HttpServices
   val apiPath = s"${UIStore.uiState.webContext.value}/api"
 
   def httpGet[A](apiPath: String
-                 , storeChange: A => Unit)
+                 , storeChange: A => Any)
                 (implicit reads: Reads[A]): Binding[HTMLElement] =
     callService[A](apiPath, Ajax.get(apiPath), storeChange)
 
   def httpPut[A, B](apiPath: String
                     , body: B
-                    , storeChange: A => Unit)
+                    , storeChange: A => Any)
                    (implicit reads: Reads[A], writes: Writes[B]): Binding[HTMLElement] =
     callService[A](apiPath, Ajax.put(apiPath, InputData.str2ajax(Json.toJson(body).toString())), storeChange)
 
   def httpPost[A, B](apiPath: String
                     , body: B
-                    , storeChange: A => Unit)
+                    , storeChange: A => Any)
                    (implicit reads: Reads[A], writes: Writes[B]): Binding[HTMLElement] =
     callService[A](apiPath, Ajax.post(apiPath, InputData.str2ajax(Json.toJson(body).toString())), storeChange)
 
   @dom
   def callService[A](apiPath: String
                      , ajaxCall: Future[XMLHttpRequest]
-                     , storeChange: A => Unit)
+                     , storeChange: A => Any)
                     (implicit reads: Reads[A]): Binding[HTMLElement] = {
     FutureBinding(ajaxCall)
       .bind match {

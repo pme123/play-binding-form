@@ -2,8 +2,9 @@ package pme123.form.client.services
 
 import java.time.Instant
 
+import com.thoughtworks.binding.Binding.{Var, Vars}
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.shared.services.Logging
 
 import scala.language.implicitConversions
@@ -72,6 +73,25 @@ trait ClientUtils
 
   def activeStyle(isActive:Boolean):String = if(isActive) "active blue" else ""
 
+  @dom
+  protected def identDropdown(label: String, idents: Vars[String], changeIdent: Var[Option[String]]): Binding[HTMLElement] =
+    <div class="ui left top pointing dropdown icon button">
+      <span class="text">
+        {label}
+      </span>
+      <div class="menu">
+        {for (ident <- idents) yield identLink(ident, changeIdent).bind}
+      </div>
+    </div>
+
+  @dom
+  private def identLink(ident: String, changeIdent: Var[Option[String]]): Binding[HTMLElement] = {
+    <a class="item"
+       onclick={_: Event =>
+         changeIdent.value = Some(ident)}>
+      {ident}
+    </a>
+  }
 }
 
 trait IntellijImplicits {

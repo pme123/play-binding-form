@@ -19,7 +19,7 @@ private[client] object FormEditorView
       <div class="ten wide column">
         <div class="ui form">
           {//
-          header(UIFormStore.uiState.ident, Some(UIFormStore.changeIdent), headerButtons).bind}{//
+          header(UIFormStore.uiState.identVar, Some(UIFormStore.changeIdent), headerButtons).bind}{//
           editorContent.bind}
         </div>
       </div>

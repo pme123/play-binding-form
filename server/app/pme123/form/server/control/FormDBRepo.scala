@@ -58,8 +58,7 @@ class FormDBRepo @Inject()()
                      from form f
          """ ++ where)
       .query[(String, String)]
-      .map { case (ident, content) =>
-        println(s"Form selected from DB: $ident")
+      .map { case (_, content) =>
         Json.parse(content)
           .validate[FormContainer] match {
           case JsSuccess(value, _) =>

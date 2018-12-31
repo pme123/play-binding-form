@@ -30,7 +30,7 @@ private[client] object DataView
       {//
       header(
         UIDataStore.uiState.data.value.identVar,
-        Some(UIFormStore.changeIdent),
+        Some(UIDataStore.changeDataIdent),
         uploadButton,
         headerButtons).bind //
       }<div class="ui form">
@@ -90,7 +90,7 @@ private[client] object DataView
   @dom
   private lazy val dataContent: Binding[HTMLElement] = {
     val ds = UIDataStore.uiState.data.bind
-    <div class="ui one column cards">
+    <div class="ui cards">
       {dataObjectContent(ds.identVar.value, ds.structure, None).bind}
     </div>
   }
@@ -112,19 +112,19 @@ private[client] object DataView
     <div class="ui grid content">
       {identDiv(ident, parent).bind}{//
       structureTypeDiv(ident, data).bind}{//
-      dataContent(ident, data, parent).bind}
+      dataContent(data, parent).bind}
     </div>
   }
 
-  private def dataContent(ident: String, data: Var[VarDataStructure], parent: Var[VarDataObject]) = {
+  private def dataContent(data: Var[VarDataStructure], parent: Var[VarDataObject]) = {
     data.value match {
-      case VarDataString(content) =>
+      case VarDataValue(ident, StructureType.STRING, content) =>
         dataStringContent(ident, content)
-      case VarDataNumber(content) =>
+      case VarDataValue(ident, StructureType.NUMBER, content) =>
         dataNumberContent(ident, content)
-      case VarDataBoolean(content) =>
+      case VarDataValue(ident, StructureType.BOOLEAN, content) =>
         dataBooleanContent(ident, content)
-      case _: VarDataObject =>
+      case VarDataObject(ident, _) =>
         dataObjectContent(ident, data.asInstanceOf[Var[VarDataObject]], Some(parent))
     }
   }
@@ -152,7 +152,7 @@ private[client] object DataView
   }
 
   @dom
-  private def dataNumberContent(ident: String, data: Var[BigDecimal]): Binding[HTMLElement] = {
+  private def dataNumberContent(ident: String, data: Var[String]): Binding[HTMLElement] = {
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -165,7 +165,7 @@ private[client] object DataView
           required = true,
         ),
         changeEvent = Some(
-          str => data.value = BigDecimal(str)
+          str => data.value = str
         ),
         extras = Map.empty
       )
@@ -174,7 +174,7 @@ private[client] object DataView
   }
 
   @dom
-  private def dataBooleanContent(ident: String, data: Var[Boolean]): Binding[HTMLElement] = {
+  private def dataBooleanContent(ident: String, data: Var[String]): Binding[HTMLElement] = {
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -186,7 +186,7 @@ private[client] object DataView
           value = Some(data.value.toString),
         ),
         changeEvent = Some(
-          str => data.value = str.toBoolean
+          str => data.value = str
         ),
         extras = Map.empty
       )

@@ -1,13 +1,12 @@
 package pme123.form.client.services
 
 import org.scalajs.jquery.{JQuery, jQuery}
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
 import pme123.form.shared.SemanticForm
 
 import scala.language.implicitConversions
 import scala.scalajs.js
 import scala.scalajs.js.JSON
-import scala.scalajs.js.annotation.ScalaJSDefined
 import scala.scalajs.js.timers.setTimeout
 
 /**

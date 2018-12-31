@@ -150,7 +150,6 @@ object Settings {
     scalaVersion := scalaV
     , name := s"$projectName${moduleName.map("-" + _).getOrElse("")}"
     , version := s"$projectV"
-    , publishArtifact in(Compile, packageDoc) := false
     , publishArtifact in packageDoc := false
     , sources in(Compile, doc) := Seq.empty
   ) ++ organizationSettings

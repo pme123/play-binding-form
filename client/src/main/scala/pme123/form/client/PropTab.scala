@@ -53,7 +53,7 @@ case object PropertiesTab {
   private lazy val defaultValueInput: Binding[HTMLElement] = {
     val selElem = UIFormStore.uiState.activePropElement.bind
 
-    if (selElem.isEditable)
+    if (!selElem.elem.readOnly)
       <div class="field">
         {BaseElementDiv(
         UIFormElem(BaseElement(
@@ -180,10 +180,11 @@ case object TextsTab {
       <div class="content">
         {//
         val texts = uiFormElem.elem.texts
+        val editable = !uiFormElem.elem.readOnly
         Constants(
           texts.label.map(elementTextDiv(_, uiFormElem.isViewable)).toList ++
-            texts.placeholder.map(elementTextDiv(_, uiFormElem.isEditable)).toList ++
-            texts.tooltip.map(elementTextDiv(_, uiFormElem.isEditable)).toList
+            texts.placeholder.map(elementTextDiv(_, editable)).toList ++
+            texts.tooltip.map(elementTextDiv(_, editable)).toList
             : _*).map(_.bind)}
       </div>
     else

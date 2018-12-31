@@ -18,8 +18,20 @@ object MappingContainer {
   implicit val jsonFormat: OFormat[MappingContainer] = Json.format[MappingContainer]
 }
 
+case class GetMappingContainer(ident: String,
+                              form: FormContainer,
+                              data: DataContainer,
+                              mappings: Seq[MappingEntry] = Nil) {
+
+}
+
+object GetMappingContainer {
+
+  implicit val jsonFormat: OFormat[GetMappingContainer] = Json.format[GetMappingContainer]
+}
+
 case class MappingEntry(formIdent: String,
-                        dataIdent: String,
+                        dataIdent: Option[String] = None,
                        )
 
 object MappingEntry {

@@ -81,12 +81,12 @@ object DropdownDiv extends BaseElementDiv {
       <input id={elem.ident}
              name={elem.ident}
              type="hidden"
-             value={elem.value.get}
+             value={elem.value.getOrElse("")}
              onchange={_: Event =>
                changeEvent(uiFormElem)}/>
       <i class="dropdown icon"></i>
       <div class="default text">
-        {elem.value.get}
+        {elem.value.getOrElse("")}
       </div>
       <div class="menu">
         {Constants(elem.elemEntries.entries.map(elementEntry(_, activeLanguage)): _*).map(_.bind)}
@@ -119,8 +119,9 @@ object TextFieldDiv extends BaseElementDiv {
              name={elem.ident}
              size={size}
              type="text"
+             readOnly={elem.readOnly}
              placeholder={texts.textForPlaceholder(activeLanguage)}
-             value={elem.value.get}
+             value={elem.value.getOrElse("")}
              onblur={_: Event =>
                changeEvent(uiFormElem)}/>
     </div>

@@ -19,19 +19,24 @@ object UIFormStore extends Logging {
     uiState.activePropElement.value = uiState.selectedElement.value.value
   }
 
-  def changeForm(form: FormContainer): Unit = {
+  def changeForm(form: FormContainer): Var[VarFormContainer] = {
     info(s"FormUIStore: changeForm ${form.ident}")
     changeIdent(form.ident)
     uiState.formElements.value.clear()
     val seq = form.elems.map(UIFormElem.apply(_))
       .map(Var(_))
-    if(seq.nonEmpty){
+    if (seq.nonEmpty) {
       uiState.formElements.value ++= seq
       changeSelectedElement(seq.head)
-    }else{
+    } else {
       addFormElement()
     }
+    uiState.form.value = VarFormContainer(
+      uiState.identVar,
+      uiState.formElements
+    )
     SemanticUI.initElements()
+    uiState.form
   }
 
 
@@ -102,7 +107,7 @@ object UIFormStore extends Logging {
 
   def changeIdent(ident: String): Unit = {
     info(s"FormUIStore: changeIdent $ident")
-    uiState.ident.value = ident
+    uiState.identVar.value = ident
   }
 
   def changeIdents(idents: Seq[String]): Unit = {
@@ -112,24 +117,35 @@ object UIFormStore extends Logging {
     SemanticUI.initElements()
   }
 
-  case class UIState(formElements: Vars[Var[UIFormElem]],
-                     selectedElement: Var[Var[UIFormElem]],
-                     activePropElement: Var[UIFormElem],
-                     activePropTab: Var[PropTabType],
-                     ident: Var[String],
-                     idents: Vars[String]
-                    )
+  def formElement(ident: String): Option[Var[UIFormElem]] = {
+    uiState.formElements.value
+      .find(_.value.elem.ident == ident)
+  }
+
+  case class UIState(
+                      identVar: Var[String],
+                      form: Var[VarFormContainer],
+                      formElements: Vars[Var[UIFormElem]],
+                      selectedElement: Var[Var[UIFormElem]],
+                      activePropElement: Var[UIFormElem],
+                      activePropTab: Var[PropTabType],
+                      idents: Vars[String]
+                    ) {
+
+  }
 
   object UIState {
     def apply(): UIState = {
       val defaultElem = Var(UIFormElem())
-
+      val elems = Vars(defaultElem)
+      val identVar = Var(s"form-${Random.nextInt(100)}")
       UIState(
-        Vars(defaultElem),
+        identVar,
+        Var(VarFormContainer(identVar, elems)),
+        elems,
         Var(defaultElem),
         Var(defaultElem.value),
         Var(PROPERTIES),
-        Var(s"form-${Random.nextInt(100)}"),
         Vars.empty
       )
     }
@@ -137,5 +153,16 @@ object UIFormStore extends Logging {
 
   private def ident(uiElemVar: Var[UIFormElem]) = uiElemVar.value.elem.ident
 
+
+}
+
+case class VarFormContainer(identVar: Var[String], elems: Vars[Var[UIFormElem]]) {
+
+  lazy val toForm: FormContainer =
+    FormContainer(identVar.value, elems.value.map(_.value.elem))
+
+}
+
+object VarFormContainer{
 
 }

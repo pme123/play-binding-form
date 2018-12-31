@@ -13,13 +13,6 @@ object FormExporter {
     tab.focus()
   }
 
-   def createForm: FormContainer = {
-    FormContainer(
-      UIFormStore.uiState.ident.value,
-      UIFormStore.uiState.formElements.value
-        .map { eV =>
-          eV.value.elem
-        }
-    )
-  }
+  def createForm: FormContainer =
+    UIFormStore.uiState.form.value.toForm
 }

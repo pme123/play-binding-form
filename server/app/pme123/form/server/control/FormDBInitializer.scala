@@ -37,6 +37,18 @@ class FormDBInitializer @Inject()()
         )"""
   )
 
+  val initMapping: Int = initTable(
+    sql"""
+        DROP TABLE IF EXISTS mapping
+      """,
+    sql"""
+        CREATE TABLE mapping (
+          id   SERIAL,
+          ident VARCHAR NOT NULL UNIQUE,
+          content VARCHAR
+        )"""
+  )
+
   val initUser: Int = initTable(
     sql"""
         DROP TABLE IF EXISTS users

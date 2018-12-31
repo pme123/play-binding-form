@@ -66,6 +66,9 @@ case class ElementText(textType: TextType, texts: Map[Language, String]) {
 
 object ElementText {
 
+  def simple(simpleLabel:String)(implicit supportedLangs: Seq[Language]): ElementText =
+    ElementText(LABEL, supportedLangs.map(l => l -> simpleLabel).toMap)
+
   def label(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementText =
     ElementText(LABEL, texts)
 
