@@ -1,6 +1,7 @@
 package pme123.form.client
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
+import pme123.form.client.form.UIFormElem
 import pme123.form.client.services.I18n
 import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TITLE}
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}

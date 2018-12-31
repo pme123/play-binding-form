@@ -4,6 +4,7 @@ import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
+import pme123.form.client.form.UIFormElem
 import pme123.form.client.services.UIStore
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}

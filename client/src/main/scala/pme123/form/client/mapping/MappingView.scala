@@ -6,6 +6,7 @@ import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client._
 import pme123.form.client.data.{DataView, UIDataStore}
+import pme123.form.client.form.{FormPreviewView, UIFormElem, UIFormStore}
 import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.DROPDOWN
@@ -63,7 +64,9 @@ private[client] object MappingView
     <div class="item">
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
-              onclick={_: Event =>}>
+              onclick={_: Event =>
+
+              }>
         <i class="check icon"></i>
       </button>
     </div>

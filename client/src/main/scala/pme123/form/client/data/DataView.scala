@@ -5,6 +5,7 @@ import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore._
+import pme123.form.client.form.UIFormElem
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.DataType.STRING

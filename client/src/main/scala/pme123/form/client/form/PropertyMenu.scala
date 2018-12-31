@@ -1,4 +1,4 @@
-package pme123.form.client
+package pme123.form.client.form
 
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}

@@ -27,7 +27,7 @@ class FormApi @Inject()(formDBRepo: FormDBRepo,
               .map(form =>
                 Ok(Json.toJson(form)).as(JSON))
           case err: JsError =>
-            Future.successful(BadRequest(s"Problem parsing Formcontainer: ${err}"))
+            Future.successful(BadRequest(s"Problem parsing Formcontainer: $err"))
         }
     }.getOrElse(Future.successful(BadRequest("No Form in Body!")))
   }

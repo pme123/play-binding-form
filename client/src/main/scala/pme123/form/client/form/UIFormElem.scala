@@ -1,6 +1,7 @@
-package pme123.form.client
+package pme123.form.client.form
 
-import pme123.form.client.UIFormElem.ChangeEvent
+import pme123.form.client.BaseElementExtras
+import pme123.form.client.form.UIFormElem.ChangeEvent
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{SPACER, TEXTFIELD}
 import pme123.form.shared.{BaseElement, ExtraProp}

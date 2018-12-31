@@ -1,8 +1,9 @@
-package pme123.form.client
+package pme123.form.client.form
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
+import pme123.form.client._
 
 private[client] object FormEditorView
   extends MainView {

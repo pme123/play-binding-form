@@ -1,4 +1,4 @@
-package pme123.form.client
+package pme123.form.client.form
 
 import com.softwaremill.quicklens._
 import pme123.form.client.services.{SemanticUI, UIStore}

@@ -7,6 +7,7 @@ import org.scalajs.dom.window
 import org.scalajs.jquery.jQuery
 import pme123.form.client.UIRoute.route
 import pme123.form.client.data.{DataServices, DataView, UIDataStore}
+import pme123.form.client.form.{FormEditorView, FormPreviewView, FormServices, UIFormStore}
 import pme123.form.client.mapping.{MappingServices, MappingView, UIMappingStore}
 import pme123.form.client.services.{ClientUtils, I18n, UIStore}
 import pme123.form.shared.services.Language

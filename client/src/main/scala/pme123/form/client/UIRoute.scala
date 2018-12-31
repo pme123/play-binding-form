@@ -4,6 +4,7 @@ import com.thoughtworks.binding.Route
 import org.scalajs.dom.window
 import pme123.form.client.FormClient.info
 import pme123.form.client.data.DataView
+import pme123.form.client.form.{FormEditorView, FormPreviewView}
 import pme123.form.client.mapping.MappingView
 import pme123.form.client.services.SemanticUI
 

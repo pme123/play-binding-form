@@ -3,8 +3,8 @@ package pme123.form.client.mapping
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.data.UIDataStore
 import pme123.form.client.data.UIDataStore.{VarDataContainer, VarDataValue}
+import pme123.form.client.form.{UIFormElem, UIFormStore, VarFormContainer}
 import pme123.form.client.services.SemanticUI
-import pme123.form.client.{UIFormElem, UIFormStore, VarFormContainer}
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
 

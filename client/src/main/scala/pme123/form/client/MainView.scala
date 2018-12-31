@@ -3,7 +3,8 @@ package pme123.form.client
 import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.HTMLElement
-import pme123.form.client.UIFormElem.ChangeEvent
+import pme123.form.client.form.UIFormElem
+import pme123.form.client.form.UIFormElem.ChangeEvent
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{ClientUtils, I18n, UIStore}
 import pme123.form.shared.ElementType.TEXTFIELD
