@@ -3,6 +3,7 @@ package pme123.form.shared
 import play.api.libs.json.{Json, OFormat}
 import pme123.form.shared.SemanticField.FieldIdent
 
+
 case class SemanticForm(on: String = "blur", inline : Boolean = true, fields: Map[FieldIdent, SemanticField] = Map.empty)
 
 object SemanticForm {

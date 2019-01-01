@@ -149,7 +149,6 @@ object ExtraProperties {
 
 }
 
-
 case class ExtraPropValue(extraProp: ExtraProp, value: ExtraValue)
 
 object ExtraPropValue {

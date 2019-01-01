@@ -2,7 +2,8 @@ package pme123.form.client.services
 
 import org.scalajs.jquery.{JQuery, jQuery}
 import play.api.libs.json.Json
-import pme123.form.shared.SemanticForm
+import pme123.form.shared.services.Language
+import pme123.form.shared.{SemanticForm, SemanticRule}
 
 import scala.language.implicitConversions
 import scala.scalajs.js
@@ -76,4 +77,7 @@ object SemanticUI {
       case _ => "sixteen"
     }
   }
+
+  def emptyRule(implicit activeLang: Language) = SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))
+
 }

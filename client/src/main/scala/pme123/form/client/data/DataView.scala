@@ -145,8 +145,7 @@ private[client] object DataView
         ),
         changeEvent = Some(
           str => data.value = str
-        ),
-        extras = Map.empty
+        )
       )
     ).bind}
     </div>
@@ -167,9 +166,7 @@ private[client] object DataView
         ),
         changeEvent = Some(
           str => data.value = str
-        ),
-        extras = Map.empty
-      )
+        ))
     ).bind}
     </div>
   }
@@ -189,7 +186,6 @@ private[client] object DataView
         changeEvent = Some(
           str => data.value = str
         ),
-        extras = Map.empty
       )
     ).bind}
     </div>
@@ -210,7 +206,6 @@ private[client] object DataView
         ), changeEvent = Some(
           UIDataStore.changeIdent(parent, ident)
         ),
-        extras = Map.empty
       )
     ).bind}
     </div>
@@ -234,7 +229,6 @@ private[client] object DataView
           changeEvent = Some(
             UIDataStore.changeStructureType(data)
           ),
-          extras = Map.empty
         )
       ).bind}
     </div>

@@ -4,9 +4,8 @@ import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client._
-import pme123.form.client.services.{I18n, SemanticUI, UIStore}
+import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared._
-import pme123.form.shared.services.SPAExtensions.StringPos
 
 private[client] object FormPreviewView
   extends MainView {
@@ -50,7 +49,7 @@ private[client] object FormPreviewView
       <button class="ui circular icon button"
               data:data-tooltip="Export Form as JSON"
               onclick={_: Event =>
-                FormExporter.exportForm()}>
+                FormUtils.exportForm()}>
         <i class="sign-out icon"></i>
       </button>
       &nbsp;
@@ -83,19 +82,7 @@ private[client] object FormPreviewView
   private lazy val initFields = {
     UIRoute.route.state.watch()
     val activeLang = UIStore.uiState.activeLanguage.bind
-    val fields = UIFormStore.uiState.formElements.value
-      .map { eV =>
-        val elem = eV.value.elem
-        elem.ident -> SemanticField(elem.ident,
-          !elem.required,
-          elem.validations.rules
-            .filter(_.enabled)
-            .map(v =>
-              SemanticRule(v.semanticType.toCamelCase, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))
-            ) ++ (if (elem.required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
-        )
-      }.toMap
-    SemanticUI.initForm(SemanticForm(fields = fields))
+    SemanticUI.initForm(SemanticForm(fields = FormUtils.semanticFields(activeLang)))
       <span/>
   }
 
@@ -106,7 +93,7 @@ private[client] object FormPreviewView
       <div>
         {persistForm.value = false
       FormServices.persistForm(
-        FormExporter.createForm
+        FormUtils.createForm
       ).bind}
       </div>
     else

@@ -50,7 +50,6 @@ trait MainView
             )),
             value = Some(ident),
             inline = true),
-          Map.empty,
           changeEvent,
         )).bind}&nbsp; &nbsp;{//
         Constants(buttons: _*).map(_.bind)}

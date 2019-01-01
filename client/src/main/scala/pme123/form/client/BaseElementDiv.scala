@@ -29,7 +29,7 @@ sealed abstract class BaseElementDiv {
   }
 
   protected def changeEvent(uiFormElem: UIFormElem): Unit = {
-    val newText = jQuery(s"#${uiFormElem.elem.ident}").value().toString
+    val newText = jQuery(s"#${uiFormElem.identVar.value}").value().toString
     uiFormElem.changeEvent
       .foreach(ce =>
         ce(newText))
@@ -41,9 +41,9 @@ object BaseElementDiv {
 
   @dom
   def apply(uiFormElem: UIFormElem): Binding[HTMLElement] = {
-    val elem = uiFormElem.elem
+    val elementType = uiFormElem.elementTypeVar.value
     <div class="content">
-      {elem.elementType match {
+      {elementType match {
       case DROPDOWN =>
         DropdownDiv.create(uiFormElem).bind
       case TEXTFIELD =>
@@ -60,7 +60,7 @@ object BaseElementDiv {
         SpacerDiv.create(uiFormElem).bind
       case _ =>
         <div>
-          {elem.ident}
+          {uiFormElem.identVar.value}
         </div>
     }}
     </div>
@@ -73,24 +73,30 @@ object DropdownDiv extends BaseElementDiv {
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
-    val elem = uiFormElem.elem
-    val clearableClass = if (elem.extras.valueFor(CLEARABLE).contains("true")) "clearable" else ""
-    val texts = elem.texts
-    <div class={s"${elem.inlineClass} field"}>
-      {label(texts, activeLanguage, elem.required).bind //
+    val texts = uiFormElem.textsVar.bind
+    val inlineClass = uiFormElem.inlineVar.bind
+    val required = uiFormElem.requiredVar.bind
+    val readOnly = uiFormElem.readOnlyVar.bind
+    val ident = uiFormElem.identVar.bind
+    val value = uiFormElem.valueVar.bind
+    val elemEntries = uiFormElem.elemEntriesVar.bind
+    val extras = uiFormElem.extrasVar.bind
+    val clearableClass = if (extras.valueFor(CLEARABLE).contains("true")) "clearable" else ""
+    <div class={s"$inlineClass field"}>
+      {label(texts, activeLanguage, required).bind //
       }<div class={s"ui $clearableClass selection dropdown"}>
-      <input id={elem.ident}
-             name={elem.ident}
+      <input id={ident}
+             name={ident}
              type="hidden"
-             value={elem.value.getOrElse("")}
+             value={value.getOrElse("")}
              onchange={_: Event =>
                changeEvent(uiFormElem)}/>
       <i class="dropdown icon"></i>
       <div class="default text">
-        {elem.value.getOrElse("")}
+        {value.getOrElse("")}
       </div>
       <div class="menu">
-        {Constants(elem.elemEntries.entries.map(elementEntry(_, activeLanguage)): _*).map(_.bind)}
+        {Constants(elemEntries.entries.map(elementEntry(_, activeLanguage)): _*).map(_.bind)}
       </div>
     </div>
     </div>
@@ -110,19 +116,24 @@ object TextFieldDiv extends BaseElementDiv {
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
-    val elem = uiFormElem.elem
-    val texts = elem.texts
-    val size = elem.extras.valueFor(SIZE).map(_.toInt).getOrElse(20)
-    <div class={s"${elem.inlineClass} field"}>
-      {if (texts.hasTexts) label(texts, activeLanguage, elem.required).bind else <span/> //
+    val texts = uiFormElem.textsVar.bind
+    val inlineClass = uiFormElem.inlineVar.bind
+    val required = uiFormElem.requiredVar.bind
+    val readOnly = uiFormElem.readOnlyVar.bind
+    val ident = uiFormElem.identVar.bind
+    val value = uiFormElem.valueVar.bind
+    val extras = uiFormElem.extrasVar.bind
+    val size = extras.valueFor(SIZE).map(_.toInt).getOrElse(20)
+    <div class={s"$inlineClass field"}>
+      {if (texts.hasTexts) label(texts, activeLanguage, required).bind else <span/> //
       }<div class="ui input">
-      <input id={elem.ident}
-             name={elem.ident}
+      <input id={ident}
+             name={ident}
              size={size}
              type="text"
-             readOnly={elem.readOnly}
+             readOnly={readOnly}
              placeholder={texts.textForPlaceholder(activeLanguage)}
-             value={elem.value.getOrElse("")}
+             value={value.getOrElse("")}
              onblur={_: Event =>
                changeEvent(uiFormElem)}/>
     </div>
@@ -136,15 +147,21 @@ object TextAreaDiv extends BaseElementDiv {
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
-    val elem = uiFormElem.elem
-    val texts = elem.texts
-    <div class={s"${elem.inlineClass} field"}>
-      {label(texts, activeLanguage, elem.required).bind //
+    val texts = uiFormElem.textsVar.bind
+    val inlineClass = uiFormElem.inlineVar.bind
+    val required = uiFormElem.requiredVar.bind
+    val readOnly = uiFormElem.readOnlyVar.bind
+    val ident = uiFormElem.identVar.bind
+    val value = uiFormElem.valueVar.bind
+
+    <div class={s"$inlineClass field"}>
+      {label(texts, activeLanguage, required).bind //
       }<div class="ui input">
-      <textarea id={elem.ident}
-                name={elem.ident}
+      <textarea id={ident}
+                name={ident}
                 placeholder={texts.textForPlaceholder(activeLanguage)}
-                value={elem.value.get}
+                value={value.get}
+                readOnly={readOnly}
                 rows={6}
                 onblur={_: Event =>
                   changeEvent(uiFormElem)}>
@@ -160,21 +177,27 @@ object CheckboxDiv extends BaseElementDiv {
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
-    val elem = uiFormElem.elem
-    val typeClass = uiFormElem.elem.extras.valueFor(CHECKBOX_TYPE).map(_.toLowerCase).getOrElse("")
-    val checkedClass = if (elem.value.contains("true")) "checked" else ""
-    val checked = elem.value.contains("true")
-    val texts = elem.texts
-    <div class={s"${elem.inlineClass} field"}>
-      {label(texts, activeLanguage, elem.required).bind //
+    val texts = uiFormElem.textsVar.bind
+    val inlineClass = uiFormElem.inlineVar.bind
+    val required = uiFormElem.requiredVar.bind
+    val readOnly = uiFormElem.readOnlyVar.bind
+    val ident = uiFormElem.identVar.bind
+    val value = uiFormElem.valueVar.bind
+    val extras = uiFormElem.extrasVar.bind
+    val typeClass = extras.valueFor(CHECKBOX_TYPE).map(_.toLowerCase).getOrElse("")
+    val checkedClass = if (value.contains("true")) "checked" else ""
+    val checked = value.contains("true")
+    <div class={s"$inlineClass field"}>
+      {label(texts, activeLanguage, required).bind //
       }<div class={s"ui $typeClass checkbox $checkedClass"}>
-        <input id={elem.ident}
-               name={elem.ident}
+        <input id={ident}
+               name={ident}
                type="checkbox"
+               readOnly={readOnly}
                checked={checked}
                tabIndex={0}
                onchange={_: Event =>
-                 val newText = jQuery(s"#${uiFormElem.elem.ident}").is(":checked").toString
+                 val newText = jQuery(s"#$ident").is(":checked").toString
                  uiFormElem.changeEvent
                    .foreach(ce =>
                      ce(newText))}/>
@@ -191,10 +214,11 @@ object TitleDiv extends BaseElementDiv {
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
-    val elem = uiFormElem.elem
-    val sizeClass = elem.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
-    val texts = elem.texts
-    <div class={s"${elem.inlineClass} field"}>
+    val texts = uiFormElem.textsVar.bind
+    val inlineClass = uiFormElem.inlineVar.bind
+    val extras = uiFormElem.extrasVar.bind
+    val sizeClass = extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
+    <div class={s"$inlineClass field"}>
       <div class={s"ui $sizeClass header"}>
         {texts.textForLabel(activeLanguage) //
         }
@@ -209,11 +233,11 @@ object DividerDiv extends BaseElementDiv {
   @dom
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
-    val elem = uiFormElem.elem
-    val texts = elem.texts
+    val texts = uiFormElem.textsVar.bind
     val text = texts.textForLabel(activeLanguage)
     val horDivider = if (text.nonEmpty) "horizontal" else ""
-    val sizeClass = elem.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
+    val extras = uiFormElem.extrasVar.bind
+    val sizeClass = extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
     <div class={s"ui $horDivider divider"}>
       <div class={s"ui $sizeClass header"}>
         {text}

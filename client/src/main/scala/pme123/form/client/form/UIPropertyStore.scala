@@ -14,11 +14,10 @@ object UIPropertyStore extends Logging {
 
   def changeElementType(elementTypeStr: String): Unit = {
     info(s"PropertyUIStore: changeElementType $elementTypeStr")
-    val uiElem = uiState.selectedElement.value.value
     val elementType = ElementType.withNameInsensitive(elementTypeStr)
     changeActivePropElem(
       UIFormElem(
-        BaseElement(elementType).copy(texts = uiElem.elem.texts),
+        BaseElement(elementType).copy(texts = uiElem.textsVar.value),
         uiElem.changeEvent
       )
     )
@@ -26,149 +25,118 @@ object UIPropertyStore extends Logging {
 
   def changeIdent(ident: String): Unit = {
     info(s"PropertyUIStore: changeIdent $ident")
-    val uiElem = uiState.selectedElement.value.value
-    changeUIFormElem(
-      uiElem.modify(_.elem.ident)
-        .setTo(ident)
-    )
+    uiElem.identVar.value = ident
   }
 
   def changeDefaultValue(defaultValue: String): Unit = {
     info(s"PropertyUIStore: changeDefaultValue $defaultValue")
-    val uiElem = uiState.selectedElement.value.value
-    changeUIFormElem(
-      uiElem.modify(_.elem.value)
-        .setTo(Some(defaultValue))
-    )
+    uiElem.valueVar.value = Some(defaultValue)
+  }
+
+  private def uiElem = {
+    uiState.selectedElement.value.value
   }
 
   def changeLayoutWide(layoutWide: String): Unit = {
     info(s"PropertyUIStore: changeLayoutWide $layoutWide")
-    val uiElem = uiState.selectedElement.value.value
-    changeUIFormElem(
-      uiElem.modify(_.elem.layoutWide)
-        .setTo(LayoutWide.withNameInsensitive(layoutWide))
-    )
+    uiElem.layoutWideVar.value = LayoutWide.withNameInsensitive(layoutWide)
   }
 
   def changeRequired(required: String): Unit = {
     info(s"PropertyUIStore: changeRequired $required")
-    val uiElem = uiState.selectedElement.value.value
-    changeUIFormElem(
-      uiElem.modify(_.elem.required)
-        .setTo(required.toBoolean)
-    )
+    uiElem.requiredVar.value = required.toBoolean
   }
 
   def changeText(language: Language, textType: TextType)(text: String): Unit = {
     info(s"PropertyUIStore: changeText $language $textType $text")
-    val uiElem = uiState.selectedElement.value.value
-    val newElem = textType match {
+    textType match {
       case LABEL =>
-        uiElem.modify(_.elem.texts.label.each.texts.at(language))
+        uiElem.textsVar.value =
+          uiElem.textsVar.value.modify(_.label.each.texts.at(language))
           .setTo(text)
       case PLACEHOLDER =>
-        uiElem.modify(_.elem.texts.placeholder.each.texts.at(language))
+        uiElem.textsVar.value =
+          uiElem.textsVar.value.modify(_.placeholder.each.texts.at(language))
           .setTo(text)
       case TOOLTIP =>
-        uiElem.modify(_.elem.texts.tooltip.each.texts.at(language))
+        uiElem.textsVar.value =
+          uiElem.textsVar.value.modify(_.tooltip.each.texts.at(language))
           .setTo(text)
     }
-    changeUIFormElem(newElem)
   }
 
 
   def addEntry(): Unit = {
     info(s"FormUIStore: addElementEntry")
-    val uiElem = uiState.selectedElement.value.value
-    changeActivePropElem(
-      uiElem
-        .modify(_.elem.elemEntries.entries)
-        .setTo(uiElem.elem.elemEntries.entries :+ ElementEntry()))
+    uiElem.elemEntriesVar.value = ElementEntries(hasEntries = true,
+      uiElem.elemEntriesVar.value.entries :+ ElementEntry()
+    )
   }
 
   def changeEntryText(language: Language, ident: String)(text: String): Unit = {
     info(s"PropertyUIStore: changeEntry $language $ident $text")
-    val uiElem = uiState.selectedElement.value.value
-    changeUIFormElem(
-      uiElem
-        .modify(_.elem.elemEntries.entries)
-        .setTo {
-          uiElem.elem.elemEntries.entries
-            .foldLeft(Seq.empty[ElementEntry]) { (a, b) =>
-              if (b.ident == ident)
-                a :+ b.modify(_.label.texts)
-                  .setTo(b.label.texts.updated(language, text))
-              else
-                a :+ b
-            }
-        })
+    uiElem.elemEntriesVar.value = ElementEntries(hasEntries = true,
+      uiElem.elemEntriesVar.value.entries
+        .foldLeft(Seq.empty[ElementEntry])((a, b) =>
+          if (b.ident == ident)
+            a :+ b.modify(_.label.texts)
+              .setTo(b.label.texts.updated(language, text))
+          else
+            a :+ b
+        )
+    )
+
   }
 
   def changeEntryKey(ident: String)(key: String): Unit = {
     info(s"PropertyUIStore: changeEntryIdent $key $ident")
-    val uiElem = uiState.selectedElement.value.value
-    changeUIFormElem(
-      uiElem
-        .modify(_.elem.elemEntries.entries)
-        .setTo {
-          uiElem.elem.elemEntries.entries
-            .foldLeft(Seq.empty[ElementEntry]) { (a, b) =>
-              if (b.ident == ident)
-                a :+ b.modify(_.key)
-                  .setTo(key)
-              else
-                a :+ b
-            }
-        })
+    uiElem.elemEntriesVar.value = ElementEntries(hasEntries = true,
+      uiElem.elemEntriesVar.value.entries
+        .foldLeft(Seq.empty[ElementEntry])((a, b) =>
+          if (b.ident == ident)
+            a :+ b.modify(_.key)
+              .setTo(key)
+          else
+            a :+ b
+        )
+    )
   }
 
   def deleteEntry(entry: ElementEntry): Unit = {
     info(s"PropertyUIStore: deleteEntry ${entry.ident}")
-    val uiElem = uiState.selectedElement.value.value
-    changeActivePropElem(
-      uiElem
-        .modify(_.elem.elemEntries.entries)
-        .setTo(uiElem.elem.elemEntries.entries.filter(_ != entry))
+    uiElem.elemEntriesVar.value = ElementEntries(hasEntries = true,
+      uiElem.elemEntriesVar.value.entries
+        .filter(_ != entry)
     )
   }
 
   def copyEntry(entry: ElementEntry): Unit = {
     info(s"PropertyUIStore: copyEntry ${entry.ident}")
-    val uiElem = uiState.selectedElement.value.value
-    changeActivePropElem(
-      uiElem
-        .modify(_.elem.elemEntries.entries)
-        .setTo {
-          uiElem.elem.elemEntries.entries
-            .foldLeft(Seq.empty[ElementEntry])((a, b) =>
-              if (b.ident == entry.ident)
-                a :+ b :+ b.copy(ident = ElementEntry.ident)
-              else
-                a :+ b
-            )
-        }
+    uiElem.elemEntriesVar.value = ElementEntries(hasEntries = true,
+      uiElem.elemEntriesVar.value.entries
+        .foldLeft(Seq.empty[ElementEntry])((a, b) =>
+          if (b.ident == entry.ident)
+            a :+ b :+ b.copy(ident = ElementEntry.ident)
+          else
+            a :+ b
+        )
     )
   }
 
   def moveEntry(draggedEntry: ElementEntry, moveToEntry: ElementEntry): Unit = {
     info(s"PropertyUIStore: moveEntry ${draggedEntry.ident}")
-    val uiElem = uiState.selectedElement.value.value
-    changeActivePropElem(
-      uiElem
-        .modify(_.elem.elemEntries.entries)
-        .setTo {
-          uiElem.elem.elemEntries.entries
-            .foldLeft(Seq.empty[ElementEntry])((a, b) =>
-              if (b.ident == moveToEntry.ident)
-                a :+ b :+ draggedEntry
-              else if (b.ident == draggedEntry.ident)
-                a
-              else
-                a :+ b
-            )
-        }
+    uiElem.elemEntriesVar.value = ElementEntries(hasEntries = true,
+      uiElem.elemEntriesVar.value.entries
+        .foldLeft(Seq.empty[ElementEntry])((a, b) =>
+          if (b.ident == moveToEntry.ident)
+            a :+ b :+ draggedEntry
+          else if (b.ident == draggedEntry.ident)
+            a
+          else
+            a :+ b
+        )
     )
+    SemanticUI.initElements()
   }
 
   private def changeActivePropElem(newUIElem: UIFormElem): Unit = {
@@ -183,64 +151,50 @@ object UIPropertyStore extends Logging {
 
   def changeExtraProp(extraProp: ExtraProp)(text: String): Unit = {
     info(s"PropertyUIStore: changeExtraProp $extraProp $text")
-    val uiElem = uiState.selectedElement.value.value
-    val newElem =
-      uiElem.elem.modify(_.extras.propValues)
-        .setTo {
-          uiElem.elem.extras.propValues
-            .foldLeft(Seq.empty[ExtraPropValue])((a, b) =>
-              if (b.extraProp == extraProp)
-                a :+ b.modify(_.value).setTo(Some(text))
-              else
-                a :+ b
-            )
-        }
+    uiElem.extrasVar.value =
 
-    changeUIFormElem(UIFormElem(
-      newElem,
-      uiElem.changeEvent
-    ))
+    uiElem.extrasVar.value.modify(_.propValues)
+      .setTo {
+        uiElem.extrasVar.value.propValues
+          .foldLeft(Seq.empty[ExtraPropValue])((a, b) =>
+            if (b.extraProp == extraProp)
+              a :+ b.modify(_.value).setTo(Some(text))
+            else
+              a :+ b
+          )
+      }
   }
 
 
   def changeValidationEnabled(vRule: ValidationRule)(enabled: String): Unit = {
     info(s"PropertyUIStore: changeValidationEnabled $vRule $enabled")
-    val uiElem = uiState.selectedElement.value.value
-    val newElem =
-      uiElem.elem.modify(_.validations.rules)
-        .setTo {
-          uiElem.elem.validations.rules
-            .foldLeft(Seq.empty[ValidationRule])((a, b) =>
-              if (b.validationType == vRule.validationType)
-                a :+ b.modify(_.enabled).setTo(enabled.toBoolean)
-              else
-                a :+ b
-            )
-        }
-    changeUIFormElem(UIFormElem(
-      newElem,
-      uiElem.changeEvent
-    ))
+    uiElem.validationsVar.value = Validations(hasValidations = true,
+      uiElem.validationsVar.value.rules
+        .foldLeft(Seq.empty[ValidationRule])((a, b) =>
+          if (b.validationType == vRule.validationType)
+            a :+ b.modify(_.enabled).setTo(enabled.toBoolean)
+          else
+            a :+ b
+        )
+    )
+    SemanticUI.initElements()
+
   }
 
   def changeValidationRule(vRule: ValidationRule, param: String)(value: String): Unit = {
     info(s"PropertyUIStore: changeValidationRule $vRule $param")
-    val uiElem = uiState.selectedElement.value.value
-    val newElem =
-      uiElem.elem.modify(_.validations.rules)
-        .setTo {
-          uiElem.elem.validations.rules
-            .foldLeft(Seq.empty[ValidationRule])((a, b) =>
-              if (b.validationType == vRule.validationType)
-                a :+ b.modify(_.params).setTo(vRule.changeParam(param, value))
-              else
-                a :+ b
-            )
-        }
-    changeUIFormElem(UIFormElem(
-      newElem,
-      uiElem.changeEvent
-    ))
+
+    uiElem.validationsVar.value = Validations(hasValidations = true,
+      uiElem.validationsVar.value.rules
+        .foldLeft(Seq.empty[ValidationRule])((a, b) =>
+          if (b.validationType == vRule.validationType)
+            a :+ b.modify(_.params).setTo(vRule.changeParam(param, value))
+          else
+            a :+ b
+        )
+    )
+    SemanticUI.initElements()
+
   }
 
 

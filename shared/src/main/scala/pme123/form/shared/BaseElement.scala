@@ -20,11 +20,6 @@ case class BaseElement(ident: String,
                        validations: Validations = Validations(),
                       ) {
 
-  val hasTexts: Boolean = texts.hasTexts
-  val hasExtras: Boolean = extras.hasExtras
-  val hasEntries: Boolean = elemEntries.hasEntries
-  val hasValidations: Boolean = validations.hasValidations
-
   lazy val inlineClass: String = if(inline) "inline" else ""
 
 }

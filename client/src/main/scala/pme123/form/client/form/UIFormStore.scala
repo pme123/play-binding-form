@@ -1,6 +1,5 @@
 package pme123.form.client.form
 
-import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared.PropTabType.PROPERTIES
@@ -72,8 +71,8 @@ object UIFormStore extends Logging {
 
   def copySelectedElement(elemVar: Var[UIFormElem]): Unit = {
     info(s"FormUIStore: copySelectedElement ${ident(elemVar)}")
-    val newUIElem = elemVar.value.modify(_.elem.ident)
-      .setTo(BaseElement.ident(elemVar.value.elem.elementType))
+    val newUIElem = elemVar.value.copy()
+      newUIElem.identVar.value = BaseElement.ident(elemVar.value.elementTypeVar.value)
     val newUIElemVar = Var(
       newUIElem
     )
@@ -119,7 +118,7 @@ object UIFormStore extends Logging {
 
   def formElement(ident: String): Option[Var[UIFormElem]] = {
     uiState.formElements.value
-      .find(_.value.elem.ident == ident)
+      .find(_.value.identVar.value == ident)
   }
 
   case class UIState(
@@ -151,7 +150,7 @@ object UIFormStore extends Logging {
     }
   }
 
-  private def ident(uiElemVar: Var[UIFormElem]) = uiElemVar.value.elem.ident
+  private def ident(uiElemVar: Var[UIFormElem]) = uiElemVar.value.identVar.value
 
 
 }
@@ -159,7 +158,8 @@ object UIFormStore extends Logging {
 case class VarFormContainer(identVar: Var[String], elems: Vars[Var[UIFormElem]]) {
 
   lazy val toForm: FormContainer =
-    FormContainer(identVar.value, elems.value.map(_.value.elem))
+    FormContainer(identVar.value,
+      elems.value.map(_.value.toBaseElement))
 
 }
 

@@ -1,7 +1,7 @@
 package pme123.form.client
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
-import pme123.form.client.form.UIFormElem
+import pme123.form.client.form.{UIFormElem, UIPropertyStore}
 import pme123.form.client.services.I18n
 import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TITLE}
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
@@ -14,25 +14,26 @@ import scala.collection.immutable.IndexedSeq
 
 object BaseElementExtras {
 
-  def extras(elementType: ElementType)(implicit supportedLangs: Seq[Language]): Map[ExtraProp, UIFormElem] = {
+  def extras(elementType: ElementType, extraProperties: ExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
     elementType match {
       case DROPDOWN =>
-        DropdownElem.extras
+        DropdownElem.extras(extraProperties)
       case CHECKBOX =>
-        CheckboxElem.extras
+        CheckboxElem.extras(extraProperties)
       case TITLE =>
-        TitleElem.extras
+        TitleElem.extras(extraProperties)
       case DIVIDER =>
-        DividerElem.extras
-      case _ => Map.empty
+        DividerElem.extras(extraProperties)
+      case _ => Nil
     }
   }
 
   object DropdownElem {
-    def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, UIFormElem] = {
 
-      Map(
-        CLEARABLE -> UIFormElem(
+    def extras(extraProperties: ExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
+
+      Seq(UIExtraPropValue(
+        CLEARABLE, UIFormElem(
           BaseElement(CLEARABLE.entryName,
             CHECKBOX,
             DataType.BOOLEAN,
@@ -41,16 +42,16 @@ object BaseElementExtras {
               None,
               Some(ElementText.tooltip(Map(DE -> "Auswählen wenn kein Wert möglich ist ", EN -> "Check this if no value should be possible")))
             ),
-            value = Some("true"),
-          )))
+            value = extraProperties.propValues.find(_.extraProp == CLEARABLE).flatMap(_.value),
+          ), Some(UIPropertyStore.changeExtraProp(CLEARABLE)))))
     }
   }
 
   object CheckboxElem {
-    def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, UIFormElem] = {
+    def extras(extraProperties: ExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
 
-      Map(
-        CHECKBOX_TYPE -> UIFormElem(BaseElement(CHECKBOX_TYPE.entryName,
+      Seq(UIExtraPropValue(
+        CHECKBOX_TYPE, UIFormElem(BaseElement(CHECKBOX_TYPE.entryName,
           DROPDOWN,
           DataType.STRING,
           texts = ElementTexts(
@@ -59,8 +60,8 @@ object BaseElementExtras {
             Some(ElementText(TOOLTIP, Map(DE -> "Art der Check-Box", EN -> "Type of the Checkbox")))
           ),
           elemEntries = I18n.enumEntries(CheckboxType.values),
-          value = CheckboxType.defaultValue,
-        )))
+          value = extraProperties.propValues.find(_.extraProp == CLEARABLE).flatMap(_.value),
+        ), Some(UIPropertyStore.changeExtraProp(CHECKBOX_TYPE)))))
     }
 
     sealed trait CheckboxType
@@ -126,34 +127,33 @@ object BaseElementExtras {
 
     }
 
-    def sizeElem(implicit supportedLangs: Seq[Language]) =
-      UIFormElem(BaseElement(SIZE.entryName,
-        DROPDOWN,
-        DataType.STRING,
+    def sizeElem(extraProperties: ExtraProperties)(implicit supportedLangs: Seq[Language]) =
+      UIExtraPropValue(
+        SIZE,
+        UIFormElem(BaseElement(SIZE.entryName,
+          DROPDOWN,
+          DataType.STRING,
           texts = ElementTexts(
-          Some(ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size"))),
-          None,
-          Some(ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)")))
-        ),
-           value = SizeType.defaultValue,
-        elemEntries = I18n.enumEntries(SizeType.values),
+            Some(ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size"))),
+            None,
+            Some(ElementText(TOOLTIP, Map(DE -> "Grösse des Titels (huge, big, medium, small, tiny)", EN -> "Size of the title (huge, big, medium, small, tiny)")))
+          ),
+          value = extraProperties.propValues.find(_.extraProp == SIZE).flatMap(_.value),
+          elemEntries = I18n.enumEntries(SizeType.values),
 
-      ))
+        ), Some(UIPropertyStore.changeExtraProp(SIZE))))
 
-    def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, UIFormElem] = {
-      Map(
-        SIZE -> sizeElem
-      )
+    def extras(extraProperties: ExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
+      Seq(sizeElem(extraProperties))
     }
   }
 
   object DividerElem {
-    def extras(implicit supportedLangs: Seq[Language]): Map[ExtraProp, UIFormElem] = {
-
-      Map(
-        SIZE -> TitleElem.sizeElem
-      )
+    def extras(extraProperties: ExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
+      Seq(TitleElem.sizeElem(extraProperties))
     }
   }
 
 }
+
+case class UIExtraPropValue(extraProp: ExtraProp, uiFormElem: UIFormElem)

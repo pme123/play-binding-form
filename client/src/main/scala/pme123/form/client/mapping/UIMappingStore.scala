@@ -5,6 +5,8 @@ import pme123.form.client.data.UIDataStore
 import pme123.form.client.data.UIDataStore.{VarDataContainer, VarDataValue}
 import pme123.form.client.form.{UIFormElem, UIFormStore, VarFormContainer}
 import pme123.form.client.services.SemanticUI
+import pme123.form.client.services.UIStore.supportedLangs
+import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
 
@@ -45,7 +47,7 @@ object UIMappingStore extends Logging {
       .foreach(e => uiState.mapping.value.mappings.value -= e)
     // add usedElements
     elems
-      .filterNot(_.value.elem.readOnly)
+      .filterNot(_.value.readOnlyVar.value)
       .foreach { uiE =>
         mappings.find(_.value.uiFormElem.value == uiE.value)
           .getOrElse(
@@ -106,11 +108,11 @@ object UIMappingStore extends Logging {
         Vars(mapping.mappings.flatMap(UIMappingEntry.apply(_).toSeq).map(Var(_)): _*))
   }
 
-  case class UIMappingEntry(uiFormElem: Var[UIFormElem] = Var(UIFormElem()),
+  case class UIMappingEntry(uiFormElem: Var[UIFormElem] = Var(UIFormElem(BaseElement(TEXTFIELD))),
                             varDataValue: Var[Option[VarDataValue]] = Var(None)) {
     lazy val toMapping: MappingEntry = {
       MappingEntry(
-        uiFormElem.value.elem.ident,
+        uiFormElem.value.identVar.value,
         varDataValue.value.map(_.ident),
       )
     }

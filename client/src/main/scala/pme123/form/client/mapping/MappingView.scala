@@ -1,14 +1,14 @@
 package pme123.form.client.mapping
 
-import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client._
 import pme123.form.client.data.{DataView, UIDataStore}
-import pme123.form.client.form.{FormPreviewView, UIFormElem, UIFormStore}
+import pme123.form.client.form.{FormPreviewView, FormUtils, UIFormElem, UIFormStore}
 import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.UIStore.supportedLangs
+import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.ElementType.DROPDOWN
 import pme123.form.shared._
 
@@ -34,7 +34,8 @@ private[client] object MappingView
         validateButton,
         exportButton,
         persistButton).bind}{//
-      mappingContent.bind //
+      mappingContent.bind }{//
+      initFields.bind //
       }<div class="ui error message"></div>
     </div>}
 
@@ -65,7 +66,7 @@ private[client] object MappingView
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
               onclick={_: Event =>
-
+                persistMapping.value = true
               }>
         <i class="check icon"></i>
       </button>
@@ -110,18 +111,17 @@ private[client] object MappingView
     val uiMapping = uiMappingVar.bind
     val uiElem = uiMapping.uiFormElem.value
     val varDataValue = uiMapping.varDataValue.bind
+    uiElem.readOnlyVar.value = true
+    uiElem.valueVar.value = varDataValue.map(_.content.value)
     println("dataIdent: " + varDataValue.map(_.ident))
     println("dataValue: " + varDataValue.map(_.content))
 
     <div class={s"${uiElem.wideClass} wide column"}>
       {TextFieldDiv
-      .create(uiElem
-        .modify(_.elem.readOnly).setTo(true)
-        .modify(_.elem.value).setTo(varDataValue.map(_.content.value))
-      ).bind}<div class="field">
+      .create(uiElem).bind}<div class="field">
       {BaseElementDiv(
         UIFormElem(BaseElement(
-          s"mapping-data-${uiElem.elem.ident}",
+          dataDropdownIdent(uiElem),
           DROPDOWN,
           DataType.STRING,
           ElementTexts(),
@@ -137,6 +137,10 @@ private[client] object MappingView
     </div>
   }
 
+  private def dataDropdownIdent(uiElem: UIFormElem) = {
+    s"mapping-data-${uiElem.identVar.value}"
+  }
+
   @dom
   private lazy val persistMappingDiv: Binding[HTMLElement] = {
     val doPersist = persistMapping.bind
@@ -149,6 +153,22 @@ private[client] object MappingView
       </div>
     else
         <span/>
+  }
+
+  @dom
+  private lazy val initFields = {
+    UIRoute.route.state.watch()
+    val activeLang = UIStore.uiState.activeLanguage.bind
+    val mappings = UIMappingStore.uiState.mapping.value.mappings.value
+    val fieldRules = FormUtils.semanticFields(activeLang)
+    val dataRules = mappings
+      .map { mV =>
+        val elemId = dataDropdownIdent(mV.value.uiFormElem.value)
+        elemId -> SemanticField(elemId, optional = false, Seq(SemanticUI.emptyRule(activeLang)))
+      }.toMap
+
+    SemanticUI.initForm(SemanticForm(fields = fieldRules ++ dataRules))
+      <span/>
   }
 
 }

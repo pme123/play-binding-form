@@ -39,9 +39,9 @@ private[client] object PropertyMenu
     <div class="ui top attached tabular menu">
       {Constants(
       PropTabType.values
-        .filterNot(p => p == ENTRIES && !selElem.elem.hasEntries)
-        .filterNot(p => p == TEXTS && !selElem.elem.hasTexts)
-        .filterNot(p => p == VALIDATIONS && !selElem.elem.hasValidations)
+        .filterNot(p => p == ENTRIES && !selElem.elemEntriesVar.value.hasEntries)
+        .filterNot(p => p == TEXTS && !selElem.textsVar.value.hasTexts)
+        .filterNot(p => p == VALIDATIONS && !selElem.validationsVar.value.hasValidations)
         .map(menuItem): _*)
       .map(_.bind)}
     </div>
