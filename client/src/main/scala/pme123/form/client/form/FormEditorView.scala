@@ -54,7 +54,9 @@ private[client] object FormEditorView
   private def element(uiElemVar: Var[UIFormElem]): Binding[HTMLElement] = {
     val uiElem = uiElemVar.bind
     val uiSelElem = UIPropertyStore.uiState.selectedElement.bind
-    <div class={s"${uiElem.wideClass} wide column"}
+    val layoutWide = uiElem.layoutWideVar.bind
+    val wideClass: String = layoutWide.entryName.toLowerCase
+    <div class={s"$wideClass wide column"}
          ondrop={ev: DragEvent =>
            UIFormElemDragDrop.drop(uiElemVar)(ev)}
          ondragover={ev: DragEvent =>

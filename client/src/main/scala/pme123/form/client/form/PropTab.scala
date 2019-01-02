@@ -50,9 +50,9 @@ case object PropertiesTab {
 
   @dom
   private lazy val defaultValueInput: Binding[HTMLElement] = {
-    val selElem = UIFormStore.uiState.activePropElement.bind
-
-    if (!selElem.readOnlyVar.value)
+    val selElem = UIFormStore.uiState.selectedElement.bind.bind
+    val readOnly = selElem.readOnlyVar.value
+    if (!readOnly)
       <div class="field">
         {BaseElementDiv(
         UIFormElem(BaseElement(
@@ -74,8 +74,8 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementTypeSelect: Binding[HTMLElement] = {
-    val uiElem = UIFormStore.uiState.activePropElement.bind
-    val elementType = uiElem.elementTypeVar.value
+    val selElem = UIFormStore.uiState.selectedElement.bind.bind
+    val elementType = selElem.elementTypeVar.value
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
@@ -101,7 +101,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val layoutWideSelect: Binding[HTMLElement] = {
-    val uiElem = UIFormStore.uiState.activePropElement.bind
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
     val layoutWide = uiElem.layoutWideVar.value
     <div class="field">
       {BaseElementDiv(
@@ -128,7 +128,7 @@ case object PropertiesTab {
 
   @dom
   private lazy val requiredCheckbox: Binding[HTMLElement] = {
-    val uiElem = UIFormStore.uiState.activePropElement.bind
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
     val required = uiElem.requiredVar.value
     <div class="field">
       {BaseElementDiv(
@@ -152,13 +152,13 @@ case object PropertiesTab {
 
   @dom
   private lazy val elementExtras: Binding[HTMLElement] = {
-    val elem = UIFormStore.uiState.activePropElement.bind
-    val extras = elem.extrasVar.bind
-
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
+    val extras = uiElem.extrasVar.bind
+    val elementType = uiElem.elementTypeVar.bind
     <div>
       {//
       Constants(
-        BaseElementExtras.extras(elem.elementTypeVar.value, extras)
+        BaseElementExtras.extras(elementType, extras)
           .map(d => BaseElementDiv(d.uiFormElem)): _*
       ).map(_.bind)}
     </div>
@@ -170,16 +170,16 @@ case object TextsTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = UIFormStore.uiState.activePropElement.bind
-    if (uiFormElem.hasTexts)
+    val uiElem = UIFormStore.uiState.selectedElement.value.bind
+    if (uiElem.hasTexts)
       <div class="content">
         {//
-        val texts = uiFormElem.textsVar.value
-        val editable = !uiFormElem.readOnlyVar.value
+        val texts = uiElem.textsVar.bind
+        val readOnly = uiElem.readOnlyVar.bind
         Constants(
-          texts.label.map(elementTextDiv(_, uiFormElem.isViewable)).toList ++
-            texts.placeholder.map(elementTextDiv(_, editable)).toList ++
-            texts.tooltip.map(elementTextDiv(_, editable)).toList
+          texts.label.map(elementTextDiv(_, uiElem.isViewable)).toList ++
+            texts.placeholder.map(elementTextDiv(_, !readOnly)).toList ++
+            texts.tooltip.map(elementTextDiv(_, !readOnly)).toList
             : _*).map(_.bind)}
       </div>
     else
@@ -225,9 +225,9 @@ case object EntriesTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = UIFormStore.uiState.activePropElement.bind
-    if (uiFormElem.hasEntries) {
-      val entries = uiFormElem.elemEntriesVar.value.entries
+    val uiElem = UIFormStore.uiState.selectedElement.value.bind
+    if (uiElem.hasEntries) {
+      val entries = uiElem.elemEntriesVar.value.entries
       <div class="content">
 
         {Constants(Seq(head) ++ entries.map(elementEntry): _*).map(_.bind)}
@@ -323,9 +323,9 @@ case object ValidationsTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiFormElem = UIFormStore.uiState.activePropElement.bind
-    if (uiFormElem.hasValidations) {
-      val validations = uiFormElem.validationsVar.value.rules
+    val uiElem = UIFormStore.uiState.selectedElement.value.bind
+    if (uiElem.hasValidations) {
+      val validations = uiElem.validationsVar.value.rules
       <div class="content">
         <table>
           {Constants(validations.map(validationRule): _*).map(_.bind)}

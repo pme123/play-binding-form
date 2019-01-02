@@ -14,13 +14,8 @@ object UIPropertyStore extends Logging {
 
   def changeElementType(elementTypeStr: String): Unit = {
     info(s"PropertyUIStore: changeElementType $elementTypeStr")
-    val elementType = ElementType.withNameInsensitive(elementTypeStr)
-    changeActivePropElem(
-      UIFormElem(
-        BaseElement(elementType).copy(texts = uiElem.textsVar.value),
-        uiElem.changeEvent
-      )
-    )
+    uiState.selectedElement.value.value.elementTypeVar.value = ElementType.withNameInsensitive(elementTypeStr)
+    SemanticUI.initElements()
   }
 
   def changeIdent(ident: String): Unit = {
@@ -40,6 +35,7 @@ object UIPropertyStore extends Logging {
   def changeLayoutWide(layoutWide: String): Unit = {
     info(s"PropertyUIStore: changeLayoutWide $layoutWide")
     uiElem.layoutWideVar.value = LayoutWide.withNameInsensitive(layoutWide)
+    SemanticUI.initElements()
   }
 
   def changeRequired(required: String): Unit = {
@@ -137,11 +133,6 @@ object UIPropertyStore extends Logging {
         )
     )
     SemanticUI.initElements()
-  }
-
-  private def changeActivePropElem(newUIElem: UIFormElem): Unit = {
-    changeUIFormElem(newUIElem)
-    uiState.activePropElement.value = newUIElem
   }
 
   private def changeUIFormElem(uiFormElem: UIFormElem): Unit = {

@@ -47,7 +47,6 @@ object FormClient
       FormHeader.create().bind}<div class="main-content">
       {//
       val main = mainView.bind
-      UIFormStore.changePage()
       main.create().bind}
     </div>
     </div>

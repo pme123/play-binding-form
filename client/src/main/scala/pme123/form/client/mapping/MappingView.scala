@@ -109,14 +109,13 @@ private[client] object MappingView
   @dom
   private def element(uiMappingVar: Var[UIMappingEntry]): Binding[HTMLElement] = {
     val uiMapping = uiMappingVar.bind
-    val uiElem = uiMapping.uiFormElem.value
+    val uiElem = uiMapping.uiFormElem.bind
     val varDataValue = uiMapping.varDataValue.bind
     uiElem.readOnlyVar.value = true
     uiElem.valueVar.value = varDataValue.map(_.content.value)
-    println("dataIdent: " + varDataValue.map(_.ident))
-    println("dataValue: " + varDataValue.map(_.content))
-
-    <div class={s"${uiElem.wideClass} wide column"}>
+    val layoutWide = uiElem.layoutWideVar.bind
+    val wideClass: String = layoutWide.entryName.toLowerCase
+    <div class={s"$wideClass wide column"}>
       {TextFieldDiv
       .create(uiElem).bind}<div class="field">
       {BaseElementDiv(

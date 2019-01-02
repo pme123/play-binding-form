@@ -73,7 +73,9 @@ private[client] object FormPreviewView
   @dom
   private def element(uiElemVar: Var[UIFormElem]): Binding[HTMLElement] = {
     val uiElem = uiElemVar.bind
-    <div class={s"${uiElem.wideClass} wide column"}>
+    val layoutWide = uiElem.layoutWideVar.bind
+    val wideClass: String = layoutWide.entryName.toLowerCase
+    <div class={s"$wideClass wide column"}>
       {BaseElementDiv(uiElem).bind}
     </div>
   }

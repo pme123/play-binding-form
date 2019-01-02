@@ -34,14 +34,22 @@ private[client] object PropertyMenu
 
   @dom
   private lazy val menu: Binding[HTMLElement] = {
-    val selElemV = UIFormStore.uiState.activePropElement.bind
-    val selElem = selElemV
+    val uiElem = UIFormStore.uiState.selectedElement.value.bind
+    val elemEntries = uiElem.elemEntriesVar.bind
+    val texts = uiElem.textsVar.bind
+    val validations = uiElem.validationsVar.bind
     <div class="ui top attached tabular menu">
       {Constants(
       PropTabType.values
-        .filterNot(p => p == ENTRIES && !selElem.elemEntriesVar.value.hasEntries)
-        .filterNot(p => p == TEXTS && !selElem.textsVar.value.hasTexts)
-        .filterNot(p => p == VALIDATIONS && !selElem.validationsVar.value.hasValidations)
+        .filterNot(p => {
+          p == ENTRIES && !elemEntries.hasEntries
+        })
+        .filterNot(p => {
+          p == TEXTS && !texts.hasTexts
+        })
+        .filterNot(p => {
+          p == VALIDATIONS && !validations.hasValidations
+        })
         .map(menuItem): _*)
       .map(_.bind)}
     </div>

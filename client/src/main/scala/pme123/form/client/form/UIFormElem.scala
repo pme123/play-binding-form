@@ -11,7 +11,7 @@ case class UIFormElem(
                        identVar: Var[String],
                        elementTypeVar: Var[ElementType],
                        dataTypeVar: Var[DataType],
-                       textsVar: Var[ElementTexts],
+                       textsVar: Var[UIElementTexts],
                        extrasVar: Var[ExtraProperties],
                        valueVar: Var[Option[String]],
                        requiredVar: Var[Boolean],
@@ -48,8 +48,6 @@ case class UIFormElem(
     case SPACER => false
     case _ => true
   }
-
-  lazy val wideClass: String = layoutWideVar.value.entryName.toLowerCase
 }
 
 object UIFormElem {

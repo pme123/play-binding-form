@@ -88,6 +88,7 @@ object DropdownDiv extends BaseElementDiv {
       <input id={ident}
              name={ident}
              type="hidden"
+             readOnly={readOnly}
              value={value.getOrElse("")}
              onchange={_: Event =>
                changeEvent(uiFormElem)}/>
@@ -190,18 +191,18 @@ object CheckboxDiv extends BaseElementDiv {
     <div class={s"$inlineClass field"}>
       {label(texts, activeLanguage, required).bind //
       }<div class={s"ui $typeClass checkbox $checkedClass"}>
-        <input id={ident}
-               name={ident}
-               type="checkbox"
-               readOnly={readOnly}
-               checked={checked}
-               tabIndex={0}
-               onchange={_: Event =>
-                 val newText = jQuery(s"#$ident").is(":checked").toString
-                 uiFormElem.changeEvent
-                   .foreach(ce =>
-                     ce(newText))}/>
-      </div>
+      <input id={ident}
+             name={ident}
+             type="checkbox"
+             readOnly={readOnly}
+             checked={checked}
+             tabIndex={0}
+             onchange={_: Event =>
+               val newText = jQuery(s"#$ident").is(":checked").toString
+               uiFormElem.changeEvent
+                 .foreach(ce =>
+                   ce(newText))}/>
+    </div>
     </div>
 
   }

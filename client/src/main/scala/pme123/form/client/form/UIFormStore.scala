@@ -14,10 +14,6 @@ object UIFormStore extends Logging {
 
   val uiState = UIState()
 
-  def changePage(): Unit = {
-    uiState.activePropElement.value = uiState.selectedElement.value.value
-  }
-
   def changeForm(form: FormContainer): Var[VarFormContainer] = {
     info(s"FormUIStore: changeForm ${form.ident}")
     changeIdent(form.ident)
@@ -63,7 +59,6 @@ object UIFormStore extends Logging {
     info(s"FormUIStore: changeSelectedElement ${ident(elemVar)}")
     if (uiState.selectedElement.value != elemVar) {
       uiState.selectedElement.value = elemVar
-      uiState.activePropElement.value = elemVar.value
       changeActivePropTab(PROPERTIES)
       SemanticUI.initElements()
     }
@@ -77,7 +72,6 @@ object UIFormStore extends Logging {
       newUIElem
     )
     uiState.selectedElement.value = newUIElemVar
-    uiState.activePropElement.value = elemVar.value
     uiState.formElements.value.insert(
       uiState.formElements.value.indexOf(elemVar) + 1,
       newUIElemVar)
@@ -100,7 +94,6 @@ object UIFormStore extends Logging {
   def changeActivePropTab(propTabType: PropTabType): Unit = {
     info(s"FormUIStore: changeActivePropTab $propTabType")
     uiState.activePropTab.value = propTabType
-    uiState.activePropElement.value = uiState.selectedElement.value.value
     SemanticUI.initElements()
   }
 
@@ -126,7 +119,6 @@ object UIFormStore extends Logging {
                       form: Var[VarFormContainer],
                       formElements: Vars[Var[UIFormElem]],
                       selectedElement: Var[Var[UIFormElem]],
-                      activePropElement: Var[UIFormElem],
                       activePropTab: Var[PropTabType],
                       idents: Vars[String]
                     ) {
@@ -143,7 +135,6 @@ object UIFormStore extends Logging {
         Var(VarFormContainer(identVar, elems)),
         elems,
         Var(defaultElem),
-        Var(defaultElem.value),
         Var(PROPERTIES),
         Vars.empty
       )
