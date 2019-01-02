@@ -3,10 +3,9 @@ package pme123.form.client.form
 import com.thoughtworks.binding.Binding.Var
 import pme123.form.shared.{ElementEntries, ElementEntry}
 
-case class UIElementEntries(hasEntries: Boolean = false, entries: Seq[UIElementEntry] = Nil) {
+case class UIElementEntries(entries: Seq[UIElementEntry] = Nil) {
   def toElementEntries =
     ElementEntries(
-      hasEntries,
       entries.map(_.toElementEntry)
     )
 }
@@ -14,7 +13,6 @@ case class UIElementEntries(hasEntries: Boolean = false, entries: Seq[UIElementE
 object UIElementEntries {
   def apply(elementEntries: ElementEntries): UIElementEntries =
     UIElementEntries(
-      elementEntries.hasEntries,
       elementEntries.entries
         .map(UIElementEntry.apply)
     )

@@ -25,7 +25,6 @@ case class UIFormElem(
 
   val hasTexts: Boolean = textsVar.value.hasTexts
   val hasExtras: Boolean = extrasVar.value.hasExtras
-  val hasEntries: Boolean = elemEntriesVar.value.hasEntries
   val hasValidations: Boolean = validationsVar.value.hasValidations
 
   def toBaseElement: BaseElement = BaseElement(

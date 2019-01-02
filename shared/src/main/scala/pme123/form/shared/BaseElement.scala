@@ -37,7 +37,7 @@ object BaseElement {
       readOnly = elementType.readOnly,
       texts = ElementTexts(elementType),
       extras = ExtraProperties(elementType),
-      elemEntries = ElementEntries(elementType),
+      elemEntries = ElementEntries(),
       validations = Validations(elementType),
     )
   }

@@ -14,6 +14,8 @@ sealed trait ElementType
 
   def i18nKey = s"enum.element-type.${entryName.toLowerCase}"
 
+  def hasEntries: Boolean = false
+
 }
 
 
@@ -53,6 +55,10 @@ object ElementType
 
   case object CHECKBOX extends ElementType
 
-  case object DROPDOWN extends ElementType
+  case object DROPDOWN extends ElementType {
+
+    override def hasEntries: Boolean = true
+
+  }
 
 }

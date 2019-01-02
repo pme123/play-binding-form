@@ -40,14 +40,14 @@ object UIPropertyStore extends Logging {
 
   def addEntry(): Unit = {
     info(s"FormUIStore: addElementEntry")
-    uiElem.elemEntriesVar.value = UIElementEntries(hasEntries = true,
+    uiElem.elemEntriesVar.value = UIElementEntries(
       uiElem.elemEntriesVar.value.entries :+ UIElementEntry(ElementEntry())
     )
   }
 
   def deleteEntry(entry: UIElementEntry): Unit = {
     info(s"PropertyUIStore: deleteEntry ${entry.ident}")
-    uiElem.elemEntriesVar.value = UIElementEntries(hasEntries = true,
+    uiElem.elemEntriesVar.value = UIElementEntries(
       uiElem.elemEntriesVar.value.entries
         .filter(_ != entry)
     )
@@ -55,7 +55,7 @@ object UIPropertyStore extends Logging {
 
   def copyEntry(entry: UIElementEntry): Unit = {
     info(s"PropertyUIStore: copyEntry ${entry.ident}")
-    uiElem.elemEntriesVar.value = UIElementEntries(hasEntries = true,
+    uiElem.elemEntriesVar.value = UIElementEntries(
       uiElem.elemEntriesVar.value.entries
         .foldLeft(Seq.empty[UIElementEntry])((a, b) =>
           if (b.ident == entry.ident)
@@ -68,7 +68,7 @@ object UIPropertyStore extends Logging {
 
   def moveEntry(draggedEntry: UIElementEntry, moveToEntry: UIElementEntry): Unit = {
     info(s"PropertyUIStore: moveEntry ${draggedEntry.ident}")
-    uiElem.elemEntriesVar.value = UIElementEntries(hasEntries = true,
+    uiElem.elemEntriesVar.value = UIElementEntries(
       uiElem.elemEntriesVar.value.entries
         .foldLeft(Seq.empty[UIElementEntry])((a, b) =>
           if (b.ident == moveToEntry.ident)

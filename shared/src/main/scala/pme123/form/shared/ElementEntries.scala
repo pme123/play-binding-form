@@ -1,26 +1,13 @@
 package pme123.form.shared
 
 import play.api.libs.json.{Json, OFormat}
-import pme123.form.shared.ElementType.DROPDOWN
 import pme123.form.shared.services.Language
 
 import scala.util.Random
 
-case class ElementEntries(hasEntries: Boolean = false, entries: Seq[ElementEntry] = Nil)
+case class ElementEntries(entries: Seq[ElementEntry] = Nil)
 
 object ElementEntries {
-
-  def apply(elementType: ElementType): ElementEntries = {
-    elementType match {
-      case DROPDOWN =>
-        ElementEntries(hasEntries = true)
-      case _ => ElementEntries()
-    }
-  }
-
-  def apply(entries: Seq[ElementEntry]): ElementEntries = {
-    ElementEntries(hasEntries = true, entries)
-  }
 
   implicit val jsonFormat: OFormat[ElementEntries] = Json.format[ElementEntries]
 

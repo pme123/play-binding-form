@@ -228,8 +228,9 @@ case object EntriesTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiElem = UIFormStore.uiState.selectedElement.value.bind
-    if (uiElem.hasEntries) {
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
+    val elemType = uiElem.elementTypeVar.bind
+    if (elemType.hasEntries) {
       val entries = uiElem.elemEntriesVar.bind
       <div class="content">
 
@@ -288,7 +289,7 @@ case object EntriesTab {
   @dom
   private def entry(elementEntry: UIElementEntry): Binding[HTMLElement] = {
     val ident = elementEntry.ident
-    val key = elementEntry.key.bind
+    val key = elementEntry.key.value
     <div class="content">
       <p>
         &nbsp;
@@ -301,15 +302,14 @@ case object EntriesTab {
         value = Some(key)),
         Some(str => elementEntry.key.value = str)
       )
-    ).bind}<p>
-      &nbsp;
-    </p>{Constants(elementEntry.label.texts.map(t => entryForLang(ident, t._1, t._2)).toSeq: _*).map(_.bind)}
+    ).bind}{//
+      Constants(elementEntry.label.texts.map(t => entryForLang(ident, t._1, t._2)).toSeq: _*).map(_.bind)}
     </div>
   }
 
   @dom
   private def entryForLang(ident: String, lang: Language, textVar: Var[String]): Binding[HTMLElement] = {
-    val text = textVar.bind
+    val text = textVar.value
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
