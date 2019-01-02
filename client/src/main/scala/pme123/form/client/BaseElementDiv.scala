@@ -4,24 +4,25 @@ import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
-import pme123.form.client.form.UIFormElem
+import pme123.form.client.form.{UIElementEntry, UIElementTexts, UIFormElem}
 import pme123.form.client.services.UIStore
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
 import pme123.form.shared.services.Language
-import pme123.form.shared.{ElementEntry, ElementTexts}
 
 sealed abstract class BaseElementDiv {
 
   @dom
-  protected def label(elementTexts: ElementTexts, activeLanguage: Language, required: Boolean): Binding[HTMLElement] = {
+  protected def label(elementTexts: UIElementTexts, activeLanguage: Language, required: Boolean): Binding[HTMLElement] = {
     val requiredStr = if (required) "*" else ""
-    if (elementTexts.textForLabel(activeLanguage).nonEmpty)
+    val labelTxt = elementTexts.textForLabel(activeLanguage).bind
+    val tooltipTxt = elementTexts.textForTooltip(activeLanguage).bind
+    if (labelTxt.nonEmpty)
       <label class="">
-        {elementTexts.textForLabel(activeLanguage) + requiredStr}&nbsp;{//
-        if (elementTexts.textForTooltip(activeLanguage).nonEmpty)
+        {labelTxt + requiredStr}&nbsp;{//
+        if (tooltipTxt.nonEmpty)
           <i class="question circle icon ui tooltip"
-             title={elementTexts.textForTooltip(activeLanguage)}></i>
+             title={tooltipTxt}></i>
         else <span/>}
       </label>
     else <span/>
@@ -104,9 +105,11 @@ object DropdownDiv extends BaseElementDiv {
   }
 
   @dom
-  private def elementEntry(entry: ElementEntry, language: Language): Binding[HTMLElement] = {
-    <div class="item" data:data-value={entry.key}>
-      {entry.label.textFor(language)}
+  private def elementEntry(entry: UIElementEntry, language: Language): Binding[HTMLElement] = {
+    val label = entry.label.textFor(language).bind
+    val key = entry.key.bind
+    <div class="item" data:data-value={key}>
+      {label}
     </div>
   }
 
@@ -124,6 +127,7 @@ object TextFieldDiv extends BaseElementDiv {
     val ident = uiFormElem.identVar.bind
     val value = uiFormElem.valueVar.bind
     val extras = uiFormElem.extrasVar.bind
+    val placeholder = texts.textForPlaceholder(activeLanguage).bind
     val size = extras.valueFor(SIZE).map(_.toInt).getOrElse(20)
     <div class={s"$inlineClass field"}>
       {if (texts.hasTexts) label(texts, activeLanguage, required).bind else <span/> //
@@ -133,7 +137,7 @@ object TextFieldDiv extends BaseElementDiv {
              size={size}
              type="text"
              readOnly={readOnly}
-             placeholder={texts.textForPlaceholder(activeLanguage)}
+             placeholder={placeholder}
              value={value.getOrElse("")}
              onblur={_: Event =>
                changeEvent(uiFormElem)}/>
@@ -154,13 +158,13 @@ object TextAreaDiv extends BaseElementDiv {
     val readOnly = uiFormElem.readOnlyVar.bind
     val ident = uiFormElem.identVar.bind
     val value = uiFormElem.valueVar.bind
-
+    val placeholder = texts.textForPlaceholder(activeLanguage).bind
     <div class={s"$inlineClass field"}>
       {label(texts, activeLanguage, required).bind //
       }<div class="ui input">
       <textarea id={ident}
                 name={ident}
-                placeholder={texts.textForPlaceholder(activeLanguage)}
+                placeholder={placeholder}
                 value={value.get}
                 readOnly={readOnly}
                 rows={6}
@@ -216,13 +220,13 @@ object TitleDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val texts = uiFormElem.textsVar.bind
+    val label = texts.textForLabel(activeLanguage).bind
     val inlineClass = uiFormElem.inlineVar.bind
     val extras = uiFormElem.extrasVar.bind
     val sizeClass = extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
     <div class={s"$inlineClass field"}>
       <div class={s"ui $sizeClass header"}>
-        {texts.textForLabel(activeLanguage) //
-        }
+        {label}
       </div>
     </div>
   }
@@ -235,13 +239,13 @@ object DividerDiv extends BaseElementDiv {
   def create(uiFormElem: UIFormElem): Binding[HTMLElement] = {
     val activeLanguage = UIStore.activeLanguage.bind
     val texts = uiFormElem.textsVar.bind
-    val text = texts.textForLabel(activeLanguage)
-    val horDivider = if (text.nonEmpty) "horizontal" else ""
+    val label = texts.textForLabel(activeLanguage).bind
+    val horDivider = if (label.nonEmpty) "horizontal" else ""
     val extras = uiFormElem.extrasVar.bind
     val sizeClass = extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
     <div class={s"ui $horDivider divider"}>
       <div class={s"ui $sizeClass header"}>
-        {text}
+        {label}
       </div>
     </div>
   }

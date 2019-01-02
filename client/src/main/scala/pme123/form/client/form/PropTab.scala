@@ -1,6 +1,6 @@
 package pme123.form.client.form
 
-import com.thoughtworks.binding.Binding.Constants
+import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
 import pme123.form.client.services.I18n
@@ -51,7 +51,8 @@ case object PropertiesTab {
   @dom
   private lazy val defaultValueInput: Binding[HTMLElement] = {
     val selElem = UIFormStore.uiState.selectedElement.bind.bind
-    val readOnly = selElem.readOnlyVar.value
+    val value = selElem.valueVar.bind
+    val readOnly = selElem.readOnlyVar.bind
     if (!readOnly)
       <div class="field">
         {BaseElementDiv(
@@ -63,8 +64,9 @@ case object PropertiesTab {
             Some(ElementText.label(Map(DE -> "Standart Wert", EN -> "Default Value"))),
             Some(ElementText.placeholder(Map(DE -> "Standart Wert", EN -> "Default Value"))),
             Some(ElementText.tooltip(Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
-          )),
-          Some(UIPropertyStore.changeDefaultValue _)
+          ),
+          value = value),
+          Some(str => selElem.valueVar.value = if (str.nonEmpty) Some(str) else None)
         )
       ).bind}
       </div>
@@ -144,7 +146,7 @@ case object PropertiesTab {
         value = Some(required.toString)
       ),
 
-        Some(UIPropertyStore.changeRequired _)
+        Some(required => uiElem.requiredVar.value = required.toBoolean)
       )
     ).bind}
     </div>
@@ -187,7 +189,7 @@ case object TextsTab {
   }
 
   @dom
-  def elementTextDiv(elementText: ElementText, show: Boolean): Binding[HTMLElement] =
+  def elementTextDiv(elementText: UIElementText, show: Boolean): Binding[HTMLElement] =
     if (show)
       <div>
         <h4>
@@ -204,7 +206,8 @@ case object TextsTab {
       <span></span>
 
   @dom
-  def textDiv(lang: Language, text: String, textType: TextType): Binding[HTMLElement] = {
+  def textDiv(lang: Language, textVar: Var[String], textType: TextType): Binding[HTMLElement] = {
+    val text = textVar.bind
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
@@ -213,7 +216,7 @@ case object TextsTab {
         DataType.STRING,
         ElementTexts.label(I18n(lang.i18nKey)),
         value = Some(text)),
-        Some(UIPropertyStore.changeText(lang, textType) _)
+        Some(str => textVar.value = str)
       )
     ).bind}
     </div>
@@ -227,10 +230,10 @@ case object EntriesTab {
   lazy val create: Binding[HTMLElement] = {
     val uiElem = UIFormStore.uiState.selectedElement.value.bind
     if (uiElem.hasEntries) {
-      val entries = uiElem.elemEntriesVar.value.entries
+      val entries = uiElem.elemEntriesVar.bind
       <div class="content">
 
-        {Constants(Seq(head) ++ entries.map(elementEntry): _*).map(_.bind)}
+        {Constants(Seq(head) ++ entries.entries.map(elementEntry): _*).map(_.bind)}
       </div>
     } else <span></span>
   }
@@ -249,7 +252,7 @@ case object EntriesTab {
     </div>
 
   @dom
-  private def elementEntry(elementEntry: ElementEntry): Binding[HTMLElement] = {
+  private def elementEntry(elementEntry: UIElementEntry): Binding[HTMLElement] = {
     <div class={s"ui card"}
          draggable="true"
          ondragstart={_: DragEvent =>
@@ -283,8 +286,9 @@ case object EntriesTab {
   }
 
   @dom
-  private def entry(elementEntry: ElementEntry): Binding[HTMLElement] = {
+  private def entry(elementEntry: UIElementEntry): Binding[HTMLElement] = {
     val ident = elementEntry.ident
+    val key = elementEntry.key.bind
     <div class="content">
       <p>
         &nbsp;
@@ -294,8 +298,8 @@ case object EntriesTab {
         TEXTFIELD,
         DataType.STRING,
         ElementTexts.placeholder(I18n("props.ident")),
-        value = Some(elementEntry.key)),
-        Some(UIPropertyStore.changeEntryKey(ident) _)
+        value = Some(key)),
+        Some(str => elementEntry.key.value = str)
       )
     ).bind}<p>
       &nbsp;
@@ -304,7 +308,8 @@ case object EntriesTab {
   }
 
   @dom
-  private def entryForLang(ident: String, lang: Language, text: String): Binding[HTMLElement] =
+  private def entryForLang(ident: String, lang: Language, textVar: Var[String]): Binding[HTMLElement] = {
+    val text = textVar.bind
     <div class="field">
       {BaseElementDiv(
       UIFormElem(BaseElement(
@@ -313,10 +318,11 @@ case object EntriesTab {
         DataType.STRING,
         ElementTexts.label(I18n(lang.i18nKey)),
         value = Some(text)),
-        Some(UIPropertyStore.changeEntryText(lang, ident) _)
+        Some(str => textVar.value = str)
       )
     ).bind}
     </div>
+  }
 }
 
 case object ValidationsTab {

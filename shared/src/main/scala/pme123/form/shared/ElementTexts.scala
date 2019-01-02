@@ -13,13 +13,6 @@ case class ElementTexts(label: Option[ElementText] = None,
                         placeholder: Option[ElementText] = None,
                         tooltip: Option[ElementText] = None) {
 
-  val hasTexts: Boolean = label.nonEmpty || placeholder.nonEmpty || tooltip.nonEmpty
-
-  def textForLabel(lang: Language): String = label.map(_.textFor(lang)).getOrElse("")
-
-  def textForPlaceholder(lang: Language): String = placeholder.map(_.textFor(lang)).getOrElse("")
-
-  def textForTooltip(lang: Language): String = tooltip.map(_.textFor(lang)).getOrElse("")
 
 }
 
@@ -55,12 +48,6 @@ object ElementTexts {
 }
 
 case class ElementText(textType: TextType, texts: Map[Language, String]) {
-
-  def textFor(lang: Language): String =
-    texts.getOrElse(lang, texts
-      .values
-      .headOption
-      .getOrElse(""))
 
 }
 
