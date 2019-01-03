@@ -3,7 +3,7 @@ package pme123.form.client.form
 import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
-import pme123.form.client.services.I18n
+import pme123.form.client.services.{I18n, SemanticUI}
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.{BaseElementDiv, BaseElementExtras}
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
@@ -44,6 +44,8 @@ case object PropertiesTab {
       defaultValueInput.bind}{//
       layoutWideSelect.bind}{//
       requiredCheckbox.bind}{//
+      inlineCheckbox.bind}{//
+      readOnlyCheckbox.bind}{//
       elementExtras.bind}
     </div>
   }
@@ -66,7 +68,10 @@ case object PropertiesTab {
             Some(ElementText.tooltip(Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
           ),
           value = value),
-          Some(str => selElem.valueVar.value = if (str.nonEmpty) Some(str) else None)
+          Some{str =>
+            selElem.valueVar.value = if (str.nonEmpty) Some(str) else None
+            SemanticUI.initElements()
+          }
         )
       ).bind}
       </div>
@@ -146,7 +151,64 @@ case object PropertiesTab {
         value = Some(required.toString)
       ),
 
-        Some(required => uiElem.requiredVar.value = required.toBoolean)
+        Some { required =>
+          uiElem.requiredVar.value = required.toBoolean
+          SemanticUI.initElements()
+        }
+      )
+    ).bind}
+    </div>
+  }
+
+  @dom
+  private lazy val inlineCheckbox: Binding[HTMLElement] = {
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
+    val inline = uiElem.inlineVar.value
+    <div class="field">
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "inlineId",
+        CHECKBOX,
+        DataType.BOOLEAN,
+        ElementTexts(
+          Some(ElementText.label(Map(DE -> "Inline", EN -> "Inline"))),
+          None,
+          Some(ElementText.tooltip(Map(DE -> "Das Label ist auf derselben Zeile.", EN -> "The label is on the same line.")))
+        ),
+        value = Some(inline.toString)
+      ),
+
+        Some { inline =>
+          uiElem.inlineVar.value = inline.toBoolean
+          SemanticUI.initElements()
+        }
+      )
+    ).bind}
+    </div>
+  }
+
+  @dom
+  private lazy val readOnlyCheckbox: Binding[HTMLElement] = {
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
+    val readOnly = uiElem.readOnlyVar.value
+    <div class="field">
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "readOnlyId",
+        CHECKBOX,
+        DataType.BOOLEAN,
+        ElementTexts(
+          Some(ElementText.label(Map(DE -> "Read only", EN -> "Read only"))),
+          None,
+          Some(ElementText.tooltip(Map(DE -> "Das Feld kann nur gelesen werden.", EN -> "The field can only be read.")))
+        ),
+        value = Some(readOnly.toString)
+      ),
+
+        Some { readOnly =>
+          uiElem.readOnlyVar.value = readOnly.toBoolean
+          SemanticUI.initElements()
+        }
       )
     ).bind}
     </div>
@@ -302,7 +364,9 @@ case object EntriesTab {
         value = Some(key)),
         Some(str => elementEntry.key.value = str)
       )
-    ).bind}{//
+    ).bind}<p>
+      &nbsp;
+    </p>{//
       Constants(elementEntry.label.texts.map(t => entryForLang(ident, t._1, t._2)).toSeq: _*).map(_.bind)}
     </div>
   }

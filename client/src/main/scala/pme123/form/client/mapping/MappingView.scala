@@ -116,9 +116,8 @@ private[client] object MappingView
     val layoutWide = uiElem.layoutWideVar.bind
     val wideClass: String = layoutWide.entryName.toLowerCase
     <div class={s"$wideClass wide column"}>
-      {TextFieldDiv
-      .create(uiElem).bind}<div class="field">
-      {BaseElementDiv(
+      {BaseElementDiv(uiElem).bind}
+      <div>&nbsp;</div>{BaseElementDiv(
         UIFormElem(BaseElement(
           dataDropdownIdent(uiElem),
           DROPDOWN,
@@ -132,7 +131,6 @@ private[client] object MappingView
           Some(UIMappingStore.changeData(uiMappingVar) _)
         )
       ).bind}
-    </div>
     </div>
   }
 
