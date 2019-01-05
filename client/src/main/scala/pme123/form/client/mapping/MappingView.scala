@@ -9,7 +9,7 @@ import pme123.form.client.form.{FormPreviewView, FormUtils, UIFormElem, UIFormSt
 import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{SemanticUI, UIStore}
-import pme123.form.shared.ElementType.DROPDOWN
+import pme123.form.shared.ElementType.{DROPDOWN, TEXTFIELD}
 import pme123.form.shared._
 
 private[client] object MappingView
@@ -126,7 +126,8 @@ private[client] object MappingView
           elemEntries = ElementEntries(
             UIDataStore.dataValueIdents().map(ident => ElementEntry(ident))
           ),
-          value = varDataValue.map(_.ident)
+          value = varDataValue.map(_.ident),
+          extras = ExtraProperties(DROPDOWN),
         ),
           Some(UIMappingStore.changeData(uiMappingVar) _)
         )

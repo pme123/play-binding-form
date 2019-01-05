@@ -12,7 +12,7 @@ case class UIFormElem(
                        elementTypeVar: Var[ElementType],
                        dataTypeVar: Var[DataType],
                        textsVar: Var[UIElementTexts],
-                       extrasVar: Var[ExtraProperties],
+                       extrasVar: Var[UIExtraProperties],
                        valueVar: Var[Option[String]],
                        requiredVar: Var[Boolean],
                        inlineVar: Var[Boolean],
@@ -24,7 +24,6 @@ case class UIFormElem(
                      ) {
 
   val hasTexts: Boolean = textsVar.value.hasTexts
-  val hasExtras: Boolean = extrasVar.value.hasExtras
   val hasValidations: Boolean = validationsVar.value.hasValidations
 
   def toBaseElement: BaseElement = BaseElement(
@@ -32,7 +31,7 @@ case class UIFormElem(
     elementTypeVar.value,
     dataTypeVar.value,
     textsVar.value.toTexts,
-    extrasVar.value,
+    extrasVar.value.toExtraProperties,
     valueVar.value,
     requiredVar.value,
     inlineVar.value,
@@ -60,7 +59,7 @@ object UIFormElem {
       Var(elem.elementType),
       Var(elem.dataType),
       Var(UIElementTexts(elem.texts)),
-      Var(elem.extras),
+      Var(UIExtraProperties(elem.extras)),
       Var(elem.value),
       Var(elem.required),
       Var(elem.inline),

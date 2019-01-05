@@ -167,7 +167,7 @@ private[client] object FormHeader
              id="languageId"
              value={language.entryName}
              onchange={_: Event =>
-               UIStore.changeLanguage(jQuery("languageId").text())}/>
+               UIStore.changeLanguage(jQuery("#languageId").value().toString)}/>
       <div class="default text">
         <i class={s"${language.flag} big flag"}></i>
       </div>

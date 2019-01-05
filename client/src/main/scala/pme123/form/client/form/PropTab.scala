@@ -3,11 +3,11 @@ package pme123.form.client.form
 import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{DragEvent, Event, HTMLElement}
-import pme123.form.client.services.{I18n, SemanticUI}
 import pme123.form.client.services.UIStore.supportedLangs
+import pme123.form.client.services.{I18n, SemanticUI}
 import pme123.form.client.{BaseElementDiv, BaseElementExtras}
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
-import pme123.form.shared.ExtraProp.SIZE
+import pme123.form.shared.ExtraProp.SIZE_CLASS
 import pme123.form.shared.PropTabType._
 import pme123.form.shared._
 import pme123.form.shared.services.Language
@@ -53,9 +53,12 @@ case object PropertiesTab {
   @dom
   private lazy val defaultValueInput: Binding[HTMLElement] = {
     val selElem = UIFormStore.uiState.selectedElement.bind.bind
-    val value = selElem.valueVar.bind
+    val elementType = selElem.elementTypeVar.bind
     val readOnly = selElem.readOnlyVar.bind
-    if (!readOnly)
+    if (readOnly || elementType.readOnly)
+        <span/>
+    else {
+      val value = selElem.valueVar.bind
       <div class="field">
         {BaseElementDiv(
         UIFormElem(BaseElement(
@@ -67,16 +70,17 @@ case object PropertiesTab {
             Some(ElementText.placeholder(Map(DE -> "Standart Wert", EN -> "Default Value"))),
             Some(ElementText.tooltip(Map(DE -> "Dieser Wert wird als Startwert angezeigt", EN -> "This value is displayed in the element on start.")))
           ),
-          value = value),
-          Some{str =>
+          value = value,
+          extras = ExtraProperties(TEXTFIELD),
+        ),
+          Some { str =>
             selElem.valueVar.value = if (str.nonEmpty) Some(str) else None
             SemanticUI.initElements()
           }
         )
       ).bind}
       </div>
-    else
-      <span></span>
+    }
   }
 
   @dom
@@ -97,7 +101,8 @@ case object PropertiesTab {
         elemEntries = ElementEntries(
           ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
         ),
-        value = Some(elementType.entryName)
+        value = Some(elementType.entryName),
+        extras = ExtraProperties(DROPDOWN),
       ),
 
         Some(UIPropertyStore.changeElementType _)
@@ -124,7 +129,8 @@ case object PropertiesTab {
         elemEntries = ElementEntries(
           LayoutWide.values.map(lw => ElementEntry(lw.entryName, ElementText.label(I18n(lw.i18nKey))))
         ),
-        value = Some(layoutWide.entryName)
+        value = Some(layoutWide.entryName),
+        extras = ExtraProperties(DROPDOWN),
       ),
 
         Some(UIPropertyStore.changeLayoutWide _)
@@ -148,7 +154,8 @@ case object PropertiesTab {
           None,
           Some(ElementText.tooltip(Map(DE -> "Das Feld ist zwingend auszufüllen.", EN -> "The value of the field is required.")))
         ),
-        value = Some(required.toString)
+        value = Some(required.toString),
+        extras = ExtraProperties(CHECKBOX),
       ),
 
         Some { required =>
@@ -163,55 +170,67 @@ case object PropertiesTab {
   @dom
   private lazy val inlineCheckbox: Binding[HTMLElement] = {
     val uiElem = UIFormStore.uiState.selectedElement.bind.bind
-    val inline = uiElem.inlineVar.value
-    <div class="field">
-      {BaseElementDiv(
-      UIFormElem(BaseElement(
-        "inlineId",
-        CHECKBOX,
-        DataType.BOOLEAN,
-        ElementTexts(
-          Some(ElementText.label(Map(DE -> "Inline", EN -> "Inline"))),
-          None,
-          Some(ElementText.tooltip(Map(DE -> "Das Label ist auf derselben Zeile.", EN -> "The label is on the same line.")))
+    val elementType = uiElem.elementTypeVar.bind
+    if (elementType.readOnly)
+        <span/>
+    else {
+      val inline = uiElem.inlineVar.value
+      <div class="field">
+        {BaseElementDiv(
+        UIFormElem(BaseElement(
+          "inlineId",
+          CHECKBOX,
+          DataType.BOOLEAN,
+          ElementTexts(
+            Some(ElementText.label(Map(DE -> "Inline", EN -> "Inline"))),
+            None,
+            Some(ElementText.tooltip(Map(DE -> "Das Label ist auf derselben Zeile.", EN -> "The label is on the same line.")))
+          ),
+          value = Some(inline.toString),
+          extras = ExtraProperties(CHECKBOX),
         ),
-        value = Some(inline.toString)
-      ),
 
-        Some { inline =>
-          uiElem.inlineVar.value = inline.toBoolean
-          SemanticUI.initElements()
-        }
-      )
-    ).bind}
-    </div>
+          Some { inline =>
+            uiElem.inlineVar.value = inline.toBoolean
+            SemanticUI.initElements()
+          }
+        )
+      ).bind}
+      </div>
+    }
   }
 
   @dom
   private lazy val readOnlyCheckbox: Binding[HTMLElement] = {
     val uiElem = UIFormStore.uiState.selectedElement.bind.bind
-    val readOnly = uiElem.readOnlyVar.value
-    <div class="field">
-      {BaseElementDiv(
-      UIFormElem(BaseElement(
-        "readOnlyId",
-        CHECKBOX,
-        DataType.BOOLEAN,
-        ElementTexts(
-          Some(ElementText.label(Map(DE -> "Read only", EN -> "Read only"))),
-          None,
-          Some(ElementText.tooltip(Map(DE -> "Das Feld kann nur gelesen werden.", EN -> "The field can only be read.")))
+    val elementType = uiElem.elementTypeVar.bind
+    if (elementType.readOnly)
+        <span/>
+    else {
+      val readOnly = uiElem.readOnlyVar.value
+      <div class="field">
+        {BaseElementDiv(
+        UIFormElem(BaseElement(
+          "readOnlyId",
+          CHECKBOX,
+          DataType.BOOLEAN,
+          ElementTexts(
+            Some(ElementText.label(Map(DE -> "Read only", EN -> "Read only"))),
+            None,
+            Some(ElementText.tooltip(Map(DE -> "Das Feld kann nur gelesen werden.", EN -> "The field can only be read.")))
+          ),
+          value = Some(readOnly.toString),
+          extras = ExtraProperties(CHECKBOX),
         ),
-        value = Some(readOnly.toString)
-      ),
 
-        Some { readOnly =>
-          uiElem.readOnlyVar.value = readOnly.toBoolean
-          SemanticUI.initElements()
-        }
-      )
-    ).bind}
-    </div>
+          Some { readOnly =>
+            uiElem.readOnlyVar.value = readOnly.toBoolean
+            SemanticUI.initElements()
+          }
+        )
+      ).bind}
+      </div>
+    }
   }
 
   @dom
@@ -277,7 +296,9 @@ case object TextsTab {
         TEXTFIELD,
         DataType.STRING,
         ElementTexts.label(I18n(lang.i18nKey)),
-        value = Some(text)),
+        value = Some(text),
+        extras = ExtraProperties(TEXTFIELD)
+      ),
         Some(str => textVar.value = str)
       )
     ).bind}
@@ -361,7 +382,9 @@ case object EntriesTab {
         TEXTFIELD,
         DataType.STRING,
         ElementTexts.placeholder(I18n("props.ident")),
-        value = Some(key)),
+        value = Some(key),
+        extras = ExtraProperties(TEXTFIELD),
+      ),
         Some(str => elementEntry.key.value = str)
       )
     ).bind}<p>
@@ -381,7 +404,9 @@ case object EntriesTab {
         TEXTFIELD,
         DataType.STRING,
         ElementTexts.label(I18n(lang.i18nKey)),
-        value = Some(text)),
+        value = Some(text),
+        extras = ExtraProperties(TEXTFIELD),
+      ),
         Some(str => textVar.value = str)
       )
     ).bind}
@@ -414,7 +439,9 @@ case object ValidationsTab {
           CHECKBOX,
           DataType.BOOLEAN,
           ElementTexts.label(I18n(vRule.validationType.i18nKey)),
-          value = Some(vRule.enabled.toString)),
+          value = Some(vRule.enabled.toString),
+          extras = ExtraProperties(TEXTFIELD),
+        ),
           Some(UIPropertyStore.changeValidationEnabled(vRule) _)
         )
       ).bind}
@@ -463,7 +490,7 @@ case object ValidationsTab {
           value = Some(paramValue.toString),
           extras = ExtraProperties(Seq(
             ExtraPropValue(
-              SIZE, Some(s"$size")
+              SIZE_CLASS, s"$size"
             )
           ))),
           Some(UIPropertyStore.changeValidationRule(vRule, param) _)

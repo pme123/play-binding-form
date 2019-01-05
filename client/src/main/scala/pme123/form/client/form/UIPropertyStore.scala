@@ -87,22 +87,6 @@ object UIPropertyStore extends Logging {
     SemanticUI.initElements()
   }
 
-  def changeExtraProp(extraProp: ExtraProp)(text: String): Unit = {
-    info(s"PropertyUIStore: changeExtraProp $extraProp $text")
-    uiElem.extrasVar.value =
-
-    uiElem.extrasVar.value.modify(_.propValues)
-      .setTo {
-        uiElem.extrasVar.value.propValues
-          .foldLeft(Seq.empty[ExtraPropValue])((a, b) =>
-            if (b.extraProp == extraProp)
-              a :+ b.modify(_.value).setTo(Some(text))
-            else
-              a :+ b
-          )
-      }
-  }
-
 
   def changeValidationEnabled(vRule: ValidationRule)(enabled: String): Unit = {
     info(s"PropertyUIStore: changeValidationEnabled $vRule $enabled")

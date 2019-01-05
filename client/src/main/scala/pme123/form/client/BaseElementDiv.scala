@@ -6,20 +6,31 @@ import org.scalajs.dom.raw.{Event, HTMLElement}
 import org.scalajs.jquery.jQuery
 import pme123.form.client.BaseElementDiv.InputAttr
 import pme123.form.client.form.UIFormElem.ChangeEvent
-import pme123.form.client.form.{UIElementEntries, UIElementEntry, UIElementTexts, UIFormElem}
+import pme123.form.client.form._
 import pme123.form.client.services.UIStore
+import pme123.form.shared.ElementType
 import pme123.form.shared.ElementType._
-import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, SIZE}
-import pme123.form.shared.{ElementType, ExtraProperties}
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, SIZE, SIZE_CLASS}
 import pme123.form.shared.services.Language
 
 sealed abstract class BaseElementDiv {
 
-  protected def changeEvent(ident: String, changeEvent: ChangeEvent): Unit = {
-    val newText = jQuery(s"#$ident").value().toString
-    changeEvent
-      .foreach(ce =>
-        ce(newText))
+  protected def changeEvent(inputAttr: InputAttr): Unit = {
+    changeEvent(inputAttr, jQuery(s"#${inputAttr.ident}").value().toString)
+  }
+
+  protected def changeEvent(inputAttr: InputAttr, newValue: String): Unit = {
+    //noinspection UnitInMap
+    inputAttr.changeEvent
+      .map(ce =>
+        ce(newValue))
+      .getOrElse(
+        inputAttr.valueVar.value =
+          if (newValue.nonEmpty)
+            Some(newValue)
+          else
+            None
+      )
   }
 }
 
@@ -53,18 +64,17 @@ object BaseElementDiv {
     )
     )
     <div class="content">
-      {elementType.readOnly match {
-      case false => <div class={s"$inlineClass $readOnlyClass field"}>
+      {if (elementType.readOnly) {
+      <div>
+        {input.bind}
+      </div>
+    } else {
+      <div class={s"$inlineClass $readOnlyClass field"}>
         {label(texts, activeLanguage, required).bind //
         }{input.bind}
       </div>
-
-      case true => <div>
-        {input.bind}
-      </div>
     }}
     </div>
-
   }
 
   @dom
@@ -117,7 +127,7 @@ object BaseElementDiv {
                        readOnly: Boolean,
                        placeholder: String,
                        label: String,
-                       extras: ExtraProperties,
+                       extras: UIExtraProperties,
                        elementEntriesVar: Var[UIElementEntries],
                        changeEvent: ChangeEvent,
                       )
@@ -128,7 +138,8 @@ object DropdownDiv extends BaseElementDiv {
 
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
-    val clearableClass = if (inputAttr.extras.valueFor(CLEARABLE).contains("true")) "clearable" else ""
+    val clearable = inputAttr.extras.valueFor(CLEARABLE).bind
+    val clearableClass = if (clearable.contains("true")) "clearable" else ""
     val value = inputAttr.valueVar.bind
     val elemEntries = inputAttr.elementEntriesVar.bind
     <div class={s"ui $clearableClass fluid selection dropdown"}>
@@ -138,10 +149,10 @@ object DropdownDiv extends BaseElementDiv {
              readOnly={inputAttr.readOnly}
              value={value.getOrElse("")}
              onchange={_: Event =>
-               changeEvent(inputAttr.ident, inputAttr.changeEvent)}/>
+               changeEvent(inputAttr)}/>
       <i class="dropdown icon"></i>
       <div class="default text">
-        {value.getOrElse("")}
+        {clearable}
       </div>
       <div class="menu">
         {Constants(elemEntries.entries.map(elementEntry(_, inputAttr.activeLanguage)): _*).map(_.bind)}
@@ -165,17 +176,19 @@ object TextFieldDiv extends BaseElementDiv {
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
     val value = inputAttr.valueVar.bind
-    val size = inputAttr.extras.valueFor(SIZE).map(_.toInt).getOrElse(20)
+    val size = inputAttr.extras.valueFor(SIZE).bind
+    val inputType = inputAttr.extras.valueFor(INPUT_TYPE).bind
+    println(s"INPUT_TYPE: $inputType")
     <div class="ui input">
       <input id={inputAttr.ident}
              name={inputAttr.ident}
-             size={size}
-             type="text"
+             size={size.toInt}
+             type={inputType}
              readOnly={inputAttr.readOnly}
              placeholder={inputAttr.placeholder}
              value={value.getOrElse("")}
              onblur={_: Event =>
-               changeEvent(inputAttr.ident, inputAttr.changeEvent)}/>
+               changeEvent(inputAttr)}/>
     </div>
   }
 
@@ -206,7 +219,7 @@ object CheckboxDiv extends BaseElementDiv {
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
     val value = inputAttr.valueVar.bind
-    val typeClass = inputAttr.extras.valueFor(CHECKBOX_TYPE).map(_.toLowerCase).getOrElse("")
+    val typeClass = inputAttr.extras.valueFor(CHECKBOX_TYPE).bind
     val checkedClass = if (value.contains("true")) "checked" else ""
     val checked = value.contains("true")
     <div class={s"ui $typeClass checkbox $checkedClass"}>
@@ -217,10 +230,8 @@ object CheckboxDiv extends BaseElementDiv {
              checked={checked}
              tabIndex={0}
              onchange={_: Event =>
-               val newText = jQuery(s"#${inputAttr.ident}").is(":checked").toString
-               inputAttr.changeEvent
-                 .foreach(ce =>
-                   ce(newText))}/>
+               changeEvent(inputAttr,
+                 jQuery(s"#${inputAttr.ident}").is(":checked").toString)}/>
     </div>
   }
 
@@ -231,7 +242,7 @@ object TitleDiv extends BaseElementDiv {
 
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
-    val sizeClass = inputAttr.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
+    val sizeClass = inputAttr.extras.valueFor(SIZE_CLASS).bind
     <div class={s"ui $sizeClass header"}>
       {inputAttr.label}
     </div>
@@ -244,7 +255,7 @@ object DividerDiv extends BaseElementDiv {
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
     val horDivider = if (inputAttr.label.nonEmpty) "horizontal" else ""
-    val sizeClass = inputAttr.extras.valueFor(SIZE).map(_.toLowerCase).getOrElse("")
+    val sizeClass = inputAttr.extras.valueFor(SIZE_CLASS).bind
     <div class={s"ui $horDivider divider"}>
       <div class={s"ui $sizeClass header"}>
         {inputAttr.label}

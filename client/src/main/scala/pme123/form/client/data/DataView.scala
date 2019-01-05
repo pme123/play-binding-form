@@ -141,6 +141,7 @@ private[client] object DataView
           STRING,
           ElementTexts.label(Map(EN -> "String value", DE -> "Text")),
           value = Some(data.value),
+          extras = ExtraProperties(TEXTFIELD),
           required = true,
         ),
         changeEvent = Some(
@@ -162,6 +163,7 @@ private[client] object DataView
           STRING,
           ElementTexts.label(Map(EN -> "Number value", DE -> "Nummer")),
           value = Some(data.value.toString),
+          extras = ExtraProperties(TEXTFIELD),
           required = true,
         ),
         changeEvent = Some(
@@ -182,6 +184,7 @@ private[client] object DataView
           STRING,
           ElementTexts.label(Map(EN -> "Boolean value", DE -> "Ja / Nein")),
           value = Some(data.value.toString),
+          extras = ExtraProperties(CHECKBOX),
         ),
         changeEvent = Some(
           str => data.value = str
@@ -202,6 +205,7 @@ private[client] object DataView
           STRING,
           ElementTexts.label(Map(EN -> "Ident", DE -> "Ident")),
           value = Some(ident),
+          extras = ExtraProperties(TEXTFIELD),
           required = true,
         ), changeEvent = Some(
           UIDataStore.changeIdent(parent, ident)
@@ -224,6 +228,7 @@ private[client] object DataView
           elemEntries = ElementEntries(
             StructureType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
           ),
+          extras = ExtraProperties(DROPDOWN),
           value = Some(data.value.structureType.entryName)
         ),
           changeEvent = Some(
