@@ -4,8 +4,8 @@ import org.scalajs.dom.window
 import play.api.libs.json.Json
 import pme123.form.client.services.I18n
 import pme123.form.shared.services.Language
-import pme123.form.shared.{FormContainer, SemanticField, SemanticRule}
 import pme123.form.shared.services.SPAExtensions.StringPos
+import pme123.form.shared.{FormContainer, SemanticField, SemanticRule}
 
 object FormUtils {
 
@@ -26,11 +26,12 @@ object FormUtils {
         val required = uiElem.requiredVar.value
         ident -> SemanticField(ident,
           !required,
-          uiElem.validationsVar.value.rules
-            .filter(_.enabled)
-            .map(v =>
-              SemanticRule(v.semanticType.toCamelCase, I18n(activeLang, v.validationType.promptI18nKey, v.params.values: _*))
-            ) ++ (if (required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
+          uiElem.validationsVar.value.rules.value
+            .filter(_.enabled.value)
+            .map{v =>
+              val vRule = v.toValidationRule
+              SemanticRule(vRule.semanticType.toCamelCase, I18n(activeLang, v.validationType.promptI18nKey, vRule.params.values: _*))
+            } ++ (if (required) Seq(SemanticRule("empty", I18n(activeLang, "enum.validation-type.empty.prompt"))) else Nil)
         )
       }.toMap
 }

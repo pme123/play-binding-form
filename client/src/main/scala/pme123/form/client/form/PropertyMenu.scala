@@ -37,7 +37,6 @@ private[client] object PropertyMenu
     val uiElem = UIFormStore.uiState.selectedElement.bind.bind
     val elemType = uiElem.elementTypeVar.bind
     val texts = uiElem.textsVar.bind
-    val validations = uiElem.validationsVar.bind
     <div class="ui top attached tabular menu">
       {Constants(
       PropTabType.values
@@ -48,7 +47,7 @@ private[client] object PropertyMenu
           p == TEXTS && !texts.hasTexts
         })
         .filterNot(p => {
-          p == VALIDATIONS && !validations.hasValidations
+          p == VALIDATIONS && !elemType.hasValidations
         })
         .map(menuItem): _*)
       .map(_.bind)}

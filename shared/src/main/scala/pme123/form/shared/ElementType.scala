@@ -16,6 +16,9 @@ sealed trait ElementType
 
   def hasEntries: Boolean = false
 
+  def hasValidations: Boolean = false
+
+
 }
 
 
@@ -25,7 +28,10 @@ object ElementType
 
   val values: IndexedSeq[ElementType] = findValues
 
-  case object TEXTFIELD extends ElementType
+  case object TEXTFIELD extends ElementType {
+    override def hasValidations: Boolean = true
+
+  }
 
   case object TEXTAREA extends ElementType
 

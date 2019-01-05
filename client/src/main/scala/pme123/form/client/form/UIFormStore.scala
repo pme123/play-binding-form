@@ -1,6 +1,7 @@
 package pme123.form.client.form
 
 import com.thoughtworks.binding.Binding.{Var, Vars}
+import pme123.form.client.form.UIFormStore.uiState
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared.PropTabType.PROPERTIES
 import pme123.form.shared._
@@ -16,7 +17,7 @@ object UIFormStore extends Logging {
 
   def changeForm(form: FormContainer): Var[VarFormContainer] = {
     info(s"FormUIStore: changeForm ${form.ident}")
-    changeIdent(form.ident)
+    uiState.identVar.value = form.ident
     uiState.formElements.value.clear()
     val seq = form.elems.map(UIFormElem.apply(_))
       .map(Var(_))
@@ -31,6 +32,7 @@ object UIFormStore extends Logging {
       uiState.formElements
     )
     SemanticUI.initElements()
+    println("CHANGEDFORM______ "+uiState.form.value.identVar.value)
     uiState.form
   }
 
@@ -148,9 +150,12 @@ object UIFormStore extends Logging {
 
 case class VarFormContainer(identVar: Var[String], elems: Vars[Var[UIFormElem]]) {
 
-  lazy val toForm: FormContainer =
+  def toForm: FormContainer =
+  {
+    println("TOFORM: " + identVar.value)
     FormContainer(identVar.value,
       elems.value.map(_.value.toBaseElement))
+  }
 
 }
 

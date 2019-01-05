@@ -8,14 +8,14 @@ import pme123.form.shared.ValidationType.{EMAIL, INTEGER, REG_EXP}
 
 import scala.collection.immutable.IndexedSeq
 
-case class Validations(hasValidations: Boolean = false, rules: Seq[ValidationRule] = Nil)
+case class Validations(rules: Seq[ValidationRule] = Nil)
 
 object Validations {
 
   def apply(elementType: ElementType): Validations = {
     elementType match {
       case TEXTFIELD =>
-        Validations(hasValidations = true, Seq(ValidationRule(EMAIL), ValidationRule(INTEGER,
+        Validations(Seq(ValidationRule(EMAIL), ValidationRule(INTEGER,
           params = ValidationParams(intParam1 = Some(0), intParam2 = Some(100))),
           ValidationRule(REG_EXP,
             params = ValidationParams(stringParam = Some("")))

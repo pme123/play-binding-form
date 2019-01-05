@@ -7,7 +7,7 @@ import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{I18n, SemanticUI}
 import pme123.form.client.{BaseElementDiv, BaseElementExtras}
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
-import pme123.form.shared.ExtraProp.SIZE_CLASS
+import pme123.form.shared.ExtraProp.SIZE
 import pme123.form.shared.PropTabType._
 import pme123.form.shared._
 import pme123.form.shared.services.Language
@@ -105,7 +105,10 @@ case object PropertiesTab {
         extras = ExtraProperties(DROPDOWN),
       ),
 
-        Some(UIPropertyStore.changeElementType _)
+        Some { eType =>
+          selElem.elementTypeVar.value = ElementType.withNameInsensitive(eType)
+          SemanticUI.initElements()
+        }
       )
     ).bind}
     </div>
@@ -133,7 +136,10 @@ case object PropertiesTab {
         extras = ExtraProperties(DROPDOWN),
       ),
 
-        Some(UIPropertyStore.changeLayoutWide _)
+        Some { layoutWide =>
+          uiElem.layoutWideVar.value = LayoutWide.withNameInsensitive(layoutWide)
+          SemanticUI.initElements()
+        }
       )
     ).bind}
     </div>
@@ -329,7 +335,7 @@ case object EntriesTab {
         <button class="mini ui circular blue icon button"
                 data:data-tooltip="Add Element Entry"
                 onclick={_: Event =>
-                  UIPropertyStore.addEntry()}>
+                  UIElemEntriesStore.addEntry()}>
           <i class="add icon"></i>
         </button>
       </div>
@@ -351,7 +357,7 @@ case object EntriesTab {
         <button class="mini ui circular grey icon button"
                 data:data-tooltip="Copy Element Entry"
                 onclick={_: Event =>
-                  UIPropertyStore.copyEntry(elementEntry)}>
+                  UIElemEntriesStore.copyEntry(elementEntry)}>
           <i class="copy icon"></i>
         </button>
         <button class="mini ui circular grey icon button"
@@ -361,7 +367,7 @@ case object EntriesTab {
         <button class="mini ui circular red icon button"
                 data:data-tooltip="Delete Element Entry"
                 onclick={_: Event =>
-                  UIPropertyStore.deleteEntry(elementEntry)}>
+                  UIElemEntriesStore.deleteEntry(elementEntry)}>
           <i class="trash icon"></i>
         </button>
       </div>
@@ -418,19 +424,21 @@ case object ValidationsTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiElem = UIFormStore.uiState.selectedElement.value.bind
-    if (uiElem.hasValidations) {
-      val validations = uiElem.validationsVar.value.rules
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
+    val elementType = uiElem.elementTypeVar.bind
+    if (elementType.hasValidations) {
+      val validations = uiElem.validationsVar.bind
       <div class="content">
         <table>
-          {Constants(validations.map(validationRule): _*).map(_.bind)}
+          {for (rule <- validations.rules) yield validationRule(rule).bind}
         </table>
       </div>
     } else <span></span>
   }
 
   @dom
-  private def validationRule(vRule: ValidationRule): Binding[HTMLElement] = {
+  private def validationRule(vRule: UIValidationRule): Binding[HTMLElement] = {
+    val enabled = vRule.enabled.bind
     <tr>
       <td>
         {BaseElementDiv(
@@ -439,61 +447,69 @@ case object ValidationsTab {
           CHECKBOX,
           DataType.BOOLEAN,
           ElementTexts.label(I18n(vRule.validationType.i18nKey)),
-          value = Some(vRule.enabled.toString),
+          value = Some(enabled.toString),
           extras = ExtraProperties(TEXTFIELD),
         ),
-          Some(UIPropertyStore.changeValidationEnabled(vRule) _)
+          Some(enabled =>
+            vRule.enabled.value = enabled.toBoolean)
         )
       ).bind}
       </td>{//
-      validationField(vRule).bind}
+      validationField(vRule.validationType, vRule.params).bind}
     </tr>
   }
 
   @dom
-  private def validationField(vRule: ValidationRule): Binding[HTMLElement] = {
+  private def validationField(valType: ValidationType, params: UIValidationParams): Binding[HTMLElement] = {
+    val pStr = params.stringParam.bind
+    val pInt1 = params.intParam1.bind
+    val pInt2 = params.intParam2.bind
 
-    vRule.params match {
-      case ValidationParams(Some(p), _, _) =>
+    (pStr, pInt1, pInt2) match {
+      case (Some(p), _, _) =>
         <td>
-          {validationParam(vRule, "p", p.toString, 20).bind}
+          {validationParam(valType, "p", p.toString, str => params.stringParam.value = Some(str), 20).bind}
         </td>
-      case ValidationParams(_, Some(p1), Some(p2)) =>
+      case (_, Some(p1), Some(p2)) =>
         <td>
           <table>
             <tr>
-              {Constants(validationParam(vRule, "p1", p1.toString),
-              validationParam(vRule, "p2", p2.toString))
+              {Constants(validationParam(valType, "p1", p1.toString, n => params.intParam1.value = Some(n.toInt)),
+              validationParam(valType, "p2", p2.toString, n => params.intParam2.value = Some(n.toInt)))
               .map(_.bind)}
             </tr>
           </table>
         </td>
-      case ValidationParams(_, Some(p1), _) =>
+      case (_, Some(p1), _) =>
         <td>
-          {validationParam(vRule, "p1", p1.toString, 20).bind}
+          {validationParam(valType, "p1", p1.toString, n => params.intParam1.value = Some(n.toInt), 20).bind}
         </td>
       case _ => <span/>
     }
   }
 
   @dom
-  private def validationParam(vRule: ValidationRule, param: String, paramValue: String, size: Int = 6): Binding[HTMLElement] = {
-    val valType = vRule.validationType
+  private def validationParam(valType: ValidationType,
+                              param: String,
+                              paramValue: String,
+                              changeEvent: String => Unit,
+                              size: Int = 6): Binding[HTMLElement] = {
     <td>
       <div class="ui input">
         {BaseElementDiv(
         UIFormElem(BaseElement(
-          s"$param-${valType.entryName}",
+          s"$param-${valType.key}",
           TEXTFIELD,
           DataType.STRING,
           ElementTexts.label(I18n(valType.i18nKey(param))),
           value = Some(paramValue.toString),
+          inline = true,
           extras = ExtraProperties(Seq(
             ExtraPropValue(
-              SIZE_CLASS, s"$size"
+              SIZE, s"$size"
             )
           ))),
-          Some(UIPropertyStore.changeValidationRule(vRule, param) _)
+          Some(changeEvent)
         )).bind}
       </div>
     </td>

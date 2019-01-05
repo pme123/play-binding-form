@@ -19,12 +19,11 @@ case class UIFormElem(
                        readOnlyVar: Var[Boolean],
                        layoutWideVar: Var[LayoutWide],
                        elemEntriesVar: Var[UIElementEntries],
-                       validationsVar: Var[Validations],
+                       validationsVar: Var[UIValidations],
                        changeEvent: ChangeEvent,
                      ) {
 
   val hasTexts: Boolean = textsVar.value.hasTexts
-  val hasValidations: Boolean = validationsVar.value.hasValidations
 
   def toBaseElement: BaseElement = BaseElement(
     identVar.value,
@@ -38,7 +37,7 @@ case class UIFormElem(
     readOnlyVar.value,
     layoutWideVar.value,
     elemEntriesVar.value.toElementEntries,
-    validationsVar.value,
+    validationsVar.value.toValidations,
   )
 
 
@@ -66,7 +65,7 @@ object UIFormElem {
       Var(elem.readOnly),
       Var(elem.layoutWide),
       Var(UIElementEntries(elem.elemEntries)),
-      Var(elem.validations),
+      Var(UIValidations(elem.validations)),
       changeEvent,
     )
   }

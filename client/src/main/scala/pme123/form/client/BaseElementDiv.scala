@@ -222,7 +222,6 @@ object CheckboxDiv extends BaseElementDiv {
     val typeClass = inputAttr.extras.valueFor(CHECKBOX_TYPE).bind
     val checkedClass = if (value.contains("true")) "checked" else ""
     val checked = value.contains("true")
-    println(s"CHECKBOX_TYPE: $typeClass - $checked")
     <div class={s"ui $typeClass checkbox $checkedClass"}>
       <input id={inputAttr.ident}
              name={inputAttr.ident}

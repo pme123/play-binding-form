@@ -22,7 +22,7 @@ object ElemEntryDragDrop {
   def drop(moveToEntry: UIElementEntry)(ev: DragEvent): Unit = {
     ev.preventDefault
     dragObject.value
-      .foreach(UIPropertyStore.moveEntry(_, moveToEntry))
+      .foreach(UIElemEntriesStore.moveEntry(_, moveToEntry))
     dragObject.value = None
   }
 }
