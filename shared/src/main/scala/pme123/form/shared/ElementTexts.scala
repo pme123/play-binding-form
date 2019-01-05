@@ -2,7 +2,6 @@ package pme123.form.shared
 
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
-import pme123.form.shared.BaseElement.ident
 import pme123.form.shared.ElementType.SPACER
 import pme123.form.shared.TextType.{LABEL, PLACEHOLDER, TOOLTIP}
 import pme123.form.shared.services.Language
@@ -18,7 +17,8 @@ case class ElementTexts(label: Option[ElementText] = None,
 
 object ElementTexts {
 
-  def apply(defaultLabel: String)(implicit supportedLangs: Seq[Language]): ElementTexts = {
+  def apply()(implicit supportedLangs: Seq[Language]): ElementTexts = {
+    val defaultLabel = "LABEL"
     ElementTexts(
       Some(ElementText.label(supportedLangs.map(_ -> defaultLabel).toMap)),
       Some(ElementText.emptyPlaceholder),
@@ -40,7 +40,7 @@ object ElementTexts {
 
   def apply(elementType: ElementType)(implicit supportedLangs: Seq[Language]): ElementTexts = elementType match {
     case SPACER => ElementTexts()
-    case _ => ElementTexts(ident(elementType))
+    case _ => ElementTexts()
   }
 
   implicit val jsonFormat: OFormat[ElementTexts] = Json.format[ElementTexts]

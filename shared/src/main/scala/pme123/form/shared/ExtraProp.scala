@@ -59,7 +59,7 @@ object SizeClass
   extends Enum[SizeClass]
     with PlayInsensitiveJsonEnum[SizeClass] {
 
-  def defaultValue: String = MEDIUM.entryName
+  def defaultValue: String = BIG.key
 
   val values: IndexedSeq[SizeClass] = findValues
 
@@ -67,8 +67,6 @@ object SizeClass
   case object HUGE extends SizeClass
 
   case object BIG extends SizeClass
-
-  case object MEDIUM extends SizeClass
 
   case object SMALL extends SizeClass
 
@@ -90,7 +88,7 @@ object CheckboxType
   extends Enum[CheckboxType]
     with PlayInsensitiveJsonEnum[CheckboxType] {
 
-  def defaultValue: String = STANDARD.entryName
+  def defaultValue: String = STANDARD.key
 
   val values: IndexedSeq[CheckboxType] = findValues
 
@@ -108,7 +106,7 @@ sealed trait InputType
   extends EnumEntry
     with I18nEnum {
 
-  def i18nKey: String = entryName.toLowerCase
+  def i18nKey: String = key
 }
 
 
@@ -116,7 +114,7 @@ object InputType
   extends Enum[InputType]
     with PlayInsensitiveJsonEnum[InputType] {
 
-  def defaultValue: String = TEXT.entryName
+  def defaultValue: String = TEXT.key
 
   val values: IndexedSeq[InputType] = findValues
 

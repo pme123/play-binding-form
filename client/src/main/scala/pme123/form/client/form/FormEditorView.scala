@@ -16,12 +16,14 @@ private[client] object FormEditorView
   // **************************
   @dom
   def create(): Binding[HTMLElement] =
-    <div class="ui grid">
+    <div class="ui two column stackable grid">
       <div class="ten wide column">
-        <div class="ui form">
+        <div class="ui segment">
+          <div class="ui form">
           {//
           header(UIFormStore.uiState.identVar, Some(UIFormStore.changeIdent), headerButtons).bind}{//
           editorContent.bind}
+          </div>
         </div>
       </div>
       <div class="six wide column">
@@ -57,7 +59,7 @@ private[client] object FormEditorView
     val uiSelElem = UIPropertyStore.uiState.selectedElement.bind
     val layoutWide = uiElem.layoutWideVar.bind
     val wideClass: String = layoutWide.entryName.toLowerCase
-    println(s"EDIT ELEM changed: $elemType")
+
     <div class={s"$wideClass wide column"}
          ondrop={ev: DragEvent =>
            UIFormElemDragDrop.drop(uiElemVar)(ev)}

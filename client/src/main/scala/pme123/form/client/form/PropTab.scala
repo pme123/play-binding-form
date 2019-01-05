@@ -253,7 +253,7 @@ case object TextsTab {
 
   @dom
   lazy val create: Binding[HTMLElement] = {
-    val uiElem = UIFormStore.uiState.selectedElement.value.bind
+    val uiElem = UIFormStore.uiState.selectedElement.bind.bind
     if (uiElem.hasTexts)
       <div class="content">
         {//

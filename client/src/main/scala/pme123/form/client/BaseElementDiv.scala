@@ -7,7 +7,7 @@ import org.scalajs.jquery.jQuery
 import pme123.form.client.BaseElementDiv.InputAttr
 import pme123.form.client.form.UIFormElem.ChangeEvent
 import pme123.form.client.form._
-import pme123.form.client.services.UIStore
+import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.ElementType
 import pme123.form.shared.ElementType._
 import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, SIZE, SIZE_CLASS}
@@ -31,6 +31,7 @@ sealed abstract class BaseElementDiv {
           else
             None
       )
+    SemanticUI.initElements()
   }
 }
 
@@ -96,7 +97,7 @@ object BaseElementDiv {
 
   @dom
   private def createInput(inputAttr: InputAttr): Binding[HTMLElement] = {
-    <div class="">
+    <span class="">
       {inputAttr.elementType match {
       case DROPDOWN =>
         DropdownDiv.create(inputAttr).bind
@@ -117,7 +118,7 @@ object BaseElementDiv {
           {inputAttr.ident}
         </div>
     }}
-    </div>
+    </span>
   }
 
   case class InputAttr(elementType: ElementType,
@@ -178,7 +179,6 @@ object TextFieldDiv extends BaseElementDiv {
     val value = inputAttr.valueVar.bind
     val size = inputAttr.extras.valueFor(SIZE).bind
     val inputType = inputAttr.extras.valueFor(INPUT_TYPE).bind
-    println(s"INPUT_TYPE: $inputType")
     <div class="ui input">
       <input id={inputAttr.ident}
              name={inputAttr.ident}
@@ -222,16 +222,16 @@ object CheckboxDiv extends BaseElementDiv {
     val typeClass = inputAttr.extras.valueFor(CHECKBOX_TYPE).bind
     val checkedClass = if (value.contains("true")) "checked" else ""
     val checked = value.contains("true")
+    println(s"CHECKBOX_TYPE: $typeClass - $checked")
     <div class={s"ui $typeClass checkbox $checkedClass"}>
       <input id={inputAttr.ident}
              name={inputAttr.ident}
              type="checkbox"
              readOnly={inputAttr.readOnly}
-             checked={checked}
-             tabIndex={0}
              onchange={_: Event =>
                changeEvent(inputAttr,
-                 jQuery(s"#${inputAttr.ident}").is(":checked").toString)}/>
+                 jQuery(s"#${inputAttr.ident}").is(":checked").toString)}
+             checked={checked}/>
     </div>
   }
 

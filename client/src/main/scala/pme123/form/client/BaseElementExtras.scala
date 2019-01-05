@@ -1,6 +1,5 @@
 package pme123.form.client
 
-import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 import pme123.form.client.form.{UIExtraProperties, UIFormElem}
 import pme123.form.client.services.I18n
 import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TEXTFIELD, TITLE}
@@ -9,8 +8,6 @@ import pme123.form.shared.TextType.{LABEL, TOOLTIP}
 import pme123.form.shared._
 import pme123.form.shared.services.Language
 import pme123.form.shared.services.Language.{DE, EN}
-
-import scala.collection.immutable.IndexedSeq
 
 object BaseElementExtras {
 
@@ -84,7 +81,6 @@ object BaseElementExtras {
   object CheckboxExtras {
     def extras(extraProperties: UIExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
       val value = extraProperties.valueFor(CHECKBOX_TYPE).value
-
       Seq(UIExtraPropValue(
         CHECKBOX_TYPE, UIFormElem(BaseElement(CHECKBOX_TYPE.entryName,
           DROPDOWN,
@@ -102,69 +98,10 @@ object BaseElementExtras {
         )
         )))
     }
-
-    sealed trait CheckboxType
-      extends EnumEntry
-        with I18nEnum {
-
-      def i18nKey = s"enum.checkbox-type.${entryName.toLowerCase}"
-
-    }
-
-
-    object CheckboxType
-      extends Enum[CheckboxType]
-        with PlayInsensitiveJsonEnum[CheckboxType] {
-
-      def defaultValue: Option[String] = Some(STANDARD.entryName)
-
-      val values: IndexedSeq[CheckboxType] = findValues
-
-      // Used for: TitleElem
-      case object STANDARD extends CheckboxType
-
-      case object SLIDER extends CheckboxType
-
-      case object TOGGLE extends CheckboxType
-
-    }
-
   }
-
 
   object TitleExtras {
 
-    sealed trait SizeType
-      extends EnumEntry
-        with I18nEnum {
-
-      def cssClass: String = entryName.toLowerCase
-
-      def i18nKey: String = s"enum.size-type.${entryName.toLowerCase}"
-
-    }
-
-
-    object SizeType
-      extends Enum[SizeType]
-        with PlayInsensitiveJsonEnum[SizeType] {
-
-      def defaultValue: Option[String] = Some(MEDIUM.entryName)
-
-      val values: IndexedSeq[SizeType] = findValues
-
-      // Used for: TitleElem
-      case object HUGE extends SizeType
-
-      case object BIG extends SizeType
-
-      case object MEDIUM extends SizeType
-
-      case object SMALL extends SizeType
-
-      case object TINY extends SizeType
-
-    }
 
     def sizeElem(extraProperties: UIExtraProperties)(implicit supportedLangs: Seq[Language]): UIExtraPropValue = {
       val value = extraProperties.valueFor(SIZE_CLASS).value
@@ -180,7 +117,7 @@ object BaseElementExtras {
           ),
           value = Some(value),
           extras = ExtraProperties(DROPDOWN),
-          elemEntries = I18n.enumEntries(SizeType.values),
+          elemEntries = I18n.enumEntries(SizeClass.values),
         ),
           Some(str =>
             extraProperties.valueFor(SIZE_CLASS).value = str

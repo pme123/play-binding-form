@@ -14,7 +14,7 @@ object I18n {
 
   def enumEntries(enums: Seq[I18nEnum])(implicit supportedLangs: Seq[Language]): ElementEntries = {
     ElementEntries(
-      enums.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
+      enums.map(enum => ElementEntry(enum.key, ElementText.label(I18n(enum.i18nKey))))
     )
   }
 }
