@@ -150,7 +150,6 @@ object DropdownDiv extends BaseElementDiv {
              readOnly={inputAttr.readOnly}
              value={value.getOrElse("")}
              onchange={_: Event =>
-               println("onchange DROPDOWN: ")
                changeEvent(inputAttr)}/>
       <i class="dropdown icon"></i>
       <div class="default text">

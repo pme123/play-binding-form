@@ -1,11 +1,12 @@
 package pme123.form.client.mapping
 
+import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
 import pme123.form.client._
 import pme123.form.client.data.{DataView, UIDataStore}
-import pme123.form.client.form.{FormPreviewView, FormUtils, UIFormElem, UIFormStore}
+import pme123.form.client.form.{FormPreviewView, UIFormElem, UIFormStore}
 import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{SemanticUI, UIStore}
@@ -13,7 +14,6 @@ import pme123.form.shared.ElementType.DROPDOWN
 import pme123.form.shared.ExtraProp.CLEARABLE
 import pme123.form.shared._
 import pme123.form.shared.services.Language.{DE, EN}
-import com.softwaremill.quicklens._
 
 private[client] object MappingView
   extends MainView {
@@ -69,7 +69,7 @@ private[client] object MappingView
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
               onclick={_: Event =>
-                persistMapping.value = true}>
+                SemanticUI.validateForm()}>
         <i class="check icon"></i>
       </button>
     </div>
@@ -80,7 +80,7 @@ private[client] object MappingView
       <button class="ui circular icon button"
               data:data-tooltip="Export Mapping as JSON"
               onclick={_: Event =>
-                MappingExporter.exportMapping()}>
+                MappingUtils.exportMapping()}>
         <i class="sign-out icon"></i>
       </button>
     </div>
@@ -124,7 +124,7 @@ private[client] object MappingView
       &nbsp;
     </div>{//
       val uIFormElem = UIFormElem(BaseElement(
-        dataDropdownIdent(uiElem),
+        MappingUtils.dataDropdownIdent(uiElem),
         DROPDOWN,
         DataType.STRING,
         ElementTexts.placeholder(Map(DE -> "Gemappt zu ..", EN -> "Maps to ..")),
@@ -134,7 +134,8 @@ private[client] object MappingView
         value = varDataValue.map(_.ident),
         extras = ExtraProperties(DROPDOWN),
       ),
-        Some(UIMappingStore.changeData(uiMappingVar) _)
+        Some(str =>
+          UIMappingStore.changeData(uiMappingVar)(str))
       )
 
       uIFormElem.extrasVar.value.valueFor(CLEARABLE).value = "true"
@@ -144,10 +145,6 @@ private[client] object MappingView
     </div>
   }
 
-  private def dataDropdownIdent(uiElem: UIFormElem) = {
-    s"mapping-data-${uiElem.identVar.value}"
-  }
-
   @dom
   private lazy val persistMappingDiv: Binding[HTMLElement] = {
     val doPersist = persistMapping.bind
@@ -155,7 +152,7 @@ private[client] object MappingView
       <div>
         {persistMapping.value = false
       MappingServices.persistMapping(
-        MappingExporter.createMapping
+        MappingUtils.createMapping
       ).bind}
       </div>
     else
@@ -164,18 +161,10 @@ private[client] object MappingView
 
   @dom
   private lazy val initFields = {
-    UIRoute.route.state.watch()
     val activeLang = UIStore.uiState.activeLanguage.bind
-    val mappings = UIMappingStore.uiState.mapping.value.mappings.value
+    val mappings = UIMappingStore.uiState.mapping.bind.mappings.bind
     val elems = UIFormStore.uiState.formElements.bind
-    val fieldRules = FormUtils.semanticFields(elems)(activeLang)
-    val dataRules = mappings
-      .map { mV =>
-        val elemId = dataDropdownIdent(mV.value.uiFormElem.value)
-        elemId -> SemanticField(elemId, optional = false, Seq(SemanticUI.emptyRule(activeLang)))
-      }.toMap
-
-    SemanticUI.initForm(SemanticForm(fields = fieldRules ++ dataRules))
+    MappingUtils.initFields(activeLang, elems, mappings)
       <span/>
   }
 

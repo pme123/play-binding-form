@@ -4,7 +4,7 @@ import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.data.UIDataStore
 import pme123.form.client.data.UIDataStore.{VarDataContainer, VarDataValue}
 import pme123.form.client.form.{UIFormElem, UIFormStore, VarFormContainer}
-import pme123.form.client.services.SemanticUI
+import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared._
@@ -66,6 +66,11 @@ object UIMappingStore extends Logging {
         uiMappingVar.value.varDataValue.value = Some(dv.value)
       )
     SemanticUI.initElements()
+    MappingUtils.initFields(
+      UIStore.activeLanguage.value,
+      UIFormStore.uiState.formElements.value,
+      uiState.mapping.value.mappings.value)
+
   }
 
 
