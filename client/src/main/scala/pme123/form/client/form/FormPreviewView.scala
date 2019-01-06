@@ -75,7 +75,6 @@ private[client] object FormPreviewView
     val uiElem = uiElemVar.bind
     val layoutWide = uiElem.layoutWideVar.bind
     val wideClass: String = layoutWide.entryName.toLowerCase
-    println("UIELELMMM: " + uiElem.identVar.value)
     <div class={s"$wideClass wide column"}>
       {BaseElementDiv(uiElem).bind}
     </div>
@@ -83,9 +82,9 @@ private[client] object FormPreviewView
 
   @dom
   private lazy val initFields = {
-    UIRoute.route.state.watch()
+    val elems = UIFormStore.uiState.formElements.bind
     val activeLang = UIStore.uiState.activeLanguage.bind
-    SemanticUI.initForm(SemanticForm(fields = FormUtils.semanticFields(activeLang)))
+    SemanticUI.initForm(SemanticForm(fields = FormUtils.semanticFields(elems)(activeLang)))
       <span/>
   }
 

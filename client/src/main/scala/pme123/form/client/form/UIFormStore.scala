@@ -1,8 +1,7 @@
 package pme123.form.client.form
 
 import com.thoughtworks.binding.Binding.{Var, Vars}
-import pme123.form.client.form.UIFormStore.uiState
-import pme123.form.client.services.SemanticUI
+import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.PropTabType.PROPERTIES
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
@@ -32,7 +31,6 @@ object UIFormStore extends Logging {
       uiState.formElements
     )
     SemanticUI.initElements()
-    println("CHANGEDFORM______ "+uiState.form.value.identVar.value)
     uiState.form
   }
 

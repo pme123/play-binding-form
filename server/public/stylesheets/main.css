@@ -87,6 +87,11 @@ body {
     background-color: green;
 }
 
+.ui.form.error .show-valid {
+    color: white;
+    background-color: red;
+}
+
 .inputfile {
     width: 0.1px;
     height: 0.1px;

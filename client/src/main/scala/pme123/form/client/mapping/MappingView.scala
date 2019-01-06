@@ -9,7 +9,7 @@ import pme123.form.client.form.{FormPreviewView, FormUtils, UIFormElem, UIFormSt
 import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{SemanticUI, UIStore}
-import pme123.form.shared.ElementType.{DROPDOWN, TEXTFIELD}
+import pme123.form.shared.ElementType.DROPDOWN
 import pme123.form.shared._
 
 private[client] object MappingView
@@ -158,7 +158,8 @@ private[client] object MappingView
     UIRoute.route.state.watch()
     val activeLang = UIStore.uiState.activeLanguage.bind
     val mappings = UIMappingStore.uiState.mapping.value.mappings.value
-    val fieldRules = FormUtils.semanticFields(activeLang)
+    val elems = UIFormStore.uiState.formElements.bind
+    val fieldRules = FormUtils.semanticFields(elems)(activeLang)
     val dataRules = mappings
       .map { mV =>
         val elemId = dataDropdownIdent(mV.value.uiFormElem.value)
