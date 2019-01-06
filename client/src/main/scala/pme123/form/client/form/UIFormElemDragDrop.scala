@@ -8,9 +8,13 @@ object UIFormElemDragDrop {
   val dragObject: Var[Option[Var[UIFormElem]]] = Var(None)
 
   def allowDrop(moveToElemVar: Var[UIFormElem])(ev: DragEvent): Unit = {
-    if (dragObject.value.exists(_ != moveToElemVar) &&
-      dragObject.value.exists(_.getClass == moveToElemVar.getClass))
-      ev.preventDefault
+    dragObject.value match {
+      case Some(v) if v == moveToElemVar => // just select
+        UIFormStore.changeSelectedElement(moveToElemVar)
+      case Some(v) if v.getClass == moveToElemVar.getClass => // allow drop
+        ev.preventDefault
+      case _ => 
+    }
   }
 
   def drag(uiElemVar: Var[UIFormElem]): Unit = {
