@@ -50,7 +50,6 @@ object BaseElementDiv {
     val extras = uiFormElem.extrasVar.bind
     val placeholder = texts.textForPlaceholder(activeLanguage).bind
     val inlineClass = if (inline) "inline" else ""
-    val readOnlyClass = if (readOnly) "disabled" else ""
     val input = createInput(InputAttr(
       elementType,
       uiFormElem.valueVar,
@@ -70,7 +69,7 @@ object BaseElementDiv {
         {input.bind}
       </div>
     } else {
-      <div class={s"$inlineClass $readOnlyClass field"}>
+      <div class={s"$inlineClass field"}>
         {label(texts, activeLanguage, required).bind //
         }{input.bind}
       </div>
@@ -143,17 +142,19 @@ object DropdownDiv extends BaseElementDiv {
     val clearableClass = if (clearable.contains("true")) "clearable" else ""
     val value = inputAttr.valueVar.bind
     val elemEntries = inputAttr.elementEntriesVar.bind
-    <div class={s"ui $clearableClass fluid selection dropdown"}>
+    val readOnlyClass = if (inputAttr.readOnly) "disabled" else ""
+    <div class={s"ui $clearableClass $readOnlyClass fluid selection dropdown"}>
       <input id={inputAttr.ident}
              name={inputAttr.ident}
              type="hidden"
              readOnly={inputAttr.readOnly}
              value={value.getOrElse("")}
              onchange={_: Event =>
+               println("onchange DROPDOWN: ")
                changeEvent(inputAttr)}/>
       <i class="dropdown icon"></i>
       <div class="default text">
-        {clearable}
+        {value.getOrElse(inputAttr.placeholder)}
       </div>
       <div class="menu">
         {Constants(elemEntries.entries.map(elementEntry(_, inputAttr.activeLanguage)): _*).map(_.bind)}
@@ -179,7 +180,8 @@ object TextFieldDiv extends BaseElementDiv {
     val value = inputAttr.valueVar.value
     val size = inputAttr.extras.valueFor(SIZE).bind
     val inputType = inputAttr.extras.valueFor(INPUT_TYPE).bind
-    <div class="ui input">
+    val readOnlyClass = if (inputAttr.readOnly) "disabled" else ""
+    <div class={s"ui $readOnlyClass input"}>
       <input id={inputAttr.ident}
              name={inputAttr.ident}
              size={size.toInt}
@@ -199,7 +201,8 @@ object TextAreaDiv extends BaseElementDiv {
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
     val value = inputAttr.valueVar.value
-    <div class="ui input">
+    val readOnlyClass = if (inputAttr.readOnly) "disabled" else ""
+    <div class={s"ui $readOnlyClass input"}>
       <textarea id={inputAttr.ident}
                 name={inputAttr.ident}
                 placeholder={inputAttr.placeholder}
@@ -222,7 +225,8 @@ object CheckboxDiv extends BaseElementDiv {
     val typeClass = inputAttr.extras.valueFor(CHECKBOX_TYPE).bind
     val checkedClass = if (value.contains("true")) "checked" else ""
     val checked = value.contains("true")
-    <div class={s"ui $typeClass checkbox $checkedClass"}>
+    val readOnlyClass = if (inputAttr.readOnly) "disabled" else ""
+    <div class={s"ui $typeClass $readOnlyClass checkbox $checkedClass"}>
       <input id={inputAttr.ident}
              name={inputAttr.ident}
              type="checkbox"

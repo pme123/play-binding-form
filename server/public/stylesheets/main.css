@@ -18,6 +18,7 @@ body {
 
 .ui.container {
     padding-top: 14px;
+    min-width: 900px;
 }
 
 .ui.main.borderless.menu {

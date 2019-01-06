@@ -10,7 +10,10 @@ import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.ElementType.DROPDOWN
+import pme123.form.shared.ExtraProp.CLEARABLE
 import pme123.form.shared._
+import pme123.form.shared.services.Language.{DE, EN}
+import com.softwaremill.quicklens._
 
 private[client] object MappingView
   extends MainView {
@@ -34,7 +37,7 @@ private[client] object MappingView
         validateButton,
         exportButton,
         persistButton).bind}{//
-      mappingContent.bind }{//
+      mappingContent.bind}{//
       initFields.bind //
       }<div class="ui error message"></div>
     </div>}
@@ -66,8 +69,7 @@ private[client] object MappingView
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
               onclick={_: Event =>
-                persistMapping.value = true
-              }>
+                persistMapping.value = true}>
         <i class="check icon"></i>
       </button>
     </div>
@@ -111,26 +113,33 @@ private[client] object MappingView
     val uiMapping = uiMappingVar.bind
     val uiElem = uiMapping.uiFormElem.bind
     val varDataValue = uiMapping.varDataValue.bind
-    uiElem.readOnlyVar.value = true
     uiElem.valueVar.value = varDataValue.map(_.content.value)
+    val baseElem = uiElem.toBaseElement
+      .modify(_.readOnly)
+      .setTo(true)
     val layoutWide = uiElem.layoutWideVar.bind
     val wideClass: String = layoutWide.entryName.toLowerCase
     <div class={s"$wideClass wide column"}>
-      {BaseElementDiv(uiElem).bind}
-      <div>&nbsp;</div>{BaseElementDiv(
-        UIFormElem(BaseElement(
-          dataDropdownIdent(uiElem),
-          DROPDOWN,
-          DataType.STRING,
-          ElementTexts(),
-          elemEntries = ElementEntries(
-            UIDataStore.dataValueIdents().map(ident => ElementEntry(ident))
-          ),
-          value = varDataValue.map(_.ident),
-          extras = ExtraProperties(DROPDOWN),
+      {BaseElementDiv(UIFormElem(baseElem)).bind}<div>
+      &nbsp;
+    </div>{//
+      val uIFormElem = UIFormElem(BaseElement(
+        dataDropdownIdent(uiElem),
+        DROPDOWN,
+        DataType.STRING,
+        ElementTexts.placeholder(Map(DE -> "Gemappt zu ..", EN -> "Maps to ..")),
+        elemEntries = ElementEntries(
+          UIDataStore.dataValueIdents().map(ident => ElementEntry(ident))
         ),
-          Some(UIMappingStore.changeData(uiMappingVar) _)
-        )
+        value = varDataValue.map(_.ident),
+        extras = ExtraProperties(DROPDOWN),
+      ),
+        Some(UIMappingStore.changeData(uiMappingVar) _)
+      )
+
+      uIFormElem.extrasVar.value.valueFor(CLEARABLE).value = "true"
+      BaseElementDiv(
+        uIFormElem
       ).bind}
     </div>
   }

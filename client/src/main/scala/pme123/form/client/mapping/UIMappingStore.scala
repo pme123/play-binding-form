@@ -47,7 +47,7 @@ object UIMappingStore extends Logging {
       .foreach(e => uiState.mapping.value.mappings.value -= e)
     // add usedElements
     elems
-      .filterNot(_.value.readOnlyVar.value)
+      .filterNot(_.value.elementTypeVar.value.readOnly)
       .foreach { uiE =>
         mappings.find(_.value.uiFormElem.value == uiE.value)
           .getOrElse(
@@ -59,9 +59,12 @@ object UIMappingStore extends Logging {
   }
 
   def changeData(uiMappingVar: Var[UIMappingEntry])(dataIdent: String): Unit = {
-    UIDataStore.dataValue(dataIdent).foreach(dv =>
-      uiMappingVar.value.varDataValue.value = Some(dv.value)
-    )
+    if (dataIdent.isEmpty)
+      uiMappingVar.value.varDataValue.value = None
+    else
+      UIDataStore.dataValue(dataIdent).foreach((dv: Var[VarDataValue]) =>
+        uiMappingVar.value.varDataValue.value = Some(dv.value)
+      )
     SemanticUI.initElements()
   }
 

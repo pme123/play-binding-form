@@ -26,6 +26,8 @@ object ElementTexts {
     )
   }
 
+  lazy val noTexts = new ElementTexts()
+
   def label(texts: Map[Language, String])(implicit supportedLangs: Seq[Language]): ElementTexts = {
     ElementTexts(
       Some(ElementText.label(texts)),
