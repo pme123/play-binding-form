@@ -53,8 +53,13 @@ object SemanticUI {
 
   def initForm(form: SemanticForm): Unit ={
     setTimeout(100) {
-      jQuery(".ui.form").form(JSON.parse(Json.toJson(form).toString()))
+      val sForm = Json.toJson(form).toString()
+      jQuery(".ui.form").form(JSON.parse(sForm))
     }
+  }
+
+  def validateForm(): Unit ={
+      jQuery(".ui.form").form("validate form")
   }
 
   def columnWide(wide: Int): String = {

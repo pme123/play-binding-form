@@ -176,7 +176,7 @@ object TextFieldDiv extends BaseElementDiv {
 
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
-    val value = inputAttr.valueVar.bind
+    val value = inputAttr.valueVar.value
     val size = inputAttr.extras.valueFor(SIZE).bind
     val inputType = inputAttr.extras.valueFor(INPUT_TYPE).bind
     <div class="ui input">
@@ -198,7 +198,7 @@ object TextAreaDiv extends BaseElementDiv {
 
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
-    val value = inputAttr.valueVar.bind
+    val value = inputAttr.valueVar.value
     <div class="ui input">
       <textarea id={inputAttr.ident}
                 name={inputAttr.ident}
@@ -218,7 +218,7 @@ object CheckboxDiv extends BaseElementDiv {
 
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
-    val value = inputAttr.valueVar.bind
+    val value = inputAttr.valueVar.value
     val typeClass = inputAttr.extras.valueFor(CHECKBOX_TYPE).bind
     val checkedClass = if (value.contains("true")) "checked" else ""
     val checked = value.contains("true")

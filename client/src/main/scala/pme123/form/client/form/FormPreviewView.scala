@@ -41,7 +41,7 @@ private[client] object FormPreviewView
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Form"
               onclick={_: Event =>
-                persistForm.value = true}>
+                SemanticUI.validateForm()}>
         <i class="check icon"></i>
       </button>
       &nbsp;
@@ -75,6 +75,7 @@ private[client] object FormPreviewView
     val uiElem = uiElemVar.bind
     val layoutWide = uiElem.layoutWideVar.bind
     val wideClass: String = layoutWide.entryName.toLowerCase
+    println("UIELELMMM: " + uiElem.identVar.value)
     <div class={s"$wideClass wide column"}>
       {BaseElementDiv(uiElem).bind}
     </div>
