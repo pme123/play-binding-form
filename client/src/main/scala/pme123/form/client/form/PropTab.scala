@@ -41,6 +41,7 @@ case object PropertiesTab {
     <div class="content">
       {//
       elementTypeSelect.bind}{//
+      identInput.bind}{//
       defaultValueInput.bind}{//
       layoutWideSelect.bind}{//
       requiredCheckbox.bind}{//
@@ -48,6 +49,70 @@ case object PropertiesTab {
       readOnlyCheckbox.bind}{//
       elementExtras.bind}
     </div>
+  }
+
+  @dom
+  private lazy val elementTypeSelect: Binding[HTMLElement] = {
+    val selElem = UIFormStore.uiState.selectedElement.bind.bind
+    val elementType = selElem.elementTypeVar.value
+    <div class="field">
+      {BaseElementDiv(
+      UIFormElem(BaseElement(
+        "elementTypeId",
+        DROPDOWN,
+        DataType.STRING,
+        ElementTexts(
+          Some(ElementText.label(Map(DE -> "Element Typ", EN -> "Element Type"))),
+          None,
+          Some(ElementText.tooltip(Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
+        ),
+        elemEntries = ElementEntries(
+          ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
+        ),
+        value = Some(elementType.entryName),
+        extras = ExtraProperties(DROPDOWN),
+      ),
+
+        Some { eType =>
+          selElem.elementTypeVar.value = ElementType.withNameInsensitive(eType)
+          SemanticUI.initElements()
+        }
+      )
+    ).bind}
+    </div>
+  }
+
+  @dom
+  private lazy val identInput: Binding[HTMLElement] = {
+    val selElem = UIFormStore.uiState.selectedElement.bind.bind
+    val elementType = selElem.elementTypeVar.bind
+    val readOnly = selElem.readOnlyVar.bind
+    if (readOnly || elementType.readOnly)
+        <span/>
+    else {
+      val ident = selElem.identVar.bind
+      <div class="field">
+        {BaseElementDiv(
+        UIFormElem(BaseElement(
+          "elemIdent",
+          TEXTFIELD,
+          DataType.STRING,
+          ElementTexts(
+            Some(ElementText.label(Map(DE -> "Identität", EN -> "Identity"))),
+            Some(ElementText.placeholder(Map(DE -> "Identität", EN -> "Identity"))),
+            Some(ElementText.tooltip(Map(DE -> "Ein eindeutiger Wert, welchen wir als Referenz nutzen", EN -> "Unique value that we use as a reference.")))
+          ),
+          value = Some(ident),
+          extras = ExtraProperties(TEXTFIELD),
+        ),
+          Some { str =>
+            selElem.identVar.value = str
+            SemanticUI.initElements()
+          }
+        )
+      ).bind}
+      </div>
+    }
   }
 
   @dom
@@ -81,37 +146,6 @@ case object PropertiesTab {
       ).bind}
       </div>
     }
-  }
-
-  @dom
-  private lazy val elementTypeSelect: Binding[HTMLElement] = {
-    val selElem = UIFormStore.uiState.selectedElement.bind.bind
-    val elementType = selElem.elementTypeVar.value
-    <div class="field">
-      {BaseElementDiv(
-      UIFormElem(BaseElement(
-        "elementTypeId",
-        DROPDOWN,
-        DataType.STRING,
-        ElementTexts(
-          Some(ElementText.label(Map(DE -> "Element Typ", EN -> "Element Type"))),
-          None,
-          Some(ElementText.tooltip(Map(DE -> "Art des Form-Elementes", EN -> "The kind of the form element.")))
-        ),
-        elemEntries = ElementEntries(
-          ElementType.values.map(et => ElementEntry(et.entryName, ElementText.label(I18n(et.i18nKey))))
-        ),
-        value = Some(elementType.entryName),
-        extras = ExtraProperties(DROPDOWN),
-      ),
-
-        Some { eType =>
-          selElem.elementTypeVar.value = ElementType.withNameInsensitive(eType)
-          SemanticUI.initElements()
-        }
-      )
-    ).bind}
-    </div>
   }
 
   @dom

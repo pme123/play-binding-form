@@ -205,11 +205,11 @@ object TextAreaDiv extends BaseElementDiv {
       <textarea id={inputAttr.ident}
                 name={inputAttr.ident}
                 placeholder={inputAttr.placeholder}
-                value={value.get}
+                value={value.getOrElse("")}
                 readOnly={inputAttr.readOnly}
                 rows={6}
                 onblur={_: Event =>
-                  inputAttr.changeEvent}>
+                  changeEvent(inputAttr)}>
       </textarea>
     </div>
   }
@@ -230,10 +230,11 @@ object CheckboxDiv extends BaseElementDiv {
              name={inputAttr.ident}
              type="checkbox"
              readOnly={inputAttr.readOnly}
+             checked={checked}
              onchange={_: Event =>
                changeEvent(inputAttr,
                  jQuery(s"#${inputAttr.ident}").is(":checked").toString)}
-             checked={checked}/>
+             />
     </div>
   }
 
