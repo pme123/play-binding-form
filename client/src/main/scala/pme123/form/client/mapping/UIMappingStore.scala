@@ -26,6 +26,7 @@ object UIMappingStore extends Logging {
     changeMappingIdent(mapping.ident)
     uiState.mapping.value =
       VarMappingContainer(
+        uiState.identVar,
         mapping,
         UIFormStore.changeForm(mapping.form),
         UIDataStore.changeData(mapping.data),
@@ -35,7 +36,7 @@ object UIMappingStore extends Logging {
 
   def changeMappingIdent(ident: String): Unit = {
     info(s"MappingUIStore: changeMappingIdent $ident")
-    uiState.mapping.value.identVar.value = ident
+    uiState.identVar.value = ident
     SemanticUI.initElements()
   }
 
@@ -98,7 +99,7 @@ object UIMappingStore extends Logging {
                                  form: Var[VarFormContainer],
                                  data: Var[VarDataContainer],
                                  mappings: Vars[Var[UIMappingEntry]] = Vars.empty) {
-    lazy val toMapping: MappingContainer = {
+    def toMapping: MappingContainer = {
       MappingContainer(identVar.value,
         form.value.identVar.value,
         data.value.identVar.value,
@@ -132,10 +133,11 @@ object UIMappingStore extends Logging {
   }
 
   object VarMappingContainer {
-    def apply(mapping: GetMappingContainer,
+    def apply(identVar: Var[String],
+              mapping: GetMappingContainer,
               varForm: Var[VarFormContainer],
               varData: Var[VarDataContainer]): VarMappingContainer =
-      VarMappingContainer(Var(mapping.ident),
+      VarMappingContainer(identVar,
         varForm,
         varData,
         Vars(mapping.mappings.flatMap(UIMappingEntry.apply(_).toSeq).map(Var(_)): _*))
@@ -143,7 +145,7 @@ object UIMappingStore extends Logging {
 
   case class UIMappingEntry(uiFormElem: Var[UIFormElem] = Var(UIFormElem(BaseElement(TEXTFIELD))),
                             varDataValue: Var[Option[VarDataValue]] = Var(None)) {
-    lazy val toMapping: MappingEntry = {
+    def toMapping: MappingEntry = {
       MappingEntry(
         uiFormElem.value.identVar.value,
         varDataValue.value.map(_.ident),

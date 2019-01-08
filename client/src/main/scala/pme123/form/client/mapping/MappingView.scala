@@ -31,7 +31,7 @@ private[client] object MappingView
       {<div class="ui form">
       {persistMappingDiv.bind}{//
       header(
-        UIMappingStore.uiState.mapping.value.identVar,
+        UIMappingStore.uiState.identVar,
         Some(UIMappingStore.changeMappingIdent),
         formDataIdent,
         createMappingButton,

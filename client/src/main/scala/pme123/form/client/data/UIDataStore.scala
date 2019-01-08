@@ -102,7 +102,7 @@ object UIDataStore extends Logging {
 
   case class VarDataContainer(identVar: Var[String], structure: Var[VarDataObject] = Var(VarDataObject())) {
 
-    lazy val toData: DataContainer = DataContainer(identVar.value, structure.value.toData)
+    def toData: DataContainer = DataContainer(identVar.value, structure.value.toData)
 
     def findValues(): Seq[Var[VarDataValue]] =
       structure.value.findValues()
