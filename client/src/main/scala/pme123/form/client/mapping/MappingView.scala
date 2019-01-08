@@ -34,6 +34,7 @@ private[client] object MappingView
         UIMappingStore.uiState.mapping.value.identVar,
         Some(UIMappingStore.changeMappingIdent),
         formDataIdent,
+        createMappingButton,
         validateButton,
         exportButton,
         persistButton).bind}{//
@@ -64,7 +65,7 @@ private[client] object MappingView
   }
 
   @dom
-  private lazy val validateButton: Binding[HTMLElement] = {
+  private lazy val createMappingButton: Binding[HTMLElement] = {
     <div class="item">
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
@@ -74,6 +75,21 @@ private[client] object MappingView
       </button>
     </div>
   }
+
+  @dom
+  private lazy val validateButton: Binding[HTMLElement] = {
+    <div class="item">
+      <button class="ui circular icon button"
+              data:data-tooltip="Create Mapping from Form and Data"
+              onclick={_: Event =>
+                MappingUtils.createMapping(
+                  UIFormStore.uiState.form.value,
+                  UIDataStore.uiState.data.value)}>
+        <i class={s"${MappingView.icon} icon"}></i>
+      </button>
+    </div>
+  }
+
   @dom
   private lazy val exportButton: Binding[HTMLElement] = {
     <div class="item">

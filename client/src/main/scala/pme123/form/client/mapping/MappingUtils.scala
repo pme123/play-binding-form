@@ -3,11 +3,12 @@ package pme123.form.client.mapping
 import com.thoughtworks.binding.Binding.Var
 import org.scalajs.dom.window
 import play.api.libs.json.Json
-import pme123.form.client.form.{FormUtils, UIFormElem}
+import pme123.form.client.data.UIDataStore.VarDataContainer
+import pme123.form.client.form.{FormUtils, UIFormElem, VarFormContainer}
 import pme123.form.client.mapping.UIMappingStore.UIMappingEntry
 import pme123.form.client.services.SemanticUI
-import pme123.form.shared.{MappingContainer, SemanticField, SemanticForm}
 import pme123.form.shared.services.Language
+import pme123.form.shared.{MappingContainer, SemanticField, SemanticForm}
 
 object MappingUtils {
 
@@ -17,8 +18,17 @@ object MappingUtils {
     tab.focus()
   }
 
-   def createMapping: MappingContainer = {
-     UIMappingStore.uiState.mapping.value.toMapping
+  def createMapping(form: VarFormContainer,
+                    data: VarDataContainer): Unit = {
+
+    UIMappingStore.uiState.mapping.value.autoMap(
+      form, data
+    )
+    SemanticUI.initElements()
+  }
+
+  def createMapping: MappingContainer = {
+    UIMappingStore.uiState.mapping.value.toMapping
   }
 
   def initFields(activeLang: Language, elems: Seq[Var[UIFormElem]], mappings: Seq[Var[UIMappingEntry]]): Unit = {

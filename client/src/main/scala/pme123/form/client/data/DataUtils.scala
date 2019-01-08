@@ -15,7 +15,6 @@ object DataUtils {
   }
 
   def createData(form: FormContainer): Unit = {
-    println("Create DATA")
     UIDataStore.uiState.identVar.value = s"${form.ident}-data"
     UIDataStore.uiState.data.value = VarDataContainer(UIDataStore.uiState.identVar, form)
     SemanticUI.initElements()

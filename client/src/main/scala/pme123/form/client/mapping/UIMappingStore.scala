@@ -75,15 +75,17 @@ object UIMappingStore extends Logging {
 
 
   case class UIState(
+                      identVar: Var[String],
                       mapping: Var[VarMappingContainer],
                       idents: Vars[String]
                     )
 
   object UIState {
-    def apply(): UIState = {
+    def apply(identVar: Var[String] = Var(MappingContainer.defaultIdent)): UIState = {
       UIState(
+        identVar,
         Var(VarMappingContainer(
-          Var(MappingContainer.defaultIdent),
+          identVar,
           UIFormStore.uiState.form,
           UIDataStore.uiState.data,
         )),
@@ -102,6 +104,29 @@ object UIMappingStore extends Logging {
         data.value.identVar.value,
         mappings.value.map(_.value.toMapping),
       )
+    }
+
+    def autoMap(form: VarFormContainer,
+                data: VarDataContainer): Unit = {
+
+      val ident = s"${form.identVar.value}-mapping"
+      uiState.identVar.value = ident
+
+      uiState.mapping.value.form.value = form
+      uiState.mapping.value.data.value = data
+
+      uiState.mapping.value.mappings.value.clear()
+
+      uiState.mapping.value.mappings.value ++=
+      form.elems.value
+          .filterNot(_.value.elementTypeVar.value.readOnly)
+          .map { ue: Var[UIFormElem] =>
+            val dataValue =
+              data.findValues()
+                .map(_.value)
+                .find(_.ident == ue.value.identVar.value)
+            UIMappingEntry(ue, Var(dataValue))
+          }.map(Var(_))
     }
 
   }

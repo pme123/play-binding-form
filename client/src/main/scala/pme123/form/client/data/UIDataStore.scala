@@ -70,6 +70,10 @@ object UIDataStore extends Logging {
     dataValues()
       .find(_.value.ident == searchIdent)
 
+  def dataIdents: Seq[String] =
+    dataValues()
+      .map(_.value.ident)
+
   def dataValues(): Seq[Var[VarDataValue]] =
     uiState.data.value
       .findValues()
