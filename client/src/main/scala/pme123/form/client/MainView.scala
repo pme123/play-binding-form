@@ -9,7 +9,7 @@ import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.client.services.{ClientUtils, I18n, UIStore}
 import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared.services.Language.{DE, EN}
-import pme123.form.shared.{BaseElement, DataType, ElementTexts, ExtraProperties}
+import pme123.form.shared.{BaseElement, ElementTexts, ExtraProperties}
 
 import scala.util.matching.Regex
 
@@ -43,7 +43,6 @@ trait MainView
           BaseElement(
             s"$link-ident",
             TEXTFIELD,
-            DataType.STRING,
             ElementTexts.label(Map(
               DE -> I18n(DE, s"view.$domain.ident"),
               EN -> I18n(EN, s"view.$domain.ident"),

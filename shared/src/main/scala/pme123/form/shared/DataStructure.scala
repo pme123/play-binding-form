@@ -34,7 +34,7 @@ object DataStructure {
 
 }
 
-case class DataObject(value: Map[String, DataStructure] = Map.empty)
+case class DataObject(value: Seq[(String, DataStructure)] = Seq.empty)
   extends DataStructure
 
 object DataObject {

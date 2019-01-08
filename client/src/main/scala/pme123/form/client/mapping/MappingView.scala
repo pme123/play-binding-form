@@ -126,7 +126,6 @@ private[client] object MappingView
       val uIFormElem = UIFormElem(BaseElement(
         MappingUtils.dataDropdownIdent(uiElem),
         DROPDOWN,
-        DataType.STRING,
         ElementTexts.placeholder(Map(DE -> "Gemappt zu ..", EN -> "Maps to ..")),
         elemEntries = ElementEntries(
           UIDataStore.dataValueIdents().map(ident => ElementEntry(ident))

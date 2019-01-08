@@ -7,6 +7,10 @@ import pme123.form.shared.ExtraPropValue.ExtraValue
 
 case class ExtraProperties(propValues: Seq[ExtraPropValue] = Nil) {
 
+  def propValue(extraProp: ExtraProp): Option[ExtraValue] =
+    propValues.find(_.extraProp == extraProp)
+      .map(_.value)
+
 }
 
 object ExtraProperties {
@@ -32,7 +36,7 @@ object ExtraProperties {
       ExtraProperties(Seq(
         ExtraPropValue(
           INPUT_TYPE, INPUT_TYPE.defaultValue
-        ),ExtraPropValue(
+        ), ExtraPropValue(
           SIZE, SIZE.defaultValue
         )))
   }

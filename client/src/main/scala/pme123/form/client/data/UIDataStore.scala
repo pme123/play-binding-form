@@ -3,6 +3,8 @@ package pme123.form.client.data
 import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.services.SemanticUI
+import pme123.form.shared.ElementType.{CHECKBOX, TEXTFIELD}
+import pme123.form.shared.ExtraProp.INPUT_TYPE
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
 
@@ -12,8 +14,11 @@ object UIDataStore extends Logging {
 
   def changeIdent(parent: Var[VarDataObject], oldIdent: String)(newIdent: String): Unit = {
     info(s"DataUIStore: changeIdent $newIdent")
-    val oldValue = parent.value.content(oldIdent)
-    parent.value = VarDataObject(parent.value.ident, (parent.value.content - oldIdent).updated(newIdent, oldValue))
+    parent.value = VarDataObject(parent.value.ident,
+      parent.value.content.foldLeft(List.empty[(String, Var[_ <: VarDataStructure])]) {
+        case (a, b) if b._1 == oldIdent => (newIdent, b._2) :: a
+        case (a, b) => b :: a
+      }.reverse)
     SemanticUI.initElements()
   }
 
@@ -43,20 +48,21 @@ object UIDataStore extends Logging {
     info(s"DataUIStore: changeStructureType $strTypeStr")
     val structureType = StructureType.withNameInsensitive(strTypeStr)
 
-    data.value = VarDataStructure(data.value.ident, DataStructure(structureType))
+    data.value = VarDataStructure.apply(data.value.ident, DataStructure(structureType))
     SemanticUI.initElements()
   }
 
   def addDataObject(parentDS: Var[VarDataObject]): Unit = {
     val parentContent = parentDS.value.content
     info(s"DataUIStore: addDataObject $parentContent".take(100))
-    parentDS.value = parentDS.value.modify(_.content).setTo(parentContent.updated(DataStructure.defaultKey, Var(VarDataValue())))
+    parentDS.value = parentDS.value.modify(_.content).setTo(
+      parentContent :+ (DataStructure.defaultKey -> Var(VarDataValue())))
     SemanticUI.initElements()
   }
 
   def deleteDataObject(dataIdent: String, parent: Var[UIDataStore.VarDataObject]): Unit = {
     info(s"DataUIStore: deleteDataObject $dataIdent")
-    parent.value = VarDataObject(parent.value.ident, parent.value.content - dataIdent)
+    parent.value = VarDataObject(parent.value.ident, parent.value.content.filter(_._1 == dataIdent))
     SemanticUI.initElements()
   }
 
@@ -70,7 +76,7 @@ object UIDataStore extends Logging {
 
   def dataValueIdents(): Seq[String] =
     dataValues()
-    .map(_.value.ident)
+      .map(_.value.ident)
 
   case class UIState(
                       identVar: Var[String],
@@ -102,6 +108,21 @@ object UIDataStore extends Logging {
   object VarDataContainer {
     def apply(identVar: Var[String], data: DataContainer): VarDataContainer =
       VarDataContainer(identVar, Var(VarDataObject.create(data.ident, data.structure.value)))
+
+    def apply(identVar: Var[String], form: FormContainer): VarDataContainer =
+      VarDataContainer(identVar,
+        Var(VarDataObject.create(identVar.value,
+          form.elems.filterNot(_.elementType.readOnly)
+            .map(el => (el.ident, el.elementType match {
+              case TEXTFIELD if el.extras.propValue(INPUT_TYPE).contains(InputType.NUMBER.key) =>
+                DataNumber(el.value.map(BigDecimal(_)).getOrElse(BigDecimal(0)))
+              case CHECKBOX =>
+                DataBoolean(el.value.exists(_.toBoolean))
+              case _ =>
+                DataString(el.value.getOrElse(""))
+            })
+            )
+        )))
   }
 
   sealed abstract class VarDataStructure {
@@ -125,24 +146,23 @@ object UIDataStore extends Logging {
     }
   }
 
-  case class VarDataObject(ident: String = DataStructure.defaultKey, content: Map[String, Var[VarDataStructure]] = Map.empty)
+  case class VarDataObject(ident: String = DataStructure.defaultKey, content: Seq[(String, Var[_ <: VarDataStructure])] = Seq.empty)
     extends VarDataStructure {
     val structureType: StructureType = StructureType.OBJECT
 
-    def toData: DataObject = DataObject(content.map { case (k, v) => k -> v.value.toData })
+    def toData: DataObject = DataObject(content.map { case (k, v) => (k, v.value.toData) })
 
     override def findValues(): Seq[Var[VarDataValue]] =
-      content.values
-      .filter((vdv: Var[VarDataStructure]) => vdv.value.isInstanceOf[VarDataValue])
-      .map(_.asInstanceOf[Var[VarDataValue]])
-      .toSeq
+      content
+        .filter { case (_, vdv) => vdv.value.isInstanceOf[VarDataValue] }
+        .map(_._2.asInstanceOf[Var[VarDataValue]])
 
   }
 
   object VarDataObject {
-    def create(ident: String, content: Map[String, DataStructure]): VarDataObject = {
-      val map = content.map(entry => (entry._1, Var(VarDataStructure(entry._1, entry._2))))
-      VarDataObject(ident, map)
+    def create(ident: String, content: Seq[(String, DataStructure)]): VarDataObject = {
+      val seq = content.map(entry => (entry._1, Var(VarDataStructure(entry._1, entry._2))))
+      VarDataObject(ident, seq)
     }
   }
 

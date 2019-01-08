@@ -60,7 +60,6 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "elementTypeId",
         DROPDOWN,
-        DataType.STRING,
         ElementTexts(
           Some(ElementText.label(Map(DE -> "Element Typ", EN -> "Element Type"))),
           None,
@@ -96,7 +95,6 @@ case object PropertiesTab {
         UIFormElem(BaseElement(
           "elemIdent",
           TEXTFIELD,
-          DataType.STRING,
           ElementTexts(
             Some(ElementText.label(Map(DE -> "Identität", EN -> "Identity"))),
             Some(ElementText.placeholder(Map(DE -> "Identität", EN -> "Identity"))),
@@ -129,7 +127,6 @@ case object PropertiesTab {
         UIFormElem(BaseElement(
           "elemDefaultValue",
           TEXTFIELD,
-          DataType.STRING,
           ElementTexts(
             Some(ElementText.label(Map(DE -> "Standart Wert", EN -> "Default Value"))),
             Some(ElementText.placeholder(Map(DE -> "Standart Wert", EN -> "Default Value"))),
@@ -157,7 +154,6 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "layoutWideId",
         DROPDOWN,
-        DataType.STRING,
         ElementTexts(
           Some(ElementText.label(Map(DE -> "Layout Breite", EN -> "Layout Wide"))),
           None,
@@ -188,7 +184,6 @@ case object PropertiesTab {
       UIFormElem(BaseElement(
         "requiredId",
         CHECKBOX,
-        DataType.BOOLEAN,
         ElementTexts(
           Some(ElementText.label(Map(DE -> "Obligatorisch", EN -> "Required"))),
           None,
@@ -220,7 +215,6 @@ case object PropertiesTab {
         UIFormElem(BaseElement(
           "inlineId",
           CHECKBOX,
-          DataType.BOOLEAN,
           ElementTexts(
             Some(ElementText.label(Map(DE -> "Inline", EN -> "Inline"))),
             None,
@@ -253,7 +247,6 @@ case object PropertiesTab {
         UIFormElem(BaseElement(
           "readOnlyId",
           CHECKBOX,
-          DataType.BOOLEAN,
           ElementTexts(
             Some(ElementText.label(Map(DE -> "Read only", EN -> "Read only"))),
             None,
@@ -334,7 +327,6 @@ case object TextsTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$textType",
         TEXTFIELD,
-        DataType.STRING,
         ElementTexts.label(I18n(lang.i18nKey)),
         value = Some(text),
         extras = ExtraProperties(TEXTFIELD)
@@ -420,7 +412,6 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"field_ident_$ident",
         TEXTFIELD,
-        DataType.STRING,
         ElementTexts.placeholder(I18n("props.ident")),
         value = Some(key),
         extras = ExtraProperties(TEXTFIELD),
@@ -442,7 +433,6 @@ case object EntriesTab {
       UIFormElem(BaseElement(
         s"${lang.abbreviation}-$ident",
         TEXTFIELD,
-        DataType.STRING,
         ElementTexts.label(I18n(lang.i18nKey)),
         value = Some(text),
         extras = ExtraProperties(TEXTFIELD),
@@ -479,7 +469,6 @@ case object ValidationsTab {
         UIFormElem(BaseElement(
           s"enable-${vRule.validationType}",
           CHECKBOX,
-          DataType.BOOLEAN,
           ElementTexts.label(I18n(vRule.validationType.i18nKey)),
           value = Some(enabled.toString),
           extras = ExtraProperties(TEXTFIELD),
@@ -534,7 +523,6 @@ case object ValidationsTab {
         UIFormElem(BaseElement(
           s"$param-${valType.key}",
           TEXTFIELD,
-          DataType.STRING,
           ElementTexts.label(I18n(valType.i18nKey(param))),
           value = Some(paramValue.toString),
           inline = true,

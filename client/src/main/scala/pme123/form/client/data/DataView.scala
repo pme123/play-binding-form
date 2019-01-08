@@ -5,10 +5,9 @@ import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore._
-import pme123.form.client.form.UIFormElem
+import pme123.form.client.form.{FormPreviewView, UIFormElem, UIFormStore}
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
-import pme123.form.shared.DataType.STRING
 import pme123.form.shared.ElementType.{CHECKBOX, DROPDOWN, TEXTFIELD}
 import pme123.form.shared._
 import pme123.form.shared.services.Language.{DE, EN}
@@ -72,9 +71,17 @@ private[client] object DataView
       &nbsp;
       &nbsp;
       <button class="ui circular icon button"
+              data:data-tooltip="Create Data from Form"
+              onclick={_: Event =>
+                DataUtils.createData(UIFormStore.uiState.form.value.toForm)}>
+        <i class={s"${FormPreviewView.icon} icon"}></i>
+      </button>
+      &nbsp;
+      &nbsp;
+      <button class="ui circular icon button"
               data:data-tooltip="Export Data as JSON"
               onclick={_: Event =>
-                DataExporter.exportData()}>
+                DataUtils.exportData()}>
         <i class="sign-out icon"></i>
       </button>
       &nbsp;
@@ -108,7 +115,7 @@ private[client] object DataView
   }
 
   @dom
-  private def dataStructureContent(ident: String, data: Var[VarDataStructure], parent: Var[VarDataObject]): Binding[HTMLElement] = {
+  private def dataStructureContent(ident: String, data: Var[_ <: VarDataStructure], parent: Var[VarDataObject]): Binding[HTMLElement] = {
     val _ = data.bind
     <div class="ui grid content">
       {identDiv(ident, parent).bind}{//
@@ -117,7 +124,7 @@ private[client] object DataView
     </div>
   }
 
-  private def dataContent(data: Var[VarDataStructure], parent: Var[VarDataObject]) = {
+  private def dataContent(data: Var[_ <: VarDataStructure], parent: Var[VarDataObject]) = {
     data.value match {
       case VarDataValue(ident, StructureType.STRING, content) =>
         dataStringContent(ident, content)
@@ -138,7 +145,6 @@ private[client] object DataView
         BaseElement(
           s"ds-value-$ident",
           TEXTFIELD,
-          STRING,
           ElementTexts.label(Map(EN -> "String value", DE -> "Text")),
           value = Some(data.value),
           extras = ExtraProperties(TEXTFIELD),
@@ -160,7 +166,6 @@ private[client] object DataView
         BaseElement(
           s"ds-value-$ident",
           TEXTFIELD,
-          STRING,
           ElementTexts.label(Map(EN -> "Number value", DE -> "Nummer")),
           value = Some(data.value.toString),
           extras = ExtraProperties(TEXTFIELD),
@@ -181,7 +186,6 @@ private[client] object DataView
         BaseElement(
           s"ds-value-$ident",
           CHECKBOX,
-          STRING,
           ElementTexts.label(Map(EN -> "Boolean value", DE -> "Ja / Nein")),
           value = Some(data.value.toString),
           extras = ExtraProperties(CHECKBOX),
@@ -202,7 +206,6 @@ private[client] object DataView
         BaseElement(
           s"ds-ident-$ident",
           TEXTFIELD,
-          STRING,
           ElementTexts.label(Map(EN -> "Ident", DE -> "Ident")),
           value = Some(ident),
           extras = ExtraProperties(TEXTFIELD),
@@ -216,14 +219,13 @@ private[client] object DataView
   }
 
   @dom
-  private def structureTypeDiv(ident: String, data: Var[VarDataStructure]): Binding[HTMLElement] = {
+  private def structureTypeDiv(ident: String, data: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
     <div class="five wide column">
       {//
       BaseElementDiv(
         UIFormElem(BaseElement(
           s"ds-type-$ident",
           DROPDOWN,
-          DataType.STRING,
           ElementTexts.label(Map(DE -> "Struktur Typ", EN -> "Structure Type")),
           elemEntries = ElementEntries(
             StructureType.values.map(enum => ElementEntry(enum.entryName, ElementText.label(I18n(enum.i18nKey))))
@@ -232,7 +234,7 @@ private[client] object DataView
           value = Some(data.value.structureType.entryName)
         ),
           changeEvent = Some(
-            UIDataStore.changeStructureType(data)
+            UIDataStore.changeStructureType(data.asInstanceOf[Var[VarDataStructure]])
           ),
         )
       ).bind}

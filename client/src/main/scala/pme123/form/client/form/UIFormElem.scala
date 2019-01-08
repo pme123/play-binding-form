@@ -10,7 +10,6 @@ import pme123.form.shared._
 case class UIFormElem(
                        identVar: Var[String],
                        elementTypeVar: Var[ElementType],
-                       dataTypeVar: Var[DataType],
                        textsVar: Var[UIElementTexts],
                        extrasVar: Var[UIExtraProperties],
                        valueVar: Var[Option[String]],
@@ -28,7 +27,6 @@ case class UIFormElem(
   def toBaseElement: BaseElement = BaseElement(
     identVar.value,
     elementTypeVar.value,
-    dataTypeVar.value,
     textsVar.value.toTexts,
     extrasVar.value.toExtraProperties,
     valueVar.value,
@@ -56,7 +54,6 @@ object UIFormElem {
     UIFormElem(
       Var(elem.ident),
       Var(elem.elementType),
-      Var(elem.dataType),
       Var(UIElementTexts(elem.texts)),
       Var(UIExtraProperties(elem.extras)),
       Var(elem.value),

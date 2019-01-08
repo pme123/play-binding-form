@@ -1,6 +1,8 @@
 package pme123.form.shared
 
 import play.api.libs.json.{Json, OFormat}
+import pme123.form.shared.ElementType.{CHECKBOX, TEXTFIELD}
+import pme123.form.shared.ExtraProp.INPUT_TYPE
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.services.Language
 
@@ -8,7 +10,6 @@ import scala.util.Random
 
 case class BaseElement(ident: String,
                        elementType: ElementType,
-                       dataType: DataType,
                        texts: ElementTexts,
                        extras: ExtraProperties,
                        value: Option[String] = Some(""),
@@ -19,8 +20,7 @@ case class BaseElement(ident: String,
                        elemEntries: ElementEntries = ElementEntries(),
                        validations: Validations = Validations(),
                       ) {
-
-  lazy val inlineClass: String = if(inline) "inline" else ""
+  lazy val inlineClass: String = if (inline) "inline" else ""
 
 }
 
@@ -33,7 +33,6 @@ object BaseElement {
     BaseElement(
       ident(elementType),
       elementType,
-      DataTypes.defaultDataType(elementType),
       readOnly = elementType.readOnly,
       texts = ElementTexts(elementType),
       extras = ExtraProperties(elementType),

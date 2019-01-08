@@ -35,7 +35,6 @@ object BaseElementExtras {
         CLEARABLE, UIFormElem(
           BaseElement(CLEARABLE.entryName,
             CHECKBOX,
-            DataType.BOOLEAN,
             texts = ElementTexts(
               Some(ElementText.label(Map(DE -> "Wert löschen", EN -> "Clearable"))),
               None,
@@ -57,7 +56,6 @@ object BaseElementExtras {
       Seq(UIExtraPropValue(
         INPUT_TYPE, UIFormElem(BaseElement(INPUT_TYPE.entryName,
           DROPDOWN,
-          DataType.STRING,
           texts = ElementTexts(
             Some(ElementText.label(Map(DE -> "Input Typ", EN -> "Input Type"))),
             None,
@@ -84,7 +82,6 @@ object BaseElementExtras {
       Seq(UIExtraPropValue(
         CHECKBOX_TYPE, UIFormElem(BaseElement(CHECKBOX_TYPE.entryName,
           DROPDOWN,
-          DataType.STRING,
           texts = ElementTexts(
             Some(ElementText.label(Map(DE -> "Art", EN -> "Type"))),
             None,
@@ -109,7 +106,6 @@ object BaseElementExtras {
         SIZE_CLASS,
         UIFormElem(BaseElement(SIZE_CLASS.entryName,
           DROPDOWN,
-          DataType.STRING,
           texts = ElementTexts(
             Some(ElementText(LABEL, Map(DE -> "Grösse", EN -> "Size"))),
             None,

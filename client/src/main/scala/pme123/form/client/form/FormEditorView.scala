@@ -55,7 +55,7 @@ private[client] object FormEditorView
   @dom
   private def element(uiElemVar: Var[UIFormElem]): Binding[HTMLElement] = {
     val uiElem = uiElemVar.bind
-    val elemType = uiElem.elementTypeVar.bind
+    uiElem.elementTypeVar.watch()
     val uiSelElem = UIElemEntriesStore.uiState.selectedElement.bind
     val layoutWide = uiElem.layoutWideVar.bind
     val wideClass: String = layoutWide.entryName.toLowerCase
