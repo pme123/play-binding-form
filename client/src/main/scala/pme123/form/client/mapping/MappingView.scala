@@ -144,9 +144,9 @@ private[client] object MappingView
         DROPDOWN,
         ElementTexts.placeholder(Map(DE -> "Gemappt zu ..", EN -> "Maps to ..")),
         elemEntries = ElementEntries(
-          UIDataStore.dataValueIdents().map(ident => ElementEntry(ident))
+          UIDataStore.dataIdents.map(ident => ElementEntry(ident))
         ),
-        value = varDataValue.map(_.ident),
+        value = varDataValue.map(_.identVar.value),
         extras = ExtraProperties(DROPDOWN),
       ),
         Some(str =>

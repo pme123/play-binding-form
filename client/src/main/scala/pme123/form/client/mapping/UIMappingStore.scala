@@ -125,7 +125,7 @@ object UIMappingStore extends Logging {
             val dataValue =
               data.findValues()
                 .map(_.value)
-                .find(_.ident == ue.value.identVar.value)
+                .find(_.identVar == ue.value.identVar.value)
             UIMappingEntry(ue, Var(dataValue))
           }.map(Var(_))
     }
@@ -148,7 +148,7 @@ object UIMappingStore extends Logging {
     def toMapping: MappingEntry = {
       MappingEntry(
         uiFormElem.value.identVar.value,
-        varDataValue.value.map(_.ident),
+        varDataValue.value.map(_.identVar.value),
       )
     }
   }

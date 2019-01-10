@@ -1,6 +1,5 @@
 package pme123.form.client.data
 
-import com.softwaremill.quicklens._
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared.ElementType.{CHECKBOX, TEXTFIELD}
@@ -14,11 +13,11 @@ object UIDataStore extends Logging {
 
   def changeIdent(parent: Var[VarDataObject], oldIdent: String)(newIdent: String): Unit = {
     info(s"DataUIStore: changeIdent $newIdent")
-    parent.value = VarDataObject(parent.value.ident,
-      parent.value.content.foldLeft(List.empty[(String, Var[_ <: VarDataStructure])]) {
+    parent.value.content.value ++=
+      parent.value.content.value.foldLeft(List.empty[(String, Var[_ <: VarDataStructure])]) {
         case (a, b) if b._1 == oldIdent => (newIdent, b._2) :: a
         case (a, b) => b :: a
-      }.reverse)
+      }.reverse
     SemanticUI.initElements()
   }
 
@@ -38,49 +37,38 @@ object UIDataStore extends Logging {
     uiState.data
   }
 
-  def changeDataIdent(ident: String): Unit = {
-    info(s"DataUIStore: changeDataIdent $ident")
-    uiState.data.value.identVar.value = ident
-    SemanticUI.initElements()
-  }
-
   def changeStructureType(data: Var[VarDataStructure])(strTypeStr: String): Unit = {
     info(s"DataUIStore: changeStructureType $strTypeStr")
     val structureType = StructureType.withNameInsensitive(strTypeStr)
 
-    data.value = VarDataStructure.apply(data.value.ident, DataStructure(structureType))
+    data.value = VarDataStructure.apply(data.value.identVar, DataStructure(structureType))
     SemanticUI.initElements()
   }
 
   def addDataObject(parentDS: Var[VarDataObject]): Unit = {
     val parentContent = parentDS.value.content
     info(s"DataUIStore: addDataObject $parentContent".take(100))
-    parentDS.value = parentDS.value.modify(_.content).setTo(
-      parentContent :+ (DataStructure.defaultKey -> Var(VarDataValue())))
+    parentDS.value.content.value += (DataStructure.defaultKey -> Var(VarDataValue()))
     SemanticUI.initElements()
   }
 
   def deleteDataObject(dataIdent: String, parent: Var[UIDataStore.VarDataObject]): Unit = {
-    info(s"DataUIStore: deleteDataObject $dataIdent")
-    parent.value = VarDataObject(parent.value.ident, parent.value.content.filter(_._1 == dataIdent))
+    info(s"DataUIStore: deleteDataObject $dataIdent " + parent.value.content)
+    parent.value.content.value -= parent.value.content.value.filterNot(_._1 == dataIdent).head
     SemanticUI.initElements()
   }
 
   def dataValue(searchIdent: String): Option[Var[VarDataValue]] =
     dataValues()
-      .find(_.value.ident == searchIdent)
+      .find(_.value.identVar.value == searchIdent)
 
   def dataIdents: Seq[String] =
     dataValues()
-      .map(_.value.ident)
+      .map(_.value.identVar.value)
 
   def dataValues(): Seq[Var[VarDataValue]] =
     uiState.data.value
       .findValues()
-
-  def dataValueIdents(): Seq[String] =
-    dataValues()
-      .map(_.value.ident)
 
   case class UIState(
                       identVar: Var[String],
@@ -111,11 +99,11 @@ object UIDataStore extends Logging {
 
   object VarDataContainer {
     def apply(identVar: Var[String], data: DataContainer): VarDataContainer =
-      VarDataContainer(identVar, Var(VarDataObject.create(data.ident, data.structure.value)))
+      VarDataContainer(identVar, Var(VarDataObject.create(identVar, data.structure.value)))
 
     def apply(identVar: Var[String], form: FormContainer): VarDataContainer =
       VarDataContainer(identVar,
-        Var(VarDataObject.create(identVar.value,
+        Var(VarDataObject.create(identVar,
           form.elems.filterNot(_.elementType.readOnly)
             .map(el => (el.ident, el.elementType match {
               case TEXTFIELD if el.extras.propValue(INPUT_TYPE).contains(InputType.NUMBER.key) =>
@@ -131,7 +119,7 @@ object UIDataStore extends Logging {
 
   sealed abstract class VarDataStructure {
 
-    def ident: String
+    def identVar: Var[String]
 
     def structureType: StructureType
 
@@ -142,35 +130,35 @@ object UIDataStore extends Logging {
   }
 
   object VarDataStructure {
-    def apply(ident: String, ds: DataStructure): VarDataStructure = ds match {
-      case DataBoolean(value) => VarDataValue(ident, StructureType.BOOLEAN, Var(value.toString))
-      case DataString(value) => VarDataValue(ident, StructureType.STRING, Var(value))
-      case DataNumber(value) => VarDataValue(ident, StructureType.NUMBER, Var(value.toString))
-      case DataObject(value) => VarDataObject.create(ident, value)
+    def apply(identVar: Var[String], ds: DataStructure): VarDataStructure = ds match {
+      case DataBoolean(value) => VarDataValue(identVar, StructureType.BOOLEAN, Var(value.toString))
+      case DataString(value) => VarDataValue(identVar, StructureType.STRING, Var(value))
+      case DataNumber(value) => VarDataValue(identVar, StructureType.NUMBER, Var(value.toString))
+      case DataObject(value) => VarDataObject.create(identVar, value)
     }
   }
 
-  case class VarDataObject(ident: String = DataStructure.defaultKey, content: Seq[(String, Var[_ <: VarDataStructure])] = Seq.empty)
+  case class VarDataObject(identVar: Var[String] = Var(DataStructure.defaultKey), content: Vars[(String, Var[_ <: VarDataStructure])] = Vars.empty)
     extends VarDataStructure {
     val structureType: StructureType = StructureType.OBJECT
 
-    def toData: DataObject = DataObject(content.map { case (k, v) => (k, v.value.toData) })
+    def toData: DataObject = DataObject(content.value.map { case (k, v) => (k, v.value.toData) })
 
     override def findValues(): Seq[Var[VarDataValue]] =
-      content
+      content.value
         .filter { case (_, vdv) => vdv.value.isInstanceOf[VarDataValue] }
         .map(_._2.asInstanceOf[Var[VarDataValue]])
 
   }
 
   object VarDataObject {
-    def create(ident: String, content: Seq[(String, DataStructure)]): VarDataObject = {
-      val seq = content.map(entry => (entry._1, Var(VarDataStructure(entry._1, entry._2))))
-      VarDataObject(ident, seq)
+    def create(identVar: Var[String], content: Seq[(String, DataStructure)]): VarDataObject = {
+      val seq = content.map(entry => (entry._1, Var(VarDataStructure(Var(entry._1), entry._2))))
+      VarDataObject(identVar, Vars(seq: _*))
     }
   }
 
-  case class VarDataValue(ident: String, structureType: StructureType, content: Var[String] = Var(""))
+  case class VarDataValue(identVar: Var[String], structureType: StructureType, content: Var[String] = Var(""))
     extends VarDataStructure {
 
     def toData: DataStructure = structureType match {
@@ -183,7 +171,7 @@ object UIDataStore extends Logging {
   }
 
   object VarDataValue {
-    def apply(): VarDataValue = new VarDataValue(DataStructure.defaultKey, StructureType.STRING, Var(""))
+    def apply(): VarDataValue = new VarDataValue(Var(DataStructure.defaultKey), StructureType.STRING, Var(""))
   }
 
 }

@@ -16,7 +16,8 @@ import pme123.form.shared.services.Language
 sealed abstract class BaseElementDiv {
 
   protected def changeEvent(inputAttr: InputAttr): Unit = {
-    changeEvent(inputAttr, jQuery(s"#${inputAttr.ident}").value().toString)
+    val query = jQuery(s"#${inputAttr.ident}")
+    changeEvent(inputAttr, query.value().toString)
   }
 
   protected def changeEvent(inputAttr: InputAttr, newValue: String): Unit = {

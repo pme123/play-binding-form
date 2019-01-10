@@ -1,6 +1,6 @@
 package pme123.form.client.data
 
-import com.thoughtworks.binding.Binding.{Constants, Var}
+import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
 import pme123.form.client._
@@ -30,7 +30,8 @@ private[client] object DataView
       {//
       header(
         UIDataStore.uiState.data.value.identVar,
-        Some(UIDataStore.changeDataIdent),
+        Some(str =>
+          UIDataStore.uiState.identVar.value = str),
         uploadButton,
         headerButtons).bind //
       }<div class="ui form">
@@ -99,27 +100,28 @@ private[client] object DataView
   private lazy val dataContent: Binding[HTMLElement] = {
     val ds = UIDataStore.uiState.data.bind
     <div class="ui cards">
-      {dataObjectContent(ds.identVar.value, ds.structure, None).bind}
+      {dataObjectContent(ds.structure, None).bind}
     </div>
   }
 
   @dom
-  private def dataObjectContent(ident: String, data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
+  private def dataObjectContent(data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
     <div class="ui fluid card">
       {//
       val obj = data.bind
-      Constants(obj.content.map { case (i, content) => dataStructureContent(i, content, data) }.toSeq: _*).map(_.bind)}<div class="extra content">
-      {objectButtons(ident, data, parent).bind}
+      for((_, content) <- obj.content) yield dataStructureContent(content, data).bind
+      }<div class="extra content">
+      {objectButtons(data, parent).bind}
     </div>
     </div>
   }
 
   @dom
-  private def dataStructureContent(ident: String, data: Var[_ <: VarDataStructure], parent: Var[VarDataObject]): Binding[HTMLElement] = {
-    val _ = data.bind
+  private def dataStructureContent(data: Var[_ <: VarDataStructure], parent: Var[VarDataObject]): Binding[HTMLElement] = {
+    val d = data.bind
     <div class="ui grid content">
-      {identDiv(ident, parent).bind}{//
-      structureTypeDiv(ident, data).bind}{//
+      {identDiv(d.identVar, parent).bind}{//
+      structureTypeDiv(data).bind}{//
       dataContent(data, parent).bind}
     </div>
   }
@@ -133,12 +135,13 @@ private[client] object DataView
       case VarDataValue(ident, StructureType.BOOLEAN, content) =>
         dataBooleanContent(ident, content)
       case VarDataObject(ident, _) =>
-        dataObjectContent(ident, data.asInstanceOf[Var[VarDataObject]], Some(parent))
+        dataObjectContent(data.asInstanceOf[Var[VarDataObject]], Some(parent))
     }
   }
 
   @dom
-  private def dataStringContent(ident: String, data: Var[String]): Binding[HTMLElement] = {
+  private def dataStringContent(identVar: Var[String], data: Var[String]): Binding[HTMLElement] = {
+    val ident = identVar.bind
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -159,7 +162,8 @@ private[client] object DataView
   }
 
   @dom
-  private def dataNumberContent(ident: String, data: Var[String]): Binding[HTMLElement] = {
+  private def dataNumberContent(identVar: Var[String], data: Var[String]): Binding[HTMLElement] = {
+    val ident = identVar.bind
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -179,7 +183,8 @@ private[client] object DataView
   }
 
   @dom
-  private def dataBooleanContent(ident: String, data: Var[String]): Binding[HTMLElement] = {
+  private def dataBooleanContent(identVar: Var[String], data: Var[String]): Binding[HTMLElement] = {
+    val ident = identVar.bind
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -199,7 +204,8 @@ private[client] object DataView
   }
 
   @dom
-  private def identDiv(ident: String, parent: Var[VarDataObject]): Binding[HTMLElement] = {
+  private def identDiv(identVar: Var[String], parent: Var[VarDataObject]): Binding[HTMLElement] = {
+    val ident = identVar.bind
     <div class="six wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -210,8 +216,8 @@ private[client] object DataView
           value = Some(ident),
           extras = ExtraProperties(TEXTFIELD),
           required = true,
-        ), changeEvent = Some(
-          UIDataStore.changeIdent(parent, ident)
+        ), changeEvent = Some(str =>
+          identVar.value = str
         ),
       )
     ).bind}
@@ -219,12 +225,12 @@ private[client] object DataView
   }
 
   @dom
-  private def structureTypeDiv(ident: String, data: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
+  private def structureTypeDiv(data: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
     <div class="five wide column">
       {//
       BaseElementDiv(
         UIFormElem(BaseElement(
-          s"ds-type-$ident",
+          s"ds-type-${data.value.identVar.value}",
           DROPDOWN,
           ElementTexts.label(Map(DE -> "Struktur Typ", EN -> "Structure Type")),
           elemEntries = ElementEntries(
@@ -242,7 +248,7 @@ private[client] object DataView
   }
 
   @dom
-  private def objectButtons(ident: String, data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
+  private def objectButtons( data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
     <div class="five wide column">
       <div class="right floated">
 
@@ -256,7 +262,7 @@ private[client] object DataView
           <button class="mini ui circular red icon button"
                   data:data-tooltip="Delete Data Object"
                   onclick={_: Event =>
-                    UIDataStore.deleteDataObject(ident, parent.get)}>
+                    UIDataStore.deleteDataObject(data.value.identVar.value, parent.get)}>
             <i class="trash icon"></i>
           </button>
         else
