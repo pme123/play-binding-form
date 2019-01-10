@@ -2,11 +2,12 @@ package pme123.form.client.form
 
 import com.thoughtworks.binding.Binding.Var
 import org.scalajs.dom.window
-import play.api.libs.json.Json
+import play.api.libs.json.{JsPath, Json}
 import pme123.form.client.services.I18n
 import pme123.form.shared.services.Language
 import pme123.form.shared.{FormContainer, SemanticField, SemanticRule}
 import pme123.form.shared.services.SPAExtensions.StringPos
+import play.api.libs.functional.syntax._
 
 object FormUtils {
 

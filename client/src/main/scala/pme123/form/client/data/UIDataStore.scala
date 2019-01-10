@@ -52,9 +52,9 @@ object UIDataStore extends Logging {
     SemanticUI.initElements()
   }
 
-  def deleteDataObject(dataIdent: String, parent: Var[UIDataStore.VarDataObject]): Unit = {
-    info(s"DataUIStore: deleteDataObject $dataIdent " + parent.value.content)
-    parent.value.content.value -= parent.value.content.value.filterNot(_._1 == dataIdent).head
+  def deleteDataObject(dataIdent: String, contentVar: Vars[(String, Var[_ <: VarDataStructure])]): Unit = {
+    info(s"DataUIStore: deleteDataObject $dataIdent from Parent")
+    contentVar.value -= contentVar.value.filterNot(_._1 == dataIdent).head
     SemanticUI.initElements()
   }
 

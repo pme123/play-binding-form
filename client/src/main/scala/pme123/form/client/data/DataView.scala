@@ -1,6 +1,6 @@
 package pme123.form.client.data
 
-import com.thoughtworks.binding.Binding.Var
+import com.thoughtworks.binding.Binding.{Var, Vars}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
 import pme123.form.client._
@@ -34,7 +34,7 @@ private[client] object DataView
           UIDataStore.uiState.identVar.value = str),
         uploadButton,
         headerButtons).bind //
-      }<div class="ui form">
+      }<div class="ui form data-view">
       {//
       submitFormDiv.bind}{//
       persistDataDiv.bind}{//
@@ -100,33 +100,34 @@ private[client] object DataView
   private lazy val dataContent: Binding[HTMLElement] = {
     val ds = UIDataStore.uiState.data.bind
     <div class="ui cards">
-      {dataObjectContent(ds.structure, None).bind}
+      <div class="ui fluid card">
+        {dataStructureContent(ds.structure, None).bind}
+      </div>
     </div>
   }
 
   @dom
-  private def dataObjectContent(data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
+  private def dataObjectContent(data: Var[VarDataObject]): Binding[HTMLElement] = {
     <div class="ui fluid card">
       {//
       val obj = data.bind
-      for((_, content) <- obj.content) yield dataStructureContent(content, data).bind
-      }<div class="extra content">
-      {objectButtons(data, parent).bind}
-    </div>
+      for ((_, content) <- obj.content) yield dataStructureContent(content, Some(obj.content)).bind}
     </div>
   }
 
   @dom
-  private def dataStructureContent(data: Var[_ <: VarDataStructure], parent: Var[VarDataObject]): Binding[HTMLElement] = {
+  private def dataStructureContent(data: Var[_ <: VarDataStructure], parentContent: Option[Vars[(String, Var[_ <: VarDataStructure])]]): Binding[HTMLElement] = {
     val d = data.bind
-    <div class="ui grid content">
-      {identDiv(d.identVar, parent).bind}{//
+    <div draggable={parentContent.nonEmpty} class="ui grid content">
+      {//
+      buttons(data, parentContent).bind}{//
+      identDiv(d.identVar).bind}{//
       structureTypeDiv(data).bind}{//
-      dataContent(data, parent).bind}
+      dataContent(data).bind}
     </div>
   }
 
-  private def dataContent(data: Var[_ <: VarDataStructure], parent: Var[VarDataObject]) = {
+  private def dataContent(data: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
     data.value match {
       case VarDataValue(ident, StructureType.STRING, content) =>
         dataStringContent(ident, content)
@@ -134,8 +135,8 @@ private[client] object DataView
         dataNumberContent(ident, content)
       case VarDataValue(ident, StructureType.BOOLEAN, content) =>
         dataBooleanContent(ident, content)
-      case VarDataObject(ident, _) =>
-        dataObjectContent(data.asInstanceOf[Var[VarDataObject]], Some(parent))
+      case _: VarDataObject =>
+        dataObjectContent(data.asInstanceOf[Var[VarDataObject]])
     }
   }
 
@@ -204,9 +205,9 @@ private[client] object DataView
   }
 
   @dom
-  private def identDiv(identVar: Var[String], parent: Var[VarDataObject]): Binding[HTMLElement] = {
+  private def identDiv(identVar: Var[String]): Binding[HTMLElement] = {
     val ident = identVar.bind
-    <div class="six wide column">
+    <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
         BaseElement(
@@ -248,27 +249,38 @@ private[client] object DataView
   }
 
   @dom
-  private def objectButtons( data: Var[VarDataObject], parent: Option[Var[VarDataObject]]): Binding[HTMLElement] = {
-    <div class="five wide column">
-      <div class="right floated">
-
-        <button class="mini ui circular blue icon button"
-                data:data-tooltip="Add Data Object"
-                onclick={_: Event =>
-                  UIDataStore.addDataObject(data)}>
-          <i class="add icon"></i>
-        </button>{//
-        if (parent.nonEmpty)
-          <button class="mini ui circular red icon button"
-                  data:data-tooltip="Delete Data Object"
-                  onclick={_: Event =>
-                    UIDataStore.deleteDataObject(data.value.identVar.value, parent.get)}>
-            <i class="trash icon"></i>
-          </button>
-        else
-            <span/>}
-      </div>
+  private def buttons(data: Var[_ <: VarDataStructure], parentContent: Option[Vars[(String, Var[_ <: VarDataStructure])]]): Binding[HTMLElement] = {
+    <div class="one wide column">
+      {addButton(data).bind}{//
+      deleteButton(data, parentContent).bind}
     </div>
+  }
+
+  @dom
+  private def addButton(parentVar: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
+    val data = parentVar.bind
+    if (data.structureType == StructureType.OBJECT)
+      <button class="mini ui circular blue icon button"
+              data:data-tooltip="Add Data Object"
+              onclick={_: Event =>
+                UIDataStore.addDataObject(parentVar.asInstanceOf[Var[VarDataObject]])}>
+        <i class="add icon"></i>
+      </button> else
+        <span/>
+  }
+
+  @dom
+  private def deleteButton(dataVar: Var[_ <: VarDataStructure], parentContent: Option[Vars[(String, Var[_ <: VarDataStructure])]]): Binding[HTMLElement] = {
+    val data = dataVar.bind
+    if (parentContent.nonEmpty)
+      <button class="mini ui circular red icon button"
+              data:data-tooltip="Delete Data Object"
+              onclick={_: Event =>
+                UIDataStore.deleteDataObject(data.identVar.value, parentContent.get)}>
+        <i class="trash icon"></i>
+      </button>
+    else
+        <span/>
   }
 
   @dom
