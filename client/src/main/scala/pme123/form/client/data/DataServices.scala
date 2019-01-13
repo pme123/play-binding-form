@@ -5,7 +5,7 @@ import org.scalajs.dom.FormData
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.raw.HTMLElement
 import pme123.form.client.services.HttpServices
-import pme123.form.shared.DataContainer
+import pme123.form.shared.DataObject
 
 /**
   * Created by pascal.mengelt on 16.07.2017.
@@ -13,10 +13,10 @@ import pme123.form.shared.DataContainer
 object DataServices
   extends HttpServices {
 
-  def persistData(dataContainer: DataContainer): Binding[HTMLElement] = {
+  def persistData(dataContainer: DataObject): Binding[HTMLElement] = {
     val path = s"$apiPath/data"
 
-    httpPost(path, dataContainer, (_: DataContainer) => () // nothing to do
+    httpPost(path, dataContainer, (_: DataObject) => () // nothing to do
     )
   }
 
@@ -29,14 +29,14 @@ object DataServices
   def getData(ident: String): Binding[HTMLElement] = {
     val path = s"$apiPath/data/$ident"
 
-    httpGet(path, (data: DataContainer) => UIDataStore.changeData(data))
+    httpGet(path, (data: DataObject) => UIDataStore.changeData(data))
   }
 
   def submitForm(form: FormData): Binding[HTMLElement] = {
     val path = s"$apiPath/data/import"
 
     callService(path, Ajax.post(path, form),
-      (dc: DataContainer) => UIDataStore.changeData(dc))
+      (dc: DataObject) => UIDataStore.changeData(dc))
   }
 
 

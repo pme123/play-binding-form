@@ -23,6 +23,7 @@ object UIFormElemDragDrop {
   }
 
   def drop(moveToElemVar: Var[UIFormElem])(ev: DragEvent): Unit = {
+    println("DROPPED")
     ev.preventDefault
     dragObject.value
       .foreach(UIFormStore.moveElement(_, moveToElemVar))

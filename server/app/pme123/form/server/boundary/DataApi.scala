@@ -27,7 +27,7 @@ class DataApi @Inject()(dataDBRepo: DataDBRepo,
 
   def persistData(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     request.body.asText.map { body =>
-      Json.parse(body).validate[DataContainer] match {
+      Json.parse(body).validate[DataObject] match {
         case JsSuccess(data, _) =>
           dataDBRepo.persist(data)
             .map(data =>
@@ -51,7 +51,7 @@ class DataApi @Inject()(dataDBRepo: DataDBRepo,
   def importDataStructure(): Action[AnyContent] = Action.async { implicit request =>
     Future(
       extractFile(request)
-        .getOrElse(DataContainer()))
+        .getOrElse(DataObject()))
       .map(ds =>
         Ok(Json.toJson(ds)).as(JSON)
       )
@@ -67,7 +67,7 @@ class DataApi @Inject()(dataDBRepo: DataDBRepo,
             else {
               val lines = Files.readAllLines(file.ref.path).asScala
               Some(
-                Json.parse(lines.mkString("\n")).validate[DataContainer] match {
+                Json.parse(lines.mkString("\n")).validate[DataObject] match {
                   case JsSuccess(ds, _) => ds
                   case err: JsError => throw JsonParseException(err)
                 }

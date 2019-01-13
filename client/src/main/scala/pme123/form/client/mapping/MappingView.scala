@@ -65,7 +65,7 @@ private[client] object MappingView
   }
 
   @dom
-  private lazy val createMappingButton: Binding[HTMLElement] = {
+  private lazy val validateButton : Binding[HTMLElement] = {
     <div class="item">
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
@@ -77,7 +77,7 @@ private[client] object MappingView
   }
 
   @dom
-  private lazy val validateButton: Binding[HTMLElement] = {
+  private lazy val createMappingButton: Binding[HTMLElement] = {
     <div class="item">
       <button class="ui circular icon button"
               data:data-tooltip="Create Mapping from Form and Data"
@@ -129,7 +129,7 @@ private[client] object MappingView
     val uiMapping = uiMappingVar.bind
     val uiElem = uiMapping.uiFormElem.bind
     val varDataValue = uiMapping.varDataValue.bind
-    uiElem.valueVar.value = varDataValue.map(_.content.value)
+    uiElem.valueVar.value = varDataValue.flatMap(_.contentVar.value)
     val baseElem = uiElem.toBaseElement
       .modify(_.readOnly)
       .setTo(true)

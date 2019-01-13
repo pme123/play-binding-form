@@ -20,7 +20,7 @@ object MappingContainer {
 
 case class GetMappingContainer(ident: String,
                               form: FormContainer,
-                              data: DataContainer,
+                              data: DataObject,
                               mappings: Seq[MappingEntry] = Nil) {
 
 }

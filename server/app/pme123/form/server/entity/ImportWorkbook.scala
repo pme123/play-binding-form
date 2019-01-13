@@ -2,7 +2,7 @@ package pme123.form.server.entity
 
 import org.apache.poi.ss.usermodel._
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import pme123.form.shared.{DataContainer, FormContainer, MappingContainer}
+import pme123.form.shared.{DataObject, FormContainer, MappingContainer}
 import pme123.form.shared.services.{Identifiable, Logging, SPAException, User}
 
 import scala.collection.JavaConverters._
@@ -58,12 +58,12 @@ case class ImportWorkbook(wb: Workbook)
     }
   }
 
-  lazy val data: Try[Seq[Try[DataContainer]]] = {
+  lazy val data: Try[Seq[Try[DataObject]]] = {
     getSheet(sheetData) map { s =>
       rows(s).map { row =>
         Try(
           Json.parse(cellAsString(row.getCell(col1)))
-            .validate[DataContainer] match {
+            .validate[DataObject] match {
             case JsSuccess(value, _) =>
               value
             case err: JsError =>

@@ -1,8 +1,6 @@
 package pme123.form.shared
 
 import play.api.libs.json.{Json, OFormat}
-import pme123.form.shared.ElementType.{CHECKBOX, TEXTFIELD}
-import pme123.form.shared.ExtraProp.INPUT_TYPE
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.services.Language
 

@@ -2,9 +2,9 @@ package pme123.form.client.data
 
 import org.scalajs.dom.window
 import play.api.libs.json.Json
-import pme123.form.client.data.UIDataStore.VarDataContainer
+import pme123.form.client.data.UIDataStore.VarDataObject
 import pme123.form.client.services.SemanticUI
-import pme123.form.shared.{DataContainer, FormContainer}
+import pme123.form.shared.{DataObject, FormContainer}
 
 object DataUtils {
 
@@ -16,11 +16,11 @@ object DataUtils {
 
   def createData(form: FormContainer): Unit = {
     UIDataStore.uiState.identVar.value = s"${form.ident}-data"
-    UIDataStore.uiState.data.value = VarDataContainer(UIDataStore.uiState.identVar, form)
+    UIDataStore.uiState.data.value = VarDataObject(UIDataStore.uiState.identVar, form)
     SemanticUI.initElements()
   }
 
-  def createData: DataContainer = {
+  def createData: DataObject = {
     UIDataStore.uiState.data.value.toData
   }
 }

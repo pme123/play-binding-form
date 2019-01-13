@@ -2,7 +2,7 @@ package pme123.form.client.data
 
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.{Event, FormData, HTMLElement, HTMLInputElement}
+import org.scalajs.dom.raw._
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore._
 import pme123.form.client.form.{FormPreviewView, UIFormElem, UIFormStore}
@@ -98,10 +98,9 @@ private[client] object DataView
 
   @dom
   private lazy val dataContent: Binding[HTMLElement] = {
-    val ds = UIDataStore.uiState.data.bind
     <div class="ui cards">
       <div class="ui fluid card">
-        {dataStructureContent(ds.structure, None).bind}
+        {dataStructureContent(UIDataStore.uiState.data, None).bind}
       </div>
     </div>
   }
@@ -111,37 +110,56 @@ private[client] object DataView
     <div class="ui fluid card">
       {//
       val obj = data.bind
-      for ((_, content) <- obj.content) yield dataStructureContent(content, Some(obj.content)).bind}
+      for (content <- obj.content) yield dataStructureContent(content, Some(obj.content)).bind}
     </div>
   }
 
   @dom
-  private def dataStructureContent(data: Var[_ <: VarDataStructure], parentContent: Option[Vars[(String, Var[_ <: VarDataStructure])]]): Binding[HTMLElement] = {
+  private def dataStructureContent(data: Var[_ <: VarDataStructure], parentContent: Option[Vars[Var[_ <: VarDataStructure]]]): Binding[HTMLElement] = {
     val d = data.bind
-    <div draggable={parentContent.nonEmpty} class="ui grid content">
-      {//
-      buttons(data, parentContent).bind}{//
-      identDiv(d.identVar).bind}{//
-      structureTypeDiv(data).bind}{//
-      dataContent(data).bind}
-    </div>
+    if (parentContent.nonEmpty)
+      <div class="ui grid content"
+           draggable={parentContent.nonEmpty}
+           ondragstart={_: DragEvent =>
+             parentContent.foreach(pc => DataStructureDragDrop.drag(data, pc))
+             }
+           ondrop={ev: DragEvent =>
+             parentContent.foreach(pc => DataStructureDragDrop.drop(data, pc)(ev))}
+           ondragover={ev: DragEvent =>
+             DataStructureDragDrop.allowDrop(data)(ev)}>
+        {//
+        buttons(data, parentContent).bind}{//
+        identDiv(d.identVar).bind}{//
+        structureTypeDiv(data).bind}{//
+        dataContent(data).bind}
+      </div>
+    else
+      <div class="ui grid content"
+           ondrop={ev: DragEvent =>
+             DataStructureDragDrop.drop(data, UIDataStore.uiState.data.value.content)(ev)}
+           ondragover={ev: DragEvent =>
+             DataStructureDragDrop.allowDrop(data)(ev)}>
+        {//
+        buttons(data, parentContent).bind}{//
+        dataContent(data).bind}
+      </div>
   }
 
   private def dataContent(data: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
     data.value match {
-      case VarDataValue(ident, StructureType.STRING, content) =>
-        dataStringContent(ident, content)
-      case VarDataValue(ident, StructureType.NUMBER, content) =>
-        dataNumberContent(ident, content)
-      case VarDataValue(ident, StructureType.BOOLEAN, content) =>
-        dataBooleanContent(ident, content)
+      case VarDataValue(identVar, StructureType.STRING, content, _) =>
+        dataStringContent(identVar, content)
+      case VarDataValue(identVar, StructureType.NUMBER, content, _) =>
+        dataNumberContent(identVar, content)
+      case VarDataValue(identVar, StructureType.BOOLEAN, content, _) =>
+        dataBooleanContent(identVar, content)
       case _: VarDataObject =>
         dataObjectContent(data.asInstanceOf[Var[VarDataObject]])
     }
   }
 
   @dom
-  private def dataStringContent(identVar: Var[String], data: Var[String]): Binding[HTMLElement] = {
+  private def dataStringContent(identVar: Var[String], data: Var[Option[String]]): Binding[HTMLElement] = {
     val ident = identVar.bind
     <div class="five wide column">
       {BaseElementDiv(
@@ -150,12 +168,12 @@ private[client] object DataView
           s"ds-value-$ident",
           TEXTFIELD,
           ElementTexts.label(Map(EN -> "String value", DE -> "Text")),
-          value = Some(data.value),
+          value = data.value,
           extras = ExtraProperties(TEXTFIELD),
           required = true,
         ),
         changeEvent = Some(
-          str => data.value = str
+          str => data.value = Some(str)
         )
       )
     ).bind}
@@ -163,7 +181,7 @@ private[client] object DataView
   }
 
   @dom
-  private def dataNumberContent(identVar: Var[String], data: Var[String]): Binding[HTMLElement] = {
+  private def dataNumberContent(identVar: Var[String], data: Var[Option[String]]): Binding[HTMLElement] = {
     val ident = identVar.bind
     <div class="five wide column">
       {BaseElementDiv(
@@ -172,19 +190,19 @@ private[client] object DataView
           s"ds-value-$ident",
           TEXTFIELD,
           ElementTexts.label(Map(EN -> "Number value", DE -> "Nummer")),
-          value = Some(data.value.toString),
+          value = data.value,
           extras = ExtraProperties(TEXTFIELD),
           required = true,
         ),
         changeEvent = Some(
-          str => data.value = str
+          str => data.value = Some(str)
         ))
     ).bind}
     </div>
   }
 
   @dom
-  private def dataBooleanContent(identVar: Var[String], data: Var[String]): Binding[HTMLElement] = {
+  private def dataBooleanContent(identVar: Var[String], data: Var[Option[String]]): Binding[HTMLElement] = {
     val ident = identVar.bind
     <div class="five wide column">
       {BaseElementDiv(
@@ -193,11 +211,11 @@ private[client] object DataView
           s"ds-value-$ident",
           CHECKBOX,
           ElementTexts.label(Map(EN -> "Boolean value", DE -> "Ja / Nein")),
-          value = Some(data.value.toString),
+          value = data.value,
           extras = ExtraProperties(CHECKBOX),
         ),
         changeEvent = Some(
-          str => data.value = str
+          str => data.value = Some(str)
         ),
       )
     ).bind}
@@ -249,7 +267,7 @@ private[client] object DataView
   }
 
   @dom
-  private def buttons(data: Var[_ <: VarDataStructure], parentContent: Option[Vars[(String, Var[_ <: VarDataStructure])]]): Binding[HTMLElement] = {
+  private def buttons(data: Var[_ <: VarDataStructure], parentContent: Option[Vars[ Var[_ <: VarDataStructure]]]): Binding[HTMLElement] = {
     <div class="one wide column">
       {addButton(data).bind}{//
       deleteButton(data, parentContent).bind}
@@ -270,7 +288,7 @@ private[client] object DataView
   }
 
   @dom
-  private def deleteButton(dataVar: Var[_ <: VarDataStructure], parentContent: Option[Vars[(String, Var[_ <: VarDataStructure])]]): Binding[HTMLElement] = {
+  private def deleteButton(dataVar: Var[_ <: VarDataStructure], parentContent: Option[Vars[Var[_ <: VarDataStructure]]]): Binding[HTMLElement] = {
     val data = dataVar.bind
     if (parentContent.nonEmpty)
       <button class="mini ui circular red icon button"

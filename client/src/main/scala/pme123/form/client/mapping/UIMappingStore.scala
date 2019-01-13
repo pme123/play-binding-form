@@ -1,11 +1,11 @@
 package pme123.form.client.mapping
 
 import com.thoughtworks.binding.Binding.{Var, Vars}
-import pme123.form.client.data.UIDataStore
-import pme123.form.client.data.UIDataStore.{VarDataContainer, VarDataValue}
+import pme123.form.client.data.{UIDataStore, VarDataValue}
+import pme123.form.client.data.UIDataStore.VarDataObject
 import pme123.form.client.form.{UIFormElem, UIFormStore, VarFormContainer}
-import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.client.services.UIStore.supportedLangs
+import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.ElementType.TEXTFIELD
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
@@ -63,7 +63,7 @@ object UIMappingStore extends Logging {
     if (dataIdent.isEmpty)
       uiMappingVar.value.varDataValue.value = None
     else
-      UIDataStore.dataValue(dataIdent).foreach((dv: Var[VarDataValue]) =>
+      UIDataStore.dataValue(dataIdent).foreach((dv: Var[VarDataValue  ]) =>
         uiMappingVar.value.varDataValue.value = Some(dv.value)
       )
     SemanticUI.initElements()
@@ -97,7 +97,7 @@ object UIMappingStore extends Logging {
 
   case class VarMappingContainer(identVar: Var[String],
                                  form: Var[VarFormContainer],
-                                 data: Var[VarDataContainer],
+                                 data: Var[VarDataObject],
                                  mappings: Vars[Var[UIMappingEntry]] = Vars.empty) {
     def toMapping: MappingContainer = {
       MappingContainer(identVar.value,
@@ -108,7 +108,7 @@ object UIMappingStore extends Logging {
     }
 
     def autoMap(form: VarFormContainer,
-                data: VarDataContainer): Unit = {
+                data: VarDataObject): Unit = {
 
       val ident = s"${form.identVar.value}-mapping"
       uiState.identVar.value = ident
@@ -125,9 +125,10 @@ object UIMappingStore extends Logging {
             val dataValue =
               data.findValues()
                 .map(_.value)
-                .find(_.identVar == ue.value.identVar.value)
+                .find(_.identVar.value == ue.value.identVar.value)
             UIMappingEntry(ue, Var(dataValue))
           }.map(Var(_))
+      SemanticUI.initElements()
     }
 
   }
@@ -136,7 +137,7 @@ object UIMappingStore extends Logging {
     def apply(identVar: Var[String],
               mapping: GetMappingContainer,
               varForm: Var[VarFormContainer],
-              varData: Var[VarDataContainer]): VarMappingContainer =
+              varData: Var[VarDataObject]): VarMappingContainer =
       VarMappingContainer(identVar,
         varForm,
         varData,

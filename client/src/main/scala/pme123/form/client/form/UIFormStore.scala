@@ -56,8 +56,8 @@ object UIFormStore extends Logging {
   }
 
   def changeSelectedElement(elemVar: Var[UIFormElem]): Unit = {
-    info(s"FormUIStore: changeSelectedElement ${ident(elemVar)}")
     if (uiState.selectedElement.value != elemVar) {
+      info(s"FormUIStore: changeSelectedElement ${ident(elemVar)}")
       uiState.selectedElement.value = elemVar
       changeActivePropTab(PROPERTIES)
       SemanticUI.initElements()
@@ -80,11 +80,13 @@ object UIFormStore extends Logging {
 
   def moveElement(draggedElem: Var[UIFormElem], moveToElemVar: Var[UIFormElem]): Unit = {
     info(s"FormUIStore: moveElement ${ident(draggedElem)} to ${ident(moveToElemVar)}")
+    val existIndex = uiState.formElements.value.indexOf(draggedElem)
+    val newIndex = uiState.formElements.value.indexOf(moveToElemVar)
     uiState.formElements.value.remove(
-      uiState.formElements.value.indexOf(draggedElem))
+      existIndex)
 
     uiState.formElements.value.insert(
-      uiState.formElements.value.indexOf(moveToElemVar) + 1,
+      newIndex,
       draggedElem)
 
     changeSelectedElement(draggedElem)

@@ -7,14 +7,8 @@ import play.api.libs.json.OFormat
 import scala.collection.immutable
 import scala.util.Random
 
-case class DataContainer(ident: String= DataStructure.defaultKey, structure: DataObject = DataObject())
-
-object DataContainer {
-  implicit val jsonFormat: OFormat[DataContainer] = derived.oformat[DataContainer]()
-
-}
-
 sealed abstract class DataStructure {
+  def ident: String
 }
 
 object DataStructure {
@@ -34,7 +28,7 @@ object DataStructure {
 
 }
 
-case class DataObject(value: Seq[(String, DataStructure)] = Seq.empty)
+case class DataObject(ident: String = "", value: Seq[DataStructure] = Seq.empty)
   extends DataStructure
 
 object DataObject {
@@ -42,13 +36,13 @@ object DataObject {
   implicit val jsonFormat: OFormat[DataObject] = derived.oformat[DataObject]()
 }
 
-case class DataString(value: String = "")
+case class DataString(ident: String = "", value: Option[String] = None)
   extends DataStructure
 
-case class DataNumber(value: BigDecimal = 0)
+case class DataNumber(ident: String = "", value: Option[BigDecimal] = None)
   extends DataStructure
 
-case class DataBoolean(value: Boolean = false)
+case class DataBoolean(ident: String = "", value: Option[Boolean] = None)
   extends DataStructure
 
 
