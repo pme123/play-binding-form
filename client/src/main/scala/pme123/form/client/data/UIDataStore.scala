@@ -61,9 +61,9 @@ object UIDataStore extends Logging {
     dataValues()
       .find(_.value.identVar.value == searchIdent)
 
-  def dataIdents: Seq[String] =
+  def dataPaths: Seq[String] =
     dataValues()
-      .map(_.value.identVar.value)
+      .map(_.value.pathString)
 
   def dataValues(): Seq[Var[VarDataValue]] =
     uiState.data.value
@@ -116,13 +116,15 @@ object UIDataStore extends Logging {
 
     def path: Seq[String] = parentPathVar.value :+ identVar.value
 
-    def pathString: String = path.mkString("/")
+    def pathString: String =
+      if(path.size >2)
+        "../" + path.takeRight(2).mkString("/")
+      else
+        path.mkString("/")
 
     def structureType: StructureType
 
     def toData: DataStructure
-
-    def findValues(): Seq[Var[VarDataValue]] = Nil
 
     def adjustPath(): Unit = ()
 
@@ -131,13 +133,23 @@ object UIDataStore extends Logging {
       adjustPath()
     }
 
-
     def isChild(moveToPath: Seq[String]): Boolean = {
       moveToPath.mkString(",")
         .startsWith(
           parentPathVar.value.mkString(",")
         ) && moveToPath.size != parentPathVar.value.size
     }
+
+    def contents: Seq[Var[_ <: VarDataStructure]] = Nil
+
+    def findValues(): Seq[Var[VarDataValue]] =
+      contents
+        .flatMap{
+          case value: Var[VarDataValue] if value.value.isInstanceOf[VarDataValue] =>
+            Seq(value)
+          case obj:Var[VarDataObject] =>
+            obj.value.findValues()
+        }
   }
 
   object VarDataStructure {
@@ -162,11 +174,7 @@ object UIDataStore extends Logging {
         .foreach(_.value.adjustPath(path :+ identVar.value))
     }
 
-    override def findValues(): Seq[Var[VarDataValue]] =
-      content.value
-        .filter(_.value.isInstanceOf[VarDataValue])
-        .map(_.asInstanceOf[Var[VarDataValue]])
-
+    override def contents: Seq[Var[_ <: VarDataStructure]] = content.value
   }
 
   object VarDataObject {

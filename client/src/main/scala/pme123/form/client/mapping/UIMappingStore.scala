@@ -41,6 +41,7 @@ object UIMappingStore extends Logging {
   }
 
   def adjustMappings(elems: Seq[Var[UIFormElem]]): Vars[Var[UIMappingEntry]] = {
+    info(s"MappingUIStore: adjustMappings")
     val mappings = uiState.mapping.value.mappings.value
     // remove unused elements
     uiState.mapping.value.mappings.value
@@ -60,10 +61,11 @@ object UIMappingStore extends Logging {
   }
 
   def changeData(uiMappingVar: Var[UIMappingEntry])(dataIdent: String): Unit = {
+    println(s"DATAIDENT: $dataIdent")
     if (dataIdent.isEmpty)
       uiMappingVar.value.varDataValue.value = None
     else
-      UIDataStore.dataValue(dataIdent).foreach((dv: Var[VarDataValue  ]) =>
+      UIDataStore.dataValue(dataIdent).foreach((dv: Var[VarDataValue]) =>
         uiMappingVar.value.varDataValue.value = Some(dv.value)
       )
     SemanticUI.initElements()
@@ -112,7 +114,6 @@ object UIMappingStore extends Logging {
 
       val ident = s"${form.identVar.value}-mapping"
       uiState.identVar.value = ident
-
       uiState.mapping.value.form.value = form
       uiState.mapping.value.data.value = data
 

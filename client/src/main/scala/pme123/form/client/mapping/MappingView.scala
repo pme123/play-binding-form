@@ -65,7 +65,7 @@ private[client] object MappingView
   }
 
   @dom
-  private lazy val validateButton : Binding[HTMLElement] = {
+  private lazy val validateButton: Binding[HTMLElement] = {
     <div class="item">
       <button class="ui circular show-valid icon submit button"
               data:data-tooltip="Validate Mapping"
@@ -144,9 +144,11 @@ private[client] object MappingView
         DROPDOWN,
         ElementTexts.placeholder(Map(DE -> "Gemappt zu ..", EN -> "Maps to ..")),
         elemEntries = ElementEntries(
-          UIDataStore.dataIdents.map(ident => ElementEntry(ident))
+          UIDataStore.dataValues()
+            .map(dv =>
+              ElementEntry(dv.value.identVar.value, dv.value.pathString))
         ),
-        value = varDataValue.map(_.identVar.value),
+        value = varDataValue.map(_.pathString),
         extras = ExtraProperties(DROPDOWN),
       ),
         Some(str =>
