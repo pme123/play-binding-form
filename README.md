@@ -5,8 +5,6 @@ A Single Page Application SPA that demos how are things done with this stack:
 * Shared: Scala
 * Client: ScalaJS / Binding.scala
 
-Next to that I use it for experimenting with stuff I need for work, like Kafka.
-
 # Work is in progress and there are lots of loose ends!
 
 # Web Client
@@ -34,31 +32,67 @@ Or with Doobie:
         "postgres",
         "3sf2reRer"
       )
-      
-# Kafka
-* Installation according to [Confluent Open Source Quick Start (Local)](https://docs.confluent.io/current/quickstart/cos-quickstart.html)
-* Go to Kafka-bin directory:
+    
+# Business View
+Having a service for generic Forms, that contain of:
+* Form-Elements
+* Data-Structure
+* Mapping between Form-Elements and Data-Structure  
 
-        cd <path-to-kafka>
-        # example
-        cd /Users/mpa/dev/kafka/confluent-5.0.0
-        
-* Start Kafka
-
-      <path-to-confluent>/bin/confluent start
-* Create the Producer Topic:
-
-      ./bin/kafka-topics --create --zookeeper localhost:2181 \
-       --replication-factor 1 --partitions 1 --topic form-msg-topic
-* To check the incoming messages do these steps:
-  * Start KSQL: 
+# State of Work
+* There are 4 main views:
+  * Form Editor
+  * Form Preview
+  * Data Editor
+  * Mapping Editor
+* Forms, Data and Mappings are imported from Excel and can be selected in the according Views.
+* Forms, Data and Mappings can be persisted in a DB.
   
-        LOG_DIR=./ksql_logs ./bin/ksql
-  * Create a Stream: 
-  
-        CREATE STREAM formPages (route VARCHAR) \
-                      WITH (KAFKA_TOPIC='form-msg-topic', VALUE_FORMAT='DELIMITED');
+## Form Editor
+* Define HTML-Elements
+* Supported are some examples Elements (text, text-area, dropdown, title ...)
+* Some example Validation
+* Entries for Dropdowns
+* Move Element with Drag and Drop
+* Move Dropdown Entries with Drag and Drop
+* Translations for Label, Placeholder and Tooltip
+* Add, copy and delete an Element
+* Supports simple Layout (Semantic - Grid)
 
-  * Create a Query:
-        
-        SELECT ROWKEY, route, ROWTIME FROM formPages LIMIT 10;`
+## Form Preview
+* Show the defined Elements in the Grid Layout
+* Try it out
+* Validate the form
+* Export the Elements as JSON
+* Save the Elements in the DB
+
+## Data Editor
+* Create the Data-structure
+* Move Element with Drag and Drop
+* Add and delete an Element
+* Create a Data-Structure from a Form
+* Export the Data-Structure as JSON
+* Save the Data-Structure in the DB
+* Import a Data-Structure JSON
+
+## Mapping Editor
+* Auto create the Mapping from Form-Elements and Data-Structure
+* Select possible Mappings from Data-Structure
+* Displays the Form, like in the Preview.
+* Validates the Mapping
+
+# Technical View
+see the `Settings` file for all dependencies!
+## Client
+* `com.thoughtworks.binding.Route` for the routing.
+* `com.thoughtworks.binding.Binding` for handling the state.
+* `com.thoughtworks.binding.FutureBinding` for asynchronous Server calls.
+* `play-jsmessages` for i18n Messages
+
+## Shared
+* `play-json` for serialization
+
+## Server
+* `play` as web framework
+* `silhouette` for authentication
+* `doobie` for database access
