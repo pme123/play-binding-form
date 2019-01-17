@@ -11,7 +11,7 @@ import pme123.form.shared.DataObject
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class DataDBRepo @Inject()()
+class DataDBRepo @Inject()(val formConf: FormConfiguration)
                           (implicit val ec: ExecutionContext)
   extends DoobieDB {
 

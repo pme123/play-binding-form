@@ -3,6 +3,7 @@ package pme123.form.server.control.services
 import doobie.Fragment
 import doobie.implicits._
 import javax.inject.Inject
+import pme123.form.server.control.FormConfiguration
 import pme123.form.server.entity.AuthUser
 import pme123.form.shared.services._
 import pme123.form.shared.services.SPAExtensions._
@@ -10,7 +11,7 @@ import pme123.form.shared.services.SPAExtensions._
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class UserDBRepo @Inject()()
+class UserDBRepo @Inject()(val formConf: FormConfiguration)
                           (implicit val ec: ExecutionContext)
   extends DoobieDB {
 

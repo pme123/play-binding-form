@@ -6,6 +6,7 @@ import doobie.implicits._
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
+import pme123.form.server.control.FormConfiguration
 
 import scala.concurrent.{ExecutionContext, Future, blocking}
 
@@ -13,11 +14,13 @@ trait DoobieDB {
 
   implicit def ec: ExecutionContext
 
+  def formConf: FormConfiguration
+
   protected val xa: Aux[IO, Unit] = Transactor.fromDriverManager[IO](
-    "org.postgresql.Driver",
-    "jdbc:postgresql://localhost/postgres",
-    "postgres",
-    "3sf2reRer"
+    formConf.dbDriver,
+    formConf.dbUrl,
+    formConf.dbUsername,
+    formConf.dbPassword,
   )
   /*
   H2

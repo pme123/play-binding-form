@@ -53,6 +53,12 @@ abstract class FormConfSettings(config: Configuration)
   val timezoneID: ZoneId = ZoneId.of(timezone)
   val wsocketHostsAllowed: Seq[String] = baseConfig.get[Seq[String]](wsocketHostsAllowedProp)
 
+  // db
+  val dbDriver: String = config.get[String]("db.default.driver")
+  val dbUrl: String = config.get[String]("db.default.url")
+  val dbUsername: String = config.get[String]("db.default.username")
+  val dbPassword: String = config.get[String]("db.default.password")
+
   //security
   val authenticatorExpiry: FiniteDuration = config.get[FiniteDuration](authenticatorExpiryProp)
   val authenticatorIdleTimeout: Option[FiniteDuration] = config.getOptional[FiniteDuration](authenticatorIdleTimeoutProp)

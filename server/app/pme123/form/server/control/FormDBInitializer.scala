@@ -9,7 +9,7 @@ import pme123.form.server.control.services.DoobieDB
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FormDBInitializer @Inject()()
+class FormDBInitializer @Inject()(val formConf: FormConfiguration)
                                  (implicit val ec: ExecutionContext)
   extends DoobieDB {
 
