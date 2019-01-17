@@ -10,7 +10,7 @@ import pme123.form.client.form._
 import pme123.form.client.services.{SemanticUI, UIStore}
 import pme123.form.shared.ElementType
 import pme123.form.shared.ElementType._
-import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, SIZE, SIZE_CLASS}
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, ROWS, SIZE, SIZE_CLASS}
 import pme123.form.shared.services.Language
 
 sealed abstract class BaseElementDiv {
@@ -201,6 +201,7 @@ object TextAreaDiv extends BaseElementDiv {
   @dom
   def create(inputAttr: InputAttr): Binding[HTMLElement] = {
     val value = inputAttr.valueVar.value
+    val rows = inputAttr.extras.valueFor(ROWS).bind
     val readOnlyClass = if (inputAttr.readOnly) "disabled" else ""
     <div class={s"ui $readOnlyClass input"}>
       <textarea id={inputAttr.ident}
@@ -208,7 +209,7 @@ object TextAreaDiv extends BaseElementDiv {
                 placeholder={inputAttr.placeholder}
                 value={value.getOrElse("")}
                 readOnly={inputAttr.readOnly}
-                rows={6}
+                rows={rows.toInt}
                 onblur={_: Event =>
                   changeEvent(inputAttr)}>
       </textarea>

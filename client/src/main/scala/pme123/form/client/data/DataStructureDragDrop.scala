@@ -35,7 +35,7 @@ object DataStructureDragDrop {
             content.value += dragObj
             dataDragObj.parentContent.value -= dragObj
           }
-        case VarDataValue(identVar, _, _, parentPathVar) =>
+        case VarDataValue(identVar, _, parentPathVar) =>
           val dataDragObj = dragObject.value.get
           val dragObjVar = dataDragObj.dragObj
           val dragIdent = dragObjVar.value.identVar.value

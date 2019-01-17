@@ -129,7 +129,6 @@ private[client] object MappingView
     val uiMapping = uiMappingVar.bind
     val uiElem = uiMapping.uiFormElem.bind
     val varDataValue = uiMapping.varDataValue.bind
-    uiElem.valueVar.value = varDataValue.flatMap(_.contentVar.value)
     val baseElem = uiElem.toBaseElement
       .modify(_.readOnly)
       .setTo(true)

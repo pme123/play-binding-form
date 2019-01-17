@@ -38,20 +38,22 @@ trait MainView
       </div>
       <div class="ui right item">
         {val ident = identVar.bind
-      BaseElementDiv(
-        UIFormElem(
-          BaseElement(
-            s"$link-ident",
-            TEXTFIELD,
-            ElementTexts.label(Map(
-              DE -> I18n(DE, s"view.$domain.ident"),
-              EN -> I18n(EN, s"view.$domain.ident"),
-            )),
-            value = Some(ident),
-            extras = ExtraProperties(TEXTFIELD),
-            inline = true),
-          changeEvent,
-        )).bind}&nbsp; &nbsp;{//
+      if (ident.nonEmpty)
+        BaseElementDiv(
+          UIFormElem(
+            BaseElement(
+              s"$link-ident",
+              TEXTFIELD,
+              ElementTexts.label(Map(
+                DE -> I18n(DE, s"view.$domain.ident"),
+                EN -> I18n(EN, s"view.$domain.ident"),
+              )),
+              value = Some(ident),
+              extras = ExtraProperties(TEXTFIELD),
+              inline = true),
+            changeEvent,
+          )).bind
+      else <span/>}&nbsp; &nbsp;{//
         Constants(buttons: _*).map(_.bind)}
       </div>
     </div>

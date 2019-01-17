@@ -5,10 +5,12 @@ import pme123.form.client.data.UIDataStore.VarDataStructure
 import pme123.form.client.services.SemanticUI
 import pme123.form.shared.ElementType.{CHECKBOX, TEXTFIELD}
 import pme123.form.shared.ExtraProp.INPUT_TYPE
+import pme123.form.shared.StructureType.{BOOLEAN, NUMBER, STRING}
 import pme123.form.shared._
 import pme123.form.shared.services.Logging
 
 object UIDataStore extends Logging {
+
 
   val uiState = UIState()
 
@@ -29,7 +31,7 @@ object UIDataStore extends Logging {
   def changeData(data: DataObject): Var[VarDataObject] = {
     info(s"DataUIStore: changeData ${data.ident}")
     uiState.identVar.value = data.ident
-    uiState.data.value = VarDataObject.create(uiState.identVar, data.value, Var(Nil))
+    uiState.data.value = VarDataObject.create(uiState.identVar, data.children, Var(Nil))
 
     SemanticUI.initElements()
     uiState.data
@@ -39,12 +41,12 @@ object UIDataStore extends Logging {
     info(s"DataUIStore: changeStructureType $strTypeStr")
     val structureType = StructureType.withNameInsensitive(strTypeStr)
 
-    data.value = VarDataStructure.apply(data.value.identVar, DataStructure(structureType), data.value.parentPathVar)
+    data.value = VarDataStructure.apply(data.value.identVar, DataStructure(data.value.identVar.value, structureType), data.value.parentPathVar)
     SemanticUI.initElements()
   }
 
   def addDataObject(parentDS: Var[VarDataObject]): Unit = {
-    val parentContent = parentDS.value.content
+    val parentContent = parentDS.value.childrenVars
     info(s"DataUIStore: addDataObject $parentContent".take(100))
     parentContent.value += Var(VarDataValue(parentDS.value.path))
     SemanticUI.initElements()
@@ -153,35 +155,36 @@ object UIDataStore extends Logging {
   }
 
   object VarDataStructure {
-    def apply(identVar: Var[String], ds: DataStructure, parentPathVar: Var[Seq[String]]): VarDataStructure = ds match {
-      case DataBoolean(_, value) => VarDataValue(identVar, StructureType.BOOLEAN, Var(value.map(_.toString)), parentPathVar)
-      case DataString(_, value) => VarDataValue(identVar, StructureType.STRING, Var(value), parentPathVar)
-      case DataNumber(_, value) => VarDataValue(identVar, StructureType.NUMBER, Var(value.map(_.toString)), parentPathVar)
-      case DataObject(_, value) => VarDataObject.create(identVar, value, parentPathVar)
+    def apply(identVar: Var[String],
+              dataStructure: DataStructure,
+              parentPathVar: Var[Seq[String]],
+             ): VarDataStructure = dataStructure match {
+      case DataObject(_, children) => VarDataObject.create(identVar, children, parentPathVar)
+      case DataValue(_, structureType) => VarDataValue(identVar, structureType, parentPathVar)
     }
   }
 
   case class VarDataObject(identVar: Var[String] = Var(DataStructure.defaultKey),
-                           content: Vars[Var[_ <: VarDataStructure]] = Vars.empty,
+                           childrenVars: Vars[Var[_ <: VarDataStructure]] = Vars.empty,
                            parentPathVar: Var[Seq[String]] = Var(Nil))
     extends VarDataStructure {
     val structureType: StructureType = StructureType.OBJECT
 
-    def toData: DataObject = DataObject(identVar.value, content.value.map(_.value.toData))
+    def toData: DataObject = DataObject(identVar.value, childrenVars.value.map(_.value.toData))
 
     override def adjustPath(): Unit = {
-      content.value
+      childrenVars.value
         .foreach(_.value.adjustPath(path :+ identVar.value))
     }
 
-    override def contents: Seq[Var[_ <: VarDataStructure]] = content.value
+    override def contents: Seq[Var[_ <: VarDataStructure]] = childrenVars.value
   }
 
   object VarDataObject {
     def create(identVar: Var[String],
-               content: Seq[DataStructure],
+               children: Seq[DataStructure],
                parentPathVar: Var[Seq[String]]): VarDataObject = {
-      val seq = content.map((entry: DataStructure) => Var(VarDataStructure(Var(entry.ident), entry, Var(parentPathVar.value :+ identVar.value))))
+      val seq = children.map((entry: DataStructure) => Var(VarDataStructure(Var(entry.ident), entry, Var(parentPathVar.value :+ identVar.value))))
       VarDataObject(identVar, Vars(seq: _*), parentPathVar)
     }
 
@@ -190,11 +193,11 @@ object UIDataStore extends Logging {
         form.elems.filterNot(_.elementType.readOnly)
           .map(el => el.elementType match {
             case TEXTFIELD if el.extras.propValue(INPUT_TYPE).contains(InputType.NUMBER.key) =>
-              DataNumber(el.ident, el.value.map(BigDecimal(_)))
+              DataValue(el.ident, NUMBER)
             case CHECKBOX =>
-              DataBoolean(el.ident, el.value.map(_.toBoolean))
+              DataValue(el.ident,BOOLEAN)
             case _ =>
-              DataString(el.ident, el.value)
+              DataValue(el.ident, STRING)
           })
         , Var(Nil))
   }
@@ -203,20 +206,15 @@ object UIDataStore extends Logging {
 
 case class VarDataValue(identVar: Var[String],
                         structureType: StructureType,
-                        contentVar: Var[Option[String]],
                         parentPathVar: Var[Seq[String]])
   extends VarDataStructure {
 
-  def toData: DataStructure = structureType match {
-    case StructureType.STRING => DataString(identVar.value, contentVar.value)
-    case StructureType.NUMBER => DataNumber(identVar.value, contentVar.value.map(BigDecimal(_)))
-    case StructureType.BOOLEAN => DataBoolean(identVar.value, contentVar.value.map(_.toBoolean))
-    case _ => DataString()
-  }
+  def toData: DataStructure =
+    DataValue(identVar.value, structureType)
 
 }
 
 object VarDataValue {
   def apply(parentPath: Seq[String]): VarDataValue =
-    new VarDataValue(Var(DataStructure.defaultKey), StructureType.STRING, Var(None), Var(parentPath))
+    new VarDataValue(Var(DataStructure.defaultKey), StructureType.STRING, Var(parentPath))
 }

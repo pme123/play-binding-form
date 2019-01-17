@@ -2,8 +2,9 @@ package pme123.form.client
 
 import pme123.form.client.form.{UIExtraProperties, UIFormElem}
 import pme123.form.client.services.I18n
-import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TEXTFIELD, TITLE}
-import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, SIZE_CLASS}
+import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TEXTAREA, TEXTFIELD, TITLE}
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, ROWS, SIZE_CLASS}
+import pme123.form.shared.InputType.NUMBER
 import pme123.form.shared.TextType.{LABEL, TOOLTIP}
 import pme123.form.shared._
 import pme123.form.shared.services.Language
@@ -17,6 +18,8 @@ object BaseElementExtras {
         DropdownExtras.extras(extraProperties)
       case TEXTFIELD =>
         TextFieldExtras.extras(extraProperties)
+      case TEXTAREA =>
+        TextAreaExtras.extras(extraProperties)
       case CHECKBOX =>
         CheckboxExtras.extras(extraProperties)
       case TITLE =>
@@ -69,11 +72,28 @@ object BaseElementExtras {
         )
         )))
     }
+  }
 
+  object TextAreaExtras {
+    def extras(extraProperties: UIExtraProperties)(implicit supportedLangs: Seq[Language]): Seq[UIExtraPropValue] = {
+      val value = extraProperties.valueFor(INPUT_TYPE).value
 
-
-
-
+      Seq(UIExtraPropValue(
+        ROWS, UIFormElem(BaseElement(ROWS.entryName,
+          TEXTFIELD,
+          texts = ElementTexts(
+            Some(ElementText.label(Map(DE -> "Zeilen", EN -> "Rows"))),
+            None,
+            Some(ElementText(TOOLTIP, Map(DE -> "Anzahl Reihen des Text Bereichs", EN -> "Number of Rows of the Text Area")))
+          ),
+          ExtraProperties(TEXTFIELD)
+            .modifyProperty(INPUT_TYPE, NUMBER.key),
+          value = Some(value),
+        ), Some(str =>
+          extraProperties.valueFor(ROWS).value = str
+        )
+        )))
+    }
   }
 
   object CheckboxExtras {

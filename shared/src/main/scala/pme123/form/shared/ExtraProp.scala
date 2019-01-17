@@ -27,6 +27,11 @@ object ExtraProp
     def defaultValue: String = "20"
   }
 
+  // Used internal for TextArea
+  case object ROWS extends ExtraProp {
+    def defaultValue: String = "6"
+  }
+
   // Used for: Dropdown
   case object CLEARABLE extends ExtraProp {
     def defaultValue: String = "false"

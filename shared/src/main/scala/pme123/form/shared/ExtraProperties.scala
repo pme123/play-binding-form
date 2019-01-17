@@ -1,11 +1,19 @@
 package pme123.form.shared
 
 import play.api.libs.json.{Json, OFormat}
-import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TEXTFIELD, TITLE}
-import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, SIZE, SIZE_CLASS}
+import pme123.form.shared.ElementType.{CHECKBOX, DIVIDER, DROPDOWN, TEXTAREA, TEXTFIELD, TITLE}
+import pme123.form.shared.ExtraProp.{CHECKBOX_TYPE, CLEARABLE, INPUT_TYPE, ROWS, SIZE, SIZE_CLASS}
 import pme123.form.shared.ExtraPropValue.ExtraValue
 
 case class ExtraProperties(propValues: Seq[ExtraPropValue] = Nil) {
+
+  def modifyProperty(extraProp: ExtraProp, newValue: String): ExtraProperties = {
+    ExtraProperties(
+      propValues.foldLeft(Seq.empty[ExtraPropValue])((a, b: ExtraPropValue) => b.extraProp match {
+        case ep if ep == extraProp => a :+ b.copy(value = newValue)
+        case _ => a :+ b
+      }))
+  }
 
   def propValue(extraProp: ExtraProp): Option[ExtraValue] =
     propValues.find(_.extraProp == extraProp)
@@ -19,6 +27,8 @@ object ExtraProperties {
     elementType match {
       case TEXTFIELD =>
         TextFieldElem.extras
+      case TEXTAREA =>
+        TextAreaElem.extras
       case DROPDOWN =>
         DropdownElem.extras
       case CHECKBOX =>
@@ -38,6 +48,14 @@ object ExtraProperties {
           INPUT_TYPE, INPUT_TYPE.defaultValue
         ), ExtraPropValue(
           SIZE, SIZE.defaultValue
+        )))
+  }
+
+  object TextAreaElem {
+    def extras: ExtraProperties =
+      ExtraProperties(Seq(
+         ExtraPropValue(
+          ROWS, ROWS.defaultValue
         )))
   }
 
