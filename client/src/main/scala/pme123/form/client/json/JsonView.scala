@@ -1,13 +1,12 @@
 package pme123.form.client.json
 
-import org.scalajs.jquery.jQuery
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.raw.{Event, HTMLElement}
+import org.scalajs.jquery.jQuery
 import play.api.libs.json.Json
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore
-import pme123.form.client.data.UIDataStore.VarDataStructure
 import pme123.form.client.form.UIFormElem
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
@@ -48,7 +47,8 @@ private[client] object JsonView
               data:data-tooltip="Import JSON"
               onclick={_: Event =>
                 val str = jQuery("#json-to-import").value().toString
-              UIDataStore.changeData(DataStructure.fromJson("json", Json.parse(str)).asInstanceOf[DataObject])}>
+                val structure = DataStructure.fromJson(DataStructure.defaultKey, Json.parse(str))
+                UIDataStore.changeData(structure.asInstanceOf[DataObject])}>
         <i class=" upload icon"></i>
       </button>
     </div>

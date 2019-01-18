@@ -132,7 +132,8 @@ private[client] object DataView
         buttons(data, parentContent).bind}{//
         identDiv(d.identVar).bind}{//
         structureTypeDiv(data).bind}{//
-        if(d.structureType == OBJECT)
+        cardinalityDiv(data).bind}{//
+        if (d.structureType == OBJECT)
           dataObjectContent(data.asInstanceOf[Var[VarDataObject]]).bind
         else <span/>}
       </div>
@@ -150,7 +151,9 @@ private[client] object DataView
 
   @dom
   private val noContent: Binding[HTMLElement] = {
-      <span>&nbsp;</span>
+    <span>
+      &nbsp;
+    </span>
   }
 
 
@@ -192,6 +195,30 @@ private[client] object DataView
         ),
           changeEvent = Some(
             UIDataStore.changeStructureType(data.asInstanceOf[Var[VarDataStructure]])
+          ),
+        )
+      ).bind}
+    </div>
+  }
+
+  @dom
+  private def cardinalityDiv(data: Var[_ <: VarDataStructure]): Binding[HTMLElement] = {
+    val cardinalityVar = data.value.cardinalityVar
+    <div class="five wide column">
+      {//
+      BaseElementDiv(
+        UIFormElem(BaseElement(
+          s"ds-cardinality-${data.value.identVar.value}",
+          DROPDOWN,
+          ElementTexts.label(Map(DE -> "Kardinalität", EN -> "Cardinality")),
+          elemEntries = ElementEntries(
+            Cardinality.values.map(enum => ElementEntry(enum.entryName, enum.label))
+          ),
+          extras = ExtraProperties(DROPDOWN),
+          value = Some(cardinalityVar.value.entryName)
+        ),
+          changeEvent = Some(str =>
+            cardinalityVar.value = Cardinality.withNameInsensitive(str)
           ),
         )
       ).bind}

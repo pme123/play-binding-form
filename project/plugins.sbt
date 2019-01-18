@@ -8,6 +8,7 @@ resolvers += Resolver.url("heroku-sbt-plugin-releases",
   url("https://dl.bintray.com/heroku/sbt-plugins/"))(Resolver.ivyStylePatterns)
 
 resolvers += "jitpack" at "https://jitpack.io"
+resolvers += Resolver.jcenterRepo
 
 // Sbt plugins
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.15")

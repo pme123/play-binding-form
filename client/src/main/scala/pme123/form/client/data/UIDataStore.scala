@@ -3,6 +3,7 @@ package pme123.form.client.data
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import pme123.form.client.data.UIDataStore.VarDataStructure
 import pme123.form.client.services.SemanticUI
+import pme123.form.shared.Cardinality.ONE
 import pme123.form.shared.ElementType.{CHECKBOX, TEXTFIELD}
 import pme123.form.shared.ExtraProp.INPUT_TYPE
 import pme123.form.shared.StructureType.{BOOLEAN, NUMBER, STRING}
@@ -31,7 +32,7 @@ object UIDataStore extends Logging {
   def changeData(data: DataObject): Var[VarDataObject] = {
     info(s"DataUIStore: changeData ${data.ident}")
     uiState.identVar.value = data.ident
-    uiState.data.value = VarDataObject.create(uiState.identVar, data.children, Var(Nil))
+    uiState.data.value = VarDataObject.create(uiState.identVar, data.cardinality, data.children, Var(Nil))
 
     SemanticUI.initElements()
     uiState.data
@@ -84,7 +85,7 @@ object UIDataStore extends Logging {
       UIState(
         identVar,
         Var(VarDataObject(identVar)),
-        Vars.empty
+        Vars.empty,
       )
     }
   }
@@ -114,12 +115,14 @@ object UIDataStore extends Logging {
 
     def identVar: Var[String]
 
+    def cardinalityVar: Var[Cardinality]
+
     def parentPathVar: Var[Seq[String]]
 
     def path: Seq[String] = parentPathVar.value :+ identVar.value
 
     def pathString: String =
-      if(path.size >2)
+      if (path.size > 2)
         "../" + path.takeRight(2).mkString("/")
       else
         path.mkString("/")
@@ -146,10 +149,10 @@ object UIDataStore extends Logging {
 
     def findValues(): Seq[Var[VarDataValue]] =
       contents
-        .flatMap{
+        .flatMap {
           case value: Var[VarDataValue] if value.value.isInstanceOf[VarDataValue] =>
             Seq(value)
-          case obj:Var[VarDataObject] =>
+          case obj: Var[VarDataObject] =>
             obj.value.findValues()
         }
   }
@@ -159,18 +162,19 @@ object UIDataStore extends Logging {
               dataStructure: DataStructure,
               parentPathVar: Var[Seq[String]],
              ): VarDataStructure = dataStructure match {
-      case DataObject(_, children) => VarDataObject.create(identVar, children, parentPathVar)
-      case DataValue(_, structureType) => VarDataValue(identVar, structureType, parentPathVar)
+      case DataObject(_, cardinality, children) => VarDataObject.create(identVar, cardinality, children, parentPathVar)
+      case DataValue(_, structureType, cardinality) => VarDataValue(identVar, structureType, Var(cardinality), parentPathVar)
     }
   }
 
   case class VarDataObject(identVar: Var[String] = Var(DataStructure.defaultKey),
+                           cardinalityVar: Var[Cardinality] = Var(ONE),
                            childrenVars: Vars[Var[_ <: VarDataStructure]] = Vars.empty,
                            parentPathVar: Var[Seq[String]] = Var(Nil))
     extends VarDataStructure {
     val structureType: StructureType = StructureType.OBJECT
 
-    def toData: DataObject = DataObject(identVar.value, childrenVars.value.map(_.value.toData))
+    def toData: DataObject = DataObject(identVar.value, cardinalityVar.value, childrenVars.value.map(_.value.toData))
 
     override def adjustPath(): Unit = {
       childrenVars.value
@@ -182,20 +186,22 @@ object UIDataStore extends Logging {
 
   object VarDataObject {
     def create(identVar: Var[String],
+               cardinality: Cardinality,
                children: Seq[DataStructure],
                parentPathVar: Var[Seq[String]]): VarDataObject = {
       val seq = children.map((entry: DataStructure) => Var(VarDataStructure(Var(entry.ident), entry, Var(parentPathVar.value :+ identVar.value))))
-      VarDataObject(identVar, Vars(seq: _*), parentPathVar)
+      VarDataObject(identVar, Var(cardinality), Vars(seq: _*), parentPathVar)
     }
 
     def apply(identVar: Var[String], form: FormContainer): VarDataObject =
       VarDataObject.create(identVar,
+        ONE,
         form.elems.filterNot(_.elementType.readOnly)
           .map(el => el.elementType match {
             case TEXTFIELD if el.extras.propValue(INPUT_TYPE).contains(InputType.NUMBER.key) =>
               DataValue(el.ident, NUMBER)
             case CHECKBOX =>
-              DataValue(el.ident,BOOLEAN)
+              DataValue(el.ident, BOOLEAN)
             case _ =>
               DataValue(el.ident, STRING)
           })
@@ -206,6 +212,7 @@ object UIDataStore extends Logging {
 
 case class VarDataValue(identVar: Var[String],
                         structureType: StructureType,
+                        cardinalityVar: Var[Cardinality],
                         parentPathVar: Var[Seq[String]])
   extends VarDataStructure {
 
@@ -216,5 +223,5 @@ case class VarDataValue(identVar: Var[String],
 
 object VarDataValue {
   def apply(parentPath: Seq[String]): VarDataValue =
-    new VarDataValue(Var(DataStructure.defaultKey), StructureType.STRING, Var(parentPath))
+    new VarDataValue(Var(DataStructure.defaultKey), StructureType.STRING, Var(ONE), Var(parentPath))
 }

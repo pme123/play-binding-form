@@ -25,7 +25,7 @@ object DataStructureDragDrop {
     if (dragObject.value.nonEmpty) {
       ev.preventDefault
       moveToElemVar.value match {
-        case VarDataObject(identVar, content, parentPathVar) =>
+        case VarDataObject(identVar, _, content, parentPathVar) =>
           val dataDragObj = dragObject.value.get
           val dragObj = dataDragObj.dragObj
           val dragIdent = dragObj.value.identVar.value
@@ -35,7 +35,7 @@ object DataStructureDragDrop {
             content.value += dragObj
             dataDragObj.parentContent.value -= dragObj
           }
-        case VarDataValue(identVar, _, parentPathVar) =>
+        case VarDataValue(identVar, _, _, parentPathVar) =>
           val dataDragObj = dragObject.value.get
           val dragObjVar = dataDragObj.dragObj
           val dragIdent = dragObjVar.value.identVar.value

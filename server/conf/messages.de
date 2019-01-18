@@ -53,5 +53,6 @@ menu.view.preview=Formular Vorschau
 menu.view.editor=Formular Editor
 menu.view.data=Data Editor
 menu.view.mapping=Mapping Editor
+menu.view.json=Json View
 view.data.ident=Daten Identität
 view.mapping.ident=Mapping Identität
