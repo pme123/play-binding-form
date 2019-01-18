@@ -31,7 +31,7 @@ object Settings {
   lazy val doobieV = "0.5.3"
   lazy val scalaTestV = "3.0.5"
 
-  lazy val organizationSettings = Seq(
+  lazy val organizationSettings: Seq[Def.Setting[_]] = Seq(
     organization := orgId
     , organizationHomepage := orgHomepage
   )
@@ -41,11 +41,19 @@ object Settings {
     case "fast" => FastOptStage
   }.getOrElse(FastOptStage)
 
+  lazy val FunTest = config("it") extend Test
+
+  def funTestFilter(name: String): Boolean = name endsWith "Spec"
+
+  def unitTestFilter(name: String): Boolean = name endsWith "Test"
+
   lazy val serverSettings: Seq[Def.Setting[_]] = Def.settings(
     scalacOptions += "-Ypartial-unification",
     buildInfoSettings,
     pipelineStages in Assets := Seq(scalaJSPipeline),
     pipelineStages := Seq(digest, gzip),
+    testOptions in Test := Seq(Tests.Filter(unitTestFilter)),
+    testOptions in FunTest := Seq(Tests.Filter(funTestFilter)),
     IntegrationTest / parallelExecution := false,
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
@@ -89,17 +97,17 @@ object Settings {
     // metrics
     "com.kenshoo" %% "metrics-play" % "2.6.6_0.6.2",
     // TEST
-    "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % IntegrationTest,
-    "com.typesafe.akka" %% "akka-stream-testkit" % "2.5.6" % IntegrationTest,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % IntegrationTest,
-    "org.awaitility" % "awaitility" % "3.0.0" % IntegrationTest,
+    "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % Test,
+    "com.typesafe.akka" %% "akka-stream-testkit" % "2.5.6" % Test,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
+    "org.awaitility" % "awaitility" % "3.0.0" % Test,
 
-    "org.scalatest" %% "scalatest" % scalaTestV % "test,it",
-    "org.tpolecat" %% "doobie-scalatest" % doobieV % IntegrationTest
+    "org.scalatest" %% "scalatest" % scalaTestV % Test,
+    "org.tpolecat" %% "doobie-scalatest" % doobieV % Test
   ).map(_.excludeAll(ExclusionRule("org.slf4j", "slf4j-log4j12")))
   )
 
-  lazy val clientSettings = Seq(
+  lazy val clientSettings: Seq[Def.Setting[_]] = Seq(
     scalacOptions ++= Seq("-Xmax-classfile-name", "78")
     , addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     , jsDependencies ++= Seq(
