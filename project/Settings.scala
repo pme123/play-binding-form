@@ -1,3 +1,4 @@
+import com.tapad.docker.DockerComposePlugin.autoImport.composeFile
 import com.typesafe.sbt.digest.Import.{DigestKeys, digest}
 import com.typesafe.sbt.gzip.Import.gzip
 import com.typesafe.sbt.web.Import.Assets
@@ -12,7 +13,6 @@ import sbt.{Def, ExclusionRule, URL, _}
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import scoverage.ScoverageSbtPlugin.autoImport._
 import webscalajs.WebScalaJS.autoImport.scalaJSPipeline
-import com.tapad.docker.DockerComposePlugin.autoImport.composeFile
 
 object Settings {
 
@@ -46,6 +46,7 @@ object Settings {
     buildInfoSettings,
     pipelineStages in Assets := Seq(scalaJSPipeline),
     pipelineStages := Seq(digest, gzip),
+    IntegrationTest / parallelExecution := false,
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
     // to have routing also in ScalaJS
@@ -88,15 +89,13 @@ object Settings {
     // metrics
     "com.kenshoo" %% "metrics-play" % "2.6.6_0.6.2",
     // TEST
-    "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % Test,
-    "com.typesafe.akka" %% "akka-stream-testkit" % "2.5.6" % Test,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
-    "org.awaitility" % "awaitility" % "3.0.0" % Test,
+    "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % IntegrationTest,
+    "com.typesafe.akka" %% "akka-stream-testkit" % "2.5.6" % IntegrationTest,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % IntegrationTest,
+    "org.awaitility" % "awaitility" % "3.0.0" % IntegrationTest,
 
-    "org.scalatest" %% "scalatest" % scalaTestV % Test,
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.4.2" % Test,
-    "org.subethamail" % "subethasmtp" % "3.1.7" % Test,
-    "org.tpolecat" %% "doobie-scalatest" % doobieV % Test
+    "org.scalatest" %% "scalatest" % scalaTestV % "test,it",
+    "org.tpolecat" %% "doobie-scalatest" % doobieV % IntegrationTest
   ).map(_.excludeAll(ExclusionRule("org.slf4j", "slf4j-log4j12")))
   )
 
