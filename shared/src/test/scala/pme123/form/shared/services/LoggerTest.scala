@@ -17,22 +17,22 @@ class LoggerTest extends UnitTest {
   // Logger.debug
   {
     val msg = debug(logMsg)
-    matchLogMsg(msg)
+    matchLogMsg("debug", msg)
   }
   // Logger.info
   {
     val msg = info(logMsg)
-    matchLogMsg(msg)
+    matchLogMsg("info", msg)
   }
   // Logger.warn
   {
     val msg = warn(logMsg)
-    matchLogMsg(msg)
+    matchLogMsg("warn", msg)
   }
   // Logger.error
   {
     val msg = error(logMsg)
-    matchLogMsg(msg)
+    matchLogMsg("error", msg)
   }
   // Logger.error(Throwable)
   {
@@ -46,7 +46,7 @@ class LoggerTest extends UnitTest {
     val simpleMsg = "simple log"
     val msg = error(simpleMsg, new Exception(logMsgPrefix))
 
-    it should "match the log message" in {
+    it should "match the error message" in {
       msg should be(simpleMsg)
     }
   }
@@ -54,7 +54,7 @@ class LoggerTest extends UnitTest {
   {
     val msg = error(logMsg,new Exception(logMsgPrefix))
 
-    matchLogMsg(msg)
+    matchLogMsg("error with params", msg)
   }
 
   "AllErrorMsgs for a AdaptersException" should "be formatted in an expected format" in {
@@ -75,10 +75,10 @@ class LoggerTest extends UnitTest {
   {
     val msg = Logging.info(logMsg)
     "A LogEntry as string" should "be a nice readable text preceeded by the LogLevel" in {
-      msg should be(s"INFO: $logMsgPrefix $logParam1 $logParam2")
+      msg should be(s"$logMsgPrefix $logParam1 $logParam2")
     }
     it should "have no problems with UTF-8 encodings" in {
-      Logging.info("12%\u00e4Tafelgetr\u00e4nke\nw") should be("INFO: 12%\u00e4Tafelgetr\u00e4nke\nw")
+      Logging.info("12%\u00e4Tafelgetr\u00e4nke\nw") should be("12%\u00e4Tafelgetr\u00e4nke\nw")
     }
   }
   // LogLevel.fromLevel
@@ -151,8 +151,8 @@ class LoggerTest extends UnitTest {
     }
   }
 
-  private def matchLogMsg(msg:String): Unit =
-    it should "match the log message" in {
+  private def matchLogMsg(postfix:String, msg:String): Unit =
+    it should s"match the log message $postfix" in {
       msg should be(logMsg)
     }
 

@@ -45,7 +45,12 @@ object DataStructure {
 }
 
 case class DataObject(ident: String = "", cardinality: Cardinality = ONE, children: Seq[DataStructure] = Seq.empty)
-  extends DataStructure
+  extends DataStructure {
+
+  def child(ident: String): Option[DataStructure] =
+    children.find(_.ident == ident)
+
+}
 
 object DataObject {
 

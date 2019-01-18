@@ -4,7 +4,8 @@ import java.io.InputStream
 
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import pme123.form.server.entity.ImportWorkbook
-import pme123.form.shared.DataString
+import pme123.form.shared.DataValue
+import pme123.form.shared.StructureType.STRING
 
 
 class ImportWorkbookTest
@@ -22,8 +23,8 @@ class ImportWorkbookTest
 
   private val wb = workbook.wb
   workbook.printImport()
-  "The FormStore import" should "be imported and contain 3 sheets" in {
-    assert(wb.getNumberOfSheets === 3)
+  "The FormStore import" should "be imported and contain 4 sheets" in {
+    assert(wb.getNumberOfSheets === 4)
   }
 
   it should "contain a forms sheet" in {
@@ -33,8 +34,8 @@ class ImportWorkbookTest
     assert(wb.getSheet(sheetData) != null)
   }
 
-  "The forms sheet" should "have 1 forms" in {
-    workbook.forms.get.length should be(1)
+  "The forms sheet" should "have 2 forms" in {
+    workbook.forms.get.length should be(2)
   }
   "The data sheet" should "have 1 data" in {
     workbook.data.get.length should be(1)
@@ -42,14 +43,15 @@ class ImportWorkbookTest
 
   "The first Form" should "be" in {
     val form = workbook.forms.get.head.get
-    form.ident should be("address-form")
-    form.elems.head.ident should be("TITLE-3549")
+    form.ident should be("address")
+    form.elems.head.ident should be("TITLE-60664")
   }
 
   "The first Data" should "be" in {
     val data = workbook.data.get.head.get
     data.ident should be("address-data")
-    data.structure.value("street") should be(DataString("Sonnenweg"))
+    data.children.size should be(4)
+    data.child("street").get should be(DataValue("street",STRING))
   }
 
 }
