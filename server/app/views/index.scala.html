@@ -4,7 +4,7 @@
 @this(webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder, header: views.html.header)
 
 
-@(pageConfig: PageConfig)(implicit r: Request[_], rh: RequestHeader)
+@(pageConfig: PageConfig)(implicit r: Request[_], rh: RequestHeader, msgProvider: MessagesProvider)
 
 <!DOCTYPE html>
 <html>

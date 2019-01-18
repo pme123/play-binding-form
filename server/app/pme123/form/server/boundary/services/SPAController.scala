@@ -21,13 +21,20 @@ abstract class SPAController(spaComps: SPAComponents)
   lazy val config: FormConfiguration = spaComps.config
   lazy val cc: ControllerComponents = spaComps.cc
   lazy val identityApi: IdentityService = spaComps.identityApi
+
   def silhouette: Silhouette[DefaultEnv] = spaComps.silhouette
 
-  def pageConfig(maybeUser: Option[AuthUser]): Future[PageConfig] =
-    Future.successful(PageConfig(context, env.isDev))
+  def pageConfig()(implicit identity: AuthUser): Future[PageConfig] =
+    Future.successful(
+      PageConfig(context, env.isDev, maybeUser = Some(identity))
+    )
 
+  def pageConfig: Future[PageConfig] =
+    Future.successful(
+      PageConfig(context, env.isDev)
+    )
 
-  private def context: String = {
+  protected def context: String = {
     val context = if (config.httpContext.length > 1)
       config.httpContext
     else

@@ -20,9 +20,9 @@ class HomeController @Inject()(template: views.html.index
 
   private lazy val jsMessages = jsMessagesFactory.all
 
-  def index(): Action[AnyContent] = SecuredAction.async { implicit request: Request[AnyContent] =>
+  def index(): Action[AnyContent] = SecuredAction.async { implicit request =>
     // uses the AssetsFinder API
-    pageConfig(None)
+    pageConfig()
       .map(pc => Ok(template(pc)))
   }
 

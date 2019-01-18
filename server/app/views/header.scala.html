@@ -9,7 +9,10 @@
 <link rel="shortcut icon" type="image/png" href="@assets.withUrlPrefix(pageConfig.context).path("assets/images/favicon.png")">
     <!-- IE with compatibility mode -->
 <meta http-equiv="x-ua-compatible" content="IE=edge">
-    <!-- Semantic-UI Styles-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="application-name" content="Form Store - Play Binding Demo" data-userid="@pageConfig.maybeUser.map(_.id)">
+
+<!-- Semantic-UI Styles-->
     @Html(webJarsUtil.css("semantic.min.css"))
     <!-- scala-adapters Styles -->
 @Html("<link rel=stylesheet type=text/css href=" + assets.withUrlPrefix(pageConfig.context).path("assets/stylesheets/main.css") + ">")

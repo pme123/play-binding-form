@@ -9,6 +9,7 @@ import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.mvc._
 import pme123.form.server.control.auth.{IdentityService, UserService}
+import pme123.form.server.entity.PageConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +29,7 @@ class AuthController @Inject()(identityApi: IdentityService,
       case Some(_) => Future.successful(Redirect(routes.HomeController.index()))
       case None =>
         val signInForm = SignInForm.form
-        pageConfig(None).map(conf =>
+        pageConfig.map(conf =>
           Ok(signInTempl(signInForm, redirectUrl, conf)))
     }
   }
@@ -38,7 +39,7 @@ class AuthController @Inject()(identityApi: IdentityService,
     */
   def authenticate(redirectUrl: Option[String] = None): Action[AnyContent] = UnsecuredAction.async { implicit request =>
     SignInForm.form.bindFromRequest.fold(
-      formWithErrors => pageConfig(None).map(conf =>
+      formWithErrors => pageConfig.map(conf =>
         BadRequest(signInTempl(formWithErrors, redirectUrl, conf))),
       formData => {
         val authService = silhouette.env.authenticatorService

@@ -20,7 +20,9 @@ lazy val formRoot = project.in(file(".")).
   ).enablePlugins(DockerComposePlugin)
 
 lazy val server = (project in file("server"))
+  .configs(E2ETest)
   .configs(FunTest)
+  .settings(inConfig(E2ETest)(Defaults.testTasks): _*)
   .settings(inConfig(FunTest)(Defaults.testTasks): _*)
   .settings(scalaJSProjects := Seq(client))
   .settings(sharedSettings(Some("server")))

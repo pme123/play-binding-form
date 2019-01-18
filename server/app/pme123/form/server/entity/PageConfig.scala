@@ -4,7 +4,8 @@ package pme123.form.server.entity
 case class PageConfig(
                        context: String, // the context the project is running (play.http.context)
                        isDevMode: Boolean, // in dev mode you have fast opt JavaScripts
-                       projectName: String = "play-binding-form" // the name of the project (Settings.projectName of your project)
+                       projectName: String = "play-binding-form", // the name of the project (Settings.projectName of your project)
+                       maybeUser: Option[AuthUser] = None,
                      ) {
 
 }

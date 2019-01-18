@@ -42,8 +42,10 @@ object Settings {
   }.getOrElse(FastOptStage)
 
   lazy val FunTest = config("it") extend Test
+  lazy val E2ETest = config("e2e") extend Test
 
   def funTestFilter(name: String): Boolean = name endsWith "Spec"
+  def e2eTestFilter(name: String): Boolean = name endsWith "E2E"
 
   def unitTestFilter(name: String): Boolean = name endsWith "Test"
 
@@ -54,7 +56,7 @@ object Settings {
     pipelineStages := Seq(digest, gzip),
     testOptions in Test := Seq(Tests.Filter(unitTestFilter)),
     testOptions in FunTest := Seq(Tests.Filter(funTestFilter)),
-    IntegrationTest / parallelExecution := false,
+    testOptions in E2ETest := Seq(Tests.Filter(e2eTestFilter)),
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
     // to have routing also in ScalaJS
@@ -101,6 +103,7 @@ object Settings {
     "com.typesafe.akka" %% "akka-stream-testkit" % "2.5.6" % Test,
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
     "org.awaitility" % "awaitility" % "3.0.0" % Test,
+    "org.seleniumhq.selenium" % "selenium-java" % "3.14.0" % Test,
 
     "org.scalatest" %% "scalatest" % scalaTestV % Test,
     "org.tpolecat" %% "doobie-scalatest" % doobieV % Test
