@@ -12,8 +12,8 @@ class FormDBSpec
   "FormDB" should {
 
     "initialize the Form Table" in {
-      whenReady(formDBRepo.selectForm("address-form")) { f =>
-        assert(f.ident == "address-form")
+      whenReady(formDBRepo.selectForm("address")) { f =>
+        assert(f.ident == "address")
       }
     }
 
