@@ -2,6 +2,9 @@
 import Settings._
 import sbtcrossproject.{CrossType, crossProject}
 
+
+resolvers in ThisBuild += "Atlassian Releases" at "https://maven.atlassian.com/public/"
+
 lazy val formRoot = project.in(file(".")).
   aggregate(sharedJvm, sharedJs, server, client)
   .settings(organizationSettings)
