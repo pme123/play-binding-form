@@ -8,7 +8,7 @@ resolvers += Resolver.url("heroku-sbt-plugin-releases",
   url("https://dl.bintray.com/heroku/sbt-plugins/"))(Resolver.ivyStylePatterns)
 
 resolvers += "jitpack" at "https://jitpack.io"
-resolvers += Resolver.jcenterRepo
+resolvers += "Atlassian Maven" at "https://maven.atlassian.com/content/repositories/atlassian-public/"
 
 // Sbt plugins
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.15")
