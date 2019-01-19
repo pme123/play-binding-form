@@ -1,6 +1,9 @@
 import com.tapad.docker.DockerComposePlugin.autoImport.composeFile
 import com.typesafe.sbt.digest.Import.{DigestKeys, digest}
 import com.typesafe.sbt.gzip.Import.gzip
+import com.typesafe.sbt.packager.docker.Cmd
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
+import com.typesafe.sbt.packager.linux.LinuxPlugin.autoImport.defaultLinuxInstallLocation
 import com.typesafe.sbt.web.Import.Assets
 import com.typesafe.sbt.web.SbtWeb.autoImport.pipelineStages
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
@@ -19,7 +22,7 @@ object Settings {
   lazy val orgId = "pme123"
   lazy val orgHomepage = Some(new URL("https://github.com/pme123"))
   lazy val projectName = "play-binding-form"
-  lazy val projectV = "1.4.4"
+  lazy val projectV = "0.0.1"
 
   // main versions
   lazy val scalaV = "2.12.6"
@@ -83,8 +86,9 @@ object Settings {
     "com.mohiva" %% "play-silhouette-testkit" % silhouetteV % "test",
     // scala-guice
     "net.codingwell" %% "scala-guice" % "4.2.1",
-    // kafka
-    "com.typesafe.akka" %% "akka-stream-kafka" % "0.22",
+    // guava
+    "com.google.guava" % "guava" % "27.0.1-jre",
+
     // doobie
     // Start with this one
     "org.tpolecat" %% "doobie-core" % doobieV,
@@ -171,6 +175,26 @@ object Settings {
     buildInfoPackage := "pme123.adapters.version"
   )
 
+  lazy val dockerSettings: Seq[Def.Setting[_]] = Seq(
+    dockerRepository := None, //Some("docker.io"),
+    dockerUsername := Some("pame"),
+    defaultLinuxInstallLocation in Docker := "/pme123",
+    dockerBaseImage := "openjdk:8-jre",
+    dockerUpdateLatest := true,
+    dockerExposedPorts := Seq(9000, 9443),
+    dockerEntrypoint := Seq("/pme123/conf/docker_entrypoint.sh"),
+    dockerCommands ++= Seq(
+      Cmd("USER", "root"),
+      Cmd("RUN", "mkdir", "/pme123/logs"),
+      Cmd("RUN", "chmod", "-R", "777", "/pme123/logs"),
+      Cmd("RUN", "chmod", "+x", "/pme123/conf/docker_entrypoint.sh"),
+      Cmd("RUN", "chmod", "+x", "/pme123/bin/play-binding-form-server"),
+      Cmd("RUN", "chgrp", "-R", "0", "/pme123", "&&", "chmod", "-R", "g=u", "/pme123"),
+      Cmd("USER", "daemon")
+    )
+
+  )
+  
   lazy val dockerComposeSettings: Seq[Def.Setting[_]] = Seq(
     composeFile := "./docker/docker-compose.yml"
   )

@@ -1,0 +1,33 @@
+### docker-compose file for development environment
+#
+version: "3.1"
+services:
+
+  postgres:
+    image: postgres
+    networks:
+      - mynet
+    environment:
+      - POSTGRES_PASSWORD=3sf2reRer
+    ports:
+      - "5432:5432"
+    hostname: postgres
+
+  pme123-forms:
+    image: pame/play-binding-form-server
+    networks:
+      - mynet
+    volumes:
+      - ./application.conf:/pme123/conf/application.conf:z
+    environment:
+      TZ: "Europe/Zurich"
+      pidfile.path: "/dev/null"
+      DB_URL: "jdbc:postgresql://postgres/postgres"
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+    hostname: pme123-forms
+
+networks:
+  mynet:

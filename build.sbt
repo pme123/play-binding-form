@@ -29,6 +29,7 @@ lazy val server = (project in file("server"))
   .settings(serverSettings)
   .settings(serverDependencies)
   .settings(jvmSettings)
+  .settings(dockerSettings)
   .enablePlugins(PlayScala, BuildInfoPlugin)
   .dependsOn(sharedJvm)
 
