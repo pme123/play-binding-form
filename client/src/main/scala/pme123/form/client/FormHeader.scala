@@ -92,21 +92,24 @@ private[client] object FormHeader
   @dom
   private lazy val formsButton: Binding[HTMLElement] = {
     val mainView = UIRoute.route.state.bind
-    <div>
+
       {mainView match {
       case DataView =>
-        DataServices.idents().bind
-        identDropdown("Choose Data", UIDataStore.uiState.idents, changeIdent).bind
-
+        <div>{
+        DataServices.idents().bind}{//
+          identDropdown("Choose Data", UIDataStore.uiState.idents, changeIdent).bind
+          }</div>
       case MappingView =>
-        MappingServices.idents().bind
+        <div>{
+          MappingServices.idents().bind}{//
         identDropdown("Choose Mapping", UIMappingStore.uiState.idents, changeIdent).bind
-
+          }</div>
       case _ =>
-        FormServices.idents().bind
+        <div>{
+          FormServices.idents().bind}{//
         identDropdown("Choose Form", UIFormStore.uiState.idents, changeIdent).bind
-    }}
-    </div>
+          }</div>
+      }}
   }
   val changeIdent: Var[Option[String]] = Var(None)
 

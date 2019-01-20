@@ -4,7 +4,6 @@ import com.thoughtworks.binding.Binding.{Constants, Var}
 import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
-import pme123.form.client.form.UIFormStore
 import pme123.form.client.services.{SPAClient, SemanticUI}
 
 import scala.language.implicitConversions
@@ -26,7 +25,7 @@ object FormClient
     SemanticUI.initElements()
   }
 
-  def render = Binding {
+  private def render = Binding {
     Constants(
       consumer,
       container
