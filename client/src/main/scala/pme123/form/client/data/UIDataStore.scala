@@ -149,11 +149,13 @@ object UIDataStore extends Logging {
 
     def findValues(): Seq[Var[VarDataValue]] =
       contents
-        .flatMap {
-          case value: Var[VarDataValue] if value.value.isInstanceOf[VarDataValue] =>
-            Seq(value)
-          case obj: Var[VarDataObject] =>
-            obj.value.findValues()
+        .flatMap { value =>
+          value.value match {
+            case _: VarDataValue =>
+              Seq(value.asInstanceOf[Var[VarDataValue]])
+            case obj: VarDataObject =>
+              obj.findValues()
+          }
         }
   }
 
