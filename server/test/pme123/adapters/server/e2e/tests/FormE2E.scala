@@ -32,7 +32,7 @@ trait FormE2E
   private def headlessOptions = options.addArguments("headless")
 
   def createWebDriver(): WebDriver = {
-    val driver = new RemoteWebDriver(new URL(webDriverUrl),
+    val driver = new RemoteWebDriver(webDriverUrl,
       if (interactiveMode) options else headlessOptions)
 
     driver.setFileDetector(new LocalFileDetector())
@@ -47,7 +47,7 @@ trait FormE2E
     find(xpath("//meta[@name='application-name']"))
       .flatMap(_.attribute("data-userid"))
 
-  "As a preparation BPF" should {
+  "As a preparation" should {
     "login as adminUser" in {
       go to baseUrl
       login(demoAdmin,demoAdmin)

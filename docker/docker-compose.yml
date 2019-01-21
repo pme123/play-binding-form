@@ -1,6 +1,6 @@
 ### docker-compose file for development environment
 #
-version: "3"
+version: "3.1"
 services:
 
   postgres:
@@ -10,8 +10,35 @@ services:
     environment:
       - POSTGRES_PASSWORD=3sf2reRer
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     hostname: postgres
+
+  pme123-forms:
+    image: pame/play-binding-form-server
+    networks:
+      - mynet
+    volumes:
+      - ./application.conf:/pme123/conf/application.conf:z
+    environment:
+      TZ: "Europe/Zurich"
+      pidfile.path: "/dev/null"
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+    hostname: pme123-forms
+
+  chrome-webdriver:
+    image: selenium/standalone-chrome:3.141.59-europium
+    networks:
+      - mynet
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - "4444:4444"
+    depends_on:
+      - pme123-forms
+    hostname: chrome-webdriver
 
 networks:
   mynet:
