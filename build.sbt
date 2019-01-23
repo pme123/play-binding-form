@@ -9,12 +9,10 @@ lazy val formRoot = project.in(file(".")).
   aggregate(sharedJvm, sharedJs, server, client)
   .settings(organizationSettings)
   .settings(dockerComposeSettings)
+  .settings(noPublishSettings)
+  .settings(noDockerPublishSettings)
   .settings(
-    publish := {}
-    , publishLocal := {}
-    , publishArtifact := false
-    , isSnapshot := true
-    , run := {
+    run := {
       (run in server in Compile).evaluated
     }
   ).enablePlugins(DockerComposePlugin)
@@ -29,6 +27,7 @@ lazy val server = (project in file("server"))
   .settings(serverSettings)
   .settings(serverDependencies)
   .settings(jvmSettings)
+  .settings(noPublishSettings)
   .settings(dockerSettings)
   .enablePlugins(PlayScala, BuildInfoPlugin)
   .dependsOn(sharedJvm)
@@ -40,6 +39,8 @@ lazy val client = (project in file("client"))
   .settings(clientSettings)
   .settings(clientDependencies)
   .settings(jsSettings)
+  .settings(noPublishSettings)
+  .settings(noDockerPublishSettings)
   .enablePlugins(ScalaJSWeb)
   .dependsOn(sharedJs)
 
@@ -47,6 +48,8 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(sharedSettings())
   .settings(sharedDependencies)
+  .settings(noPublishSettings)
+  .settings(noDockerPublishSettings)
   .jsSettings(jsSettings)
   .jsSettings(sharedJsDependencies) // defined in sbt-scalajs-crossproject
   .jvmSettings(jvmSettings)

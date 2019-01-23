@@ -22,7 +22,7 @@ object Settings {
   lazy val orgId = "pme123"
   lazy val orgHomepage = Some(new URL("https://github.com/pme123"))
   lazy val projectName = "play-binding-form"
-  lazy val projectV = "0.0.1"
+  lazy val projectV = "0.0.2"
 
   // main versions
   lazy val scalaV = "2.12.6"
@@ -48,6 +48,7 @@ object Settings {
   lazy val E2ETest = config("e2e") extend Test
 
   def funTestFilter(name: String): Boolean = name endsWith "Spec"
+
   def e2eTestFilter(name: String): Boolean = name endsWith "E2E"
 
   def unitTestFilter(name: String): Boolean = name endsWith "Test"
@@ -176,7 +177,7 @@ object Settings {
   )
 
   lazy val dockerSettings: Seq[Def.Setting[_]] = Seq(
-    dockerRepository := None, //Some("docker.io"),
+    dockerRepository := Some("docker.io"),
     dockerUsername := Some("pame"),
     defaultLinuxInstallLocation in Docker := "/pme123",
     dockerBaseImage := "openjdk:8-jre",
@@ -197,5 +198,16 @@ object Settings {
   
   lazy val dockerComposeSettings: Seq[Def.Setting[_]] = Seq(
     composeFile := "./docker/docker-compose.yml"
+  )
+  lazy val noPublishSettings: Seq[Def.Setting[_]] = Seq(
+    publish := {},
+    publishLocal := {},
+    publishArtifact := false,
+    isSnapshot := true
+  )
+
+  lazy val noDockerPublishSettings: Seq[Def.Setting[_]] = Seq(
+    publish in Docker := {},
+    publishLocal in Docker := {}
   )
 }
