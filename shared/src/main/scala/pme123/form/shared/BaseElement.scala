@@ -1,6 +1,6 @@
 package pme123.form.shared
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 import pme123.form.shared.LayoutWide.EIGHT
 import pme123.form.shared.services.Language
 

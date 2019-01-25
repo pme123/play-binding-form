@@ -1,5 +1,9 @@
 package pme123.form.client.services
 
+import org.denigma.codemirror.extensions.EditorConfig
+import org.denigma.codemirror.{CodeMirror, EditorConfiguration}
+import org.scalajs.dom.{console, document}
+import org.scalajs.dom.raw.HTMLTextAreaElement
 import org.scalajs.jquery.{JQuery, jQuery}
 import play.api.libs.json.Json
 import pme123.form.shared.services.Language

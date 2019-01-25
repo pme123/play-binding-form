@@ -2,23 +2,32 @@ package pme123.form.client.json
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
-import org.scalajs.dom.raw.{Event, HTMLElement}
+import org.denigma.codemirror.CodeMirror
+import org.denigma.codemirror.extensions.EditorConfig
+import org.scalajs.dom._
+import org.scalajs.dom.raw.{Event, HTMLElement, HTMLTextAreaElement}
 import org.scalajs.jquery.jQuery
 import play.api.libs.json.Json
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore
-import pme123.form.client.form.UIFormElem
+import pme123.form.client.form.{FormServices, FormUtils, UIFormElem}
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
-import pme123.form.shared.ElementType.TEXTAREA
+import pme123.form.shared.ElementType.{TEXTAREA, TEXTFIELD}
 import pme123.form.shared.ExtraProp.ROWS
 import pme123.form.shared._
+
+import scala.scalajs.js.timers.setTimeout
 
 private[client] object JsonView
   extends MainView {
 
   val link = "json"
   val icon = "file outline"
+  val urlFieldId = "url-to-import"
+  val jsonFieldId = "json-to-import"
+
+  val callService = Var(false)
 
   // 1. level of abstraction
   // **************************
@@ -32,6 +41,7 @@ private[client] object JsonView
         None,
         importButton,
       ).bind}{//
+      callServiceDiv.bind}{//
       content.bind}<div class="ui error message"></div>
     </div>}
 
@@ -46,9 +56,16 @@ private[client] object JsonView
       <button class="ui circular icon button"
               data:data-tooltip="Import JSON"
               onclick={_: Event =>
-                val str = jQuery("#json-to-import").value().toString
-                val structure = DataStructure.fromJson(DataStructure.defaultKey, Json.parse(str))
-                UIDataStore.changeData(structure.asInstanceOf[DataObject])}>
+                val url = jQuery(s"#$urlFieldId").value().toString
+
+                  if (url.trim.nonEmpty) {
+                    callService.value = true
+                  } else {
+                    val jsonStr = jQuery(s"#$jsonFieldId").value().toString
+                    val structure = DataStructure.fromJson(DataStructure.defaultKey, Json.parse(jsonStr))
+                    UIDataStore.changeData(structure.asInstanceOf[DataObject])
+                  }
+                }>
         <i class=" upload icon"></i>
       </button>
     </div>
@@ -58,57 +75,67 @@ private[client] object JsonView
   @dom
   private lazy val content: Binding[HTMLElement] = {
     <div class="ui card">
-          {BaseElementDiv(
+      {val url = UIJsonStore.uiState.urlVar.bind
+    BaseElementDiv(
       UIFormElem(BaseElement(
-        s"json-to-import",
-        TEXTAREA,
+        urlFieldId,
+        TEXTFIELD,
         ElementTexts.placeholder(I18n("json.import")),
-        extras = ExtraProperties(Seq(
-          ExtraPropValue(
-            ROWS, "50"
-          ))),
-        value = Some(testJson)
-      )
-      )
-    ).bind}
+        extras = ExtraProperties(),
+        value = url
+      ), Some { str =>
+        UIJsonStore.uiState.urlVar.value = Some(str)
+      }
+      )).bind}{//
+      val json = UIJsonStore.uiState.jsonVar.bind
+      initCodeField()
+      BaseElementDiv(
+        UIFormElem(BaseElement(
+          jsonFieldId,
+          TEXTAREA,
+          ElementTexts.placeholder(I18n("json.import")),
+          extras = ExtraProperties(Seq(
+            ExtraPropValue(
+              ROWS, "50"
+            ))),
+          value = json
+        ), Some { str =>
+          UIJsonStore.uiState.jsonVar.value = Some(str)
+        }
+        )).bind}
     </div>
   }
 
+  def initCodeField() = {
+    setTimeout(500) {
+      val params =
+        EditorConfig
+          .mode("javascript")
+          .lineNumbers(true)
 
-  private val testJson =
-    """
-      |{
-      |	"name": "Luke Skywalker",
-      |	"height": "172",
-      |	"mass": "77",
-      |	"hair_color": "blond",
-      |	"skin_color": "fair",
-      |	"eye_color": "blue",
-      |	"birth_year": "19BBY",
-      |	"gender": "male",
-      |	"homeworld": "https://swapi.co/api/planets/1/",
-      |	"films": [
-      |		"https://swapi.co/api/films/2/",
-      |		"https://swapi.co/api/films/6/",
-      |		"https://swapi.co/api/films/3/",
-      |		"https://swapi.co/api/films/1/",
-      |		"https://swapi.co/api/films/7/"
-      |	],
-      |	"species": [
-      |		"https://swapi.co/api/species/1/"
-      |	],
-      |	"vehicles": [
-      |		"https://swapi.co/api/vehicles/14/",
-      |		"https://swapi.co/api/vehicles/30/"
-      |	],
-      |	"starships": [
-      |		"https://swapi.co/api/starships/12/",
-      |		"https://swapi.co/api/starships/22/"
-      |	],
-      |	"created": "2014-12-09T13:50:51.644000Z",
-      |	"edited": "2014-12-20T21:17:56.891000Z",
-      |	"url": "https://swapi.co/api/people/1/"
-      |}
-    """.stripMargin
+      val element = document.getElementById(jsonFieldId)
+      // println("element: " + element.id)
+      //config
+      element match {
+        case el: HTMLTextAreaElement =>
+          val m = CodeMirror.fromTextArea(el, params)
+          m.setSize("100%", "100%")
+        case _ => console.error("cannot find text area for the code!")
+      }
+    }
+  }
 
+  @dom
+  private lazy val callServiceDiv: Binding[HTMLElement] = {
+    val doCall = callService.bind
+    if (doCall)
+      <div>
+        {callService.value = false
+      JsonServices.getJson(
+        UIJsonStore.uiState.urlVar.value.get
+      ).bind}
+      </div>
+    else
+        <span/>
+  }
 }

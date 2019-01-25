@@ -101,6 +101,7 @@ object Settings {
     "org.webjars" %% "webjars-play" % "2.6.1",
     "org.webjars" % "Semantic-UI" % semanticV,
     "org.webjars" % "jquery" % jQueryV,
+    "org.webjars" % "codemirror" % "5.41.0",
     // metrics
     "com.kenshoo" %% "metrics-play" % "2.6.6_0.6.2",
     // TEST
@@ -124,24 +125,26 @@ object Settings {
     )
   )
   lazy val clientDependencies: Seq[Def.Setting[_]] = Def.settings(libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "0.9.6"
-    , "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
-    , "com.typesafe.play" %%% "play-json" % "2.6.1"
-    , "com.thoughtworks.binding" %%% "dom" % bindingV
-    , "com.thoughtworks.binding" %%% "route" % bindingV
-    , "com.thoughtworks.binding" %%% "futurebinding" % bindingV
-    , "fr.hmil" %%% "roshttp" % "2.0.2"
-    // java.time support for ScalaJS
-    , "org.scala-js" %%% "scalajs-java-time" % "0.2.2"
-    // jquery support for ScalaJS
-    , "be.doeraene" %%% "scalajs-jquery" % "0.9.1"
-    , "org.scalatest" %%% "scalatest" % scalaTestV % Test
+    "org.scala-js" %%% "scalajs-dom" % "0.9.6",
+    "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+    "com.typesafe.play" %%% "play-json" % "2.6.1",
+    "com.thoughtworks.binding" %%% "dom" % bindingV,
+    "com.thoughtworks.binding" %%% "route" % bindingV,
+    "com.thoughtworks.binding" %%% "futurebinding" % bindingV,
+    "fr.hmil" %%% "roshttp" % "2.0.2",
+    "org.denigma" %%% "codemirror-facade" % "5.13.2-0.8",
+    // java.time support for ScalaJS, 
+    "org.scala-js" %%% "scalajs-java-time" % "0.2.2",
+    // jquery support for ScalaJS, 
+    "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
+    "org.scalatest" %%% "scalatest" % scalaTestV % Test,
   ))
 
   lazy val sharedDependencies: Seq[Def.Setting[_]] = Def.settings(libraryDependencies ++= Seq(
     "org.julienrf" %%% "play-json-derived-codecs" % "4.0.0",
     "com.beachape" %%% "enumeratum-play-json" % "1.5.14",
     "com.softwaremill.quicklens" %%% "quicklens" % "1.4.11",
+    "com.github.marklister" %%% "base64" % "0.2.4",
     // logging lib that also works with ScalaJS
     "biz.enef" %%% "slogging" % sloggingV,
     "org.scalatest" %%% "scalatest" % scalaTestV % Test,
@@ -195,7 +198,7 @@ object Settings {
     )
 
   )
-  
+
   lazy val dockerComposeSettings: Seq[Def.Setting[_]] = Seq(
     composeFile := "./docker/docker-compose.yml"
   )

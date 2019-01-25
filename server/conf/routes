@@ -29,10 +29,13 @@ POST        /api/data                     pme123.form.server.boundary.DataApi.pe
 POST        /api/data/import              pme123.form.server.boundary.DataApi.importDataStructure()
 
 # Mapping API
-GET         /api/mapping/idents              pme123.form.server.boundary.MappingApi.idents()
-GET         /api/mapping/:ident              pme123.form.server.boundary.MappingApi.mapping(ident:String)
+GET         /api/mapping/idents           pme123.form.server.boundary.MappingApi.idents()
+GET         /api/mapping/:ident           pme123.form.server.boundary.MappingApi.mapping(ident:String)
 + nocsrf
-POST        /api/mapping                     pme123.form.server.boundary.MappingApi.persistMapping()
+POST        /api/mapping                  pme123.form.server.boundary.MappingApi.persistMapping()
+
+# Json API
+GET         /api/json/:url                pme123.form.server.boundary.JsonApi.callService(url)
 
 
 # API to get all the Client Configs that are registered for a jobConfig

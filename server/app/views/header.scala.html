@@ -14,5 +14,8 @@
 
 <!-- Semantic-UI Styles-->
     @Html(webJarsUtil.css("semantic.min.css"))
+    @Html(webJarsUtil.css("lib/codemirror.css"))
+    @Html(webJarsUtil.script("lib/codemirror.js"))
+    @Html(webJarsUtil.script("mode/javascript/javascript.js"))
     <!-- scala-adapters Styles -->
 @Html("<link rel=stylesheet type=text/css href=" + assets.withUrlPrefix(pageConfig.context).path("assets/stylesheets/main.css") + ">")

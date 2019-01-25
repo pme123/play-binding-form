@@ -4,6 +4,7 @@ import sbtcrossproject.{CrossType, crossProject}
 
 
 resolvers in ThisBuild += "Atlassian Releases" at "https://maven.atlassian.com/public/"
+resolvers in ThisBuild += sbt.Resolver.bintrayRepo("denigma", "denigma-releases")
 
 lazy val formRoot = project.in(file(".")).
   aggregate(sharedJvm, sharedJs, server, client)
