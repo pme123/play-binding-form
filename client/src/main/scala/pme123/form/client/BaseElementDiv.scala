@@ -47,7 +47,7 @@ object BaseElementDiv {
     val inline = uiFormElem.inlineVar.bind
     val required = uiFormElem.requiredVar.bind
     val readOnly = uiFormElem.readOnlyVar.bind
-    val ident = uiFormElem.identVar.bind
+    val ident = uiFormElem.varIdent.bind
     val extras = uiFormElem.extrasVar.bind
     val placeholder = texts.textForPlaceholder(activeLanguage).bind
     val inlineClass = if (inline) "inline" else ""

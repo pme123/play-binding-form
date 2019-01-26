@@ -89,7 +89,7 @@ case object PropertiesTab {
     if (readOnly || elementType.readOnly)
         <span/>
     else {
-      val ident = selElem.identVar.bind
+      val ident = selElem.varIdent.bind
       <div class="field">
         {BaseElementDiv(
         UIFormElem(BaseElement(
@@ -104,7 +104,7 @@ case object PropertiesTab {
           extras = ExtraProperties(TEXTFIELD),
         ),
           Some { str =>
-            selElem.identVar.value = str
+            selElem.varIdent.value = str
             SemanticUI.initElements()
           }
         )

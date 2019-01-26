@@ -21,7 +21,7 @@ private[client] object FormEditorView
         <div class="ui segment">
           <div class="ui form">
           {//
-          header(UIFormStore.uiState.identVar, Some(UIFormStore.changeIdent), headerButtons).bind}{//
+          header(UIFormStore.uiState.varIdent, Some(UIFormStore.changeIdent), headerButtons).bind}{//
           editorContent.bind}
           </div>
         </div>

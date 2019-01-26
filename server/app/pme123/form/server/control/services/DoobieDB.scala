@@ -22,15 +22,6 @@ trait DoobieDB {
     formConf.dbUsername,
     formConf.dbPassword,
   )
-  /*
-  H2
-    protected val xa: Aux[IO, Unit] = Transactor.fromDriverManager[IO](
-      "org.h2.Driver",
-      "jdbc:h2:~/dev/servers/h2",
-      "sa",
-      ""
-    )
-    */
 
   protected def update(sql: Fragment): Future[Int] =
     Future(

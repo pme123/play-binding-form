@@ -42,6 +42,6 @@ object MappingUtils {
   }
 
   def dataDropdownIdent(uiElem: UIFormElem): String = {
-    s"mapping-data-${uiElem.identVar.value}"
+    s"mapping-data-${uiElem.varIdent.value}"
   }
 }

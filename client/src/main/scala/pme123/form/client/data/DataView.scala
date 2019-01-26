@@ -30,9 +30,9 @@ private[client] object DataView
     <div class="ui container">
       {//
       header(
-        UIDataStore.uiState.data.value.identVar,
+        UIDataStore.uiState.data.value.varIdent,
         Some(str =>
-          UIDataStore.uiState.identVar.value = str),
+          UIDataStore.uiState.varIdent.value = str),
         uploadButton,
         headerButtons).bind //
       }<div class="ui form data-view">
@@ -130,7 +130,7 @@ private[client] object DataView
              DataStructureDragDrop.allowDrop(data)(ev)}>
         {//
         buttons(data, parentContent).bind}{//
-        identDiv(d.identVar).bind}{//
+        identDiv(d.varIdent).bind}{//
         structureTypeDiv(data).bind}{//
         cardinalityDiv(data).bind}{//
         if (d.structureType == OBJECT)
@@ -158,8 +158,8 @@ private[client] object DataView
 
 
   @dom
-  private def identDiv(identVar: Var[String]): Binding[HTMLElement] = {
-    val ident = identVar.bind
+  private def identDiv(varIdent: Var[String]): Binding[HTMLElement] = {
+    val ident = varIdent.bind
     <div class="five wide column">
       {BaseElementDiv(
       UIFormElem(
@@ -171,7 +171,7 @@ private[client] object DataView
           extras = ExtraProperties(TEXTFIELD),
           required = true,
         ), changeEvent = Some(str =>
-          identVar.value = str
+          varIdent.value = str
         ),
       )
     ).bind}
@@ -184,7 +184,7 @@ private[client] object DataView
       {//
       BaseElementDiv(
         UIFormElem(BaseElement(
-          s"ds-type-${data.value.identVar.value}",
+          s"ds-type-${data.value.varIdent.value}",
           DROPDOWN,
           ElementTexts.label(Map(DE -> "Struktur Typ", EN -> "Structure Type")),
           elemEntries = ElementEntries(
@@ -208,7 +208,7 @@ private[client] object DataView
       {//
       BaseElementDiv(
         UIFormElem(BaseElement(
-          s"ds-cardinality-${data.value.identVar.value}",
+          s"ds-cardinality-${data.value.varIdent.value}",
           DROPDOWN,
           ElementTexts.label(Map(DE -> "Kardinalität", EN -> "Cardinality")),
           elemEntries = ElementEntries(
@@ -253,7 +253,7 @@ private[client] object DataView
       <button class="mini ui circular red icon button"
               data:data-tooltip="Delete Data Object"
               onclick={_: Event =>
-                UIDataStore.deleteDataObject(data.identVar.value, parentContent.get)}>
+                UIDataStore.deleteDataObject(data.varIdent.value, parentContent.get)}>
         <i class="trash icon"></i>
       </button>
     else

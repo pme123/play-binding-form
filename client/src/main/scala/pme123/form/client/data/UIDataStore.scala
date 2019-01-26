@@ -17,7 +17,7 @@ object UIDataStore extends Logging {
 
   def changeIdent(data: Var[VarDataStructure])(newIdent: String): Unit = {
     info(s"DataUIStore: changeIdent $newIdent")
-    data.value.identVar.value = newIdent
+    data.value.varIdent.value = newIdent
     data.value.adjustPath()
     SemanticUI.initElements()
   }
@@ -31,8 +31,8 @@ object UIDataStore extends Logging {
 
   def changeData(data: DataObject): Var[VarDataObject] = {
     info(s"DataUIStore: changeData ${data.ident}")
-    uiState.identVar.value = data.ident
-    uiState.data.value = VarDataObject.create(uiState.identVar, data.cardinality, data.children, Var(Nil))
+    uiState.varIdent.value = data.ident
+    uiState.data.value = VarDataObject.create(uiState.varIdent, data.cardinality, data.children, Var(Nil))
 
     SemanticUI.initElements()
     uiState.data
@@ -42,7 +42,7 @@ object UIDataStore extends Logging {
     info(s"DataUIStore: changeStructureType $strTypeStr")
     val structureType = StructureType.withNameInsensitive(strTypeStr)
 
-    data.value = VarDataStructure.apply(data.value.identVar, DataStructure(data.value.identVar.value, structureType), data.value.parentPathVar)
+    data.value = VarDataStructure.apply(data.value.varIdent, DataStructure(data.value.varIdent.value, structureType), data.value.parentPathVar)
     SemanticUI.initElements()
   }
 
@@ -55,14 +55,14 @@ object UIDataStore extends Logging {
 
   def deleteDataObject(dataIdent: String, contentVar: Vars[Var[_ <: VarDataStructure]]): Unit = {
     info(s"DataUIStore: deleteDataObject $dataIdent from Parent")
-    val deleteCandidates = contentVar.value.filter(_.value.identVar.value == dataIdent)
+    val deleteCandidates = contentVar.value.filter(_.value.varIdent.value == dataIdent)
     contentVar.value -= deleteCandidates.head
     SemanticUI.initElements()
   }
 
   def dataValue(searchIdent: String): Option[Var[VarDataValue]] =
     dataValues()
-      .find(_.value.identVar.value == searchIdent)
+      .find(_.value.varIdent.value == searchIdent)
 
   def dataPaths: Seq[String] =
     dataValues()
@@ -73,7 +73,7 @@ object UIDataStore extends Logging {
       .findValues()
 
   case class UIState(
-                      identVar: Var[String],
+                      varIdent: Var[String],
                       data: Var[VarDataObject],
                       idents: Vars[String]
                     )
@@ -81,10 +81,10 @@ object UIDataStore extends Logging {
   object UIState {
 
     def apply(): UIState = {
-      val identVar = Var(DataStructure.defaultKey)
+      val varIdent = Var(DataStructure.defaultKey)
       UIState(
-        identVar,
-        Var(VarDataObject(identVar)),
+        varIdent,
+        Var(VarDataObject(varIdent)),
         Vars.empty,
       )
     }
@@ -92,12 +92,12 @@ object UIDataStore extends Logging {
 
   /*
     object VarDataContainer {
-      def apply(identVar: Var[String], data: DataContainer): VarDataContainer =
-        VarDataContainer(identVar, Var(VarDataObject.create(identVar, data.structure.value, Var(Nil))))
+      def apply(varIdent: Var[String], data: DataContainer): VarDataContainer =
+        VarDataContainer(varIdent, Var(VarDataObject.create(varIdent, data.structure.value, Var(Nil))))
 
-      def apply(identVar: Var[String], form: FormContainer): VarDataContainer =
-        VarDataContainer(identVar,
-          Var(VarDataObject.create(identVar,
+      def apply(varIdent: Var[String], form: FormContainer): VarDataContainer =
+        VarDataContainer(varIdent,
+          Var(VarDataObject.create(varIdent,
             form.elems.filterNot(_.elementType.readOnly)
               .map(el => el.elementType match {
                 case TEXTFIELD if el.extras.propValue(INPUT_TYPE).contains(InputType.NUMBER.key) =>
@@ -113,13 +113,13 @@ object UIDataStore extends Logging {
   */
   sealed abstract class VarDataStructure {
 
-    def identVar: Var[String]
+    def varIdent: Var[String]
 
     def cardinalityVar: Var[Cardinality]
 
     def parentPathVar: Var[Seq[String]]
 
-    def path: Seq[String] = parentPathVar.value :+ identVar.value
+    def path: Seq[String] = parentPathVar.value :+ varIdent.value
 
     def pathString: String =
       if (path.size > 2)
@@ -160,43 +160,43 @@ object UIDataStore extends Logging {
   }
 
   object VarDataStructure {
-    def apply(identVar: Var[String],
+    def apply(varIdent: Var[String],
               dataStructure: DataStructure,
               parentPathVar: Var[Seq[String]],
              ): VarDataStructure = dataStructure match {
-      case DataObject(_, cardinality, children) => VarDataObject.create(identVar, cardinality, children, parentPathVar)
-      case DataValue(_, structureType, cardinality) => VarDataValue(identVar, structureType, Var(cardinality), parentPathVar)
+      case DataObject(_, cardinality, children) => VarDataObject.create(varIdent, cardinality, children, parentPathVar)
+      case DataValue(_, structureType, cardinality) => VarDataValue(varIdent, structureType, Var(cardinality), parentPathVar)
     }
   }
 
-  case class VarDataObject(identVar: Var[String] = Var(DataStructure.defaultKey),
+  case class VarDataObject(varIdent: Var[String] = Var(DataStructure.defaultKey),
                            cardinalityVar: Var[Cardinality] = Var(ONE),
                            childrenVars: Vars[Var[_ <: VarDataStructure]] = Vars.empty,
                            parentPathVar: Var[Seq[String]] = Var(Nil))
     extends VarDataStructure {
     val structureType: StructureType = StructureType.OBJECT
 
-    def toData: DataObject = DataObject(identVar.value, cardinalityVar.value, childrenVars.value.map(_.value.toData))
+    def toData: DataObject = DataObject(varIdent.value, cardinalityVar.value, childrenVars.value.map(_.value.toData))
 
     override def adjustPath(): Unit = {
       childrenVars.value
-        .foreach(_.value.adjustPath(path :+ identVar.value))
+        .foreach(_.value.adjustPath(path :+ varIdent.value))
     }
 
     override def contents: Seq[Var[_ <: VarDataStructure]] = childrenVars.value
   }
 
   object VarDataObject {
-    def create(identVar: Var[String],
+    def create(varIdent: Var[String],
                cardinality: Cardinality,
                children: Seq[DataStructure],
                parentPathVar: Var[Seq[String]]): VarDataObject = {
-      val seq = children.map((entry: DataStructure) => Var(VarDataStructure(Var(entry.ident), entry, Var(parentPathVar.value :+ identVar.value))))
-      VarDataObject(identVar, Var(cardinality), Vars(seq: _*), parentPathVar)
+      val seq = children.map((entry: DataStructure) => Var(VarDataStructure(Var(entry.ident), entry, Var(parentPathVar.value :+ varIdent.value))))
+      VarDataObject(varIdent, Var(cardinality), Vars(seq: _*), parentPathVar)
     }
 
-    def apply(identVar: Var[String], form: FormContainer): VarDataObject =
-      VarDataObject.create(identVar,
+    def apply(varIdent: Var[String], form: FormContainer): VarDataObject =
+      VarDataObject.create(varIdent,
         ONE,
         form.elems.filterNot(_.elementType.readOnly)
           .map(el => el.elementType match {
@@ -212,14 +212,14 @@ object UIDataStore extends Logging {
 
 }
 
-case class VarDataValue(identVar: Var[String],
+case class VarDataValue(varIdent: Var[String],
                         structureType: StructureType,
                         cardinalityVar: Var[Cardinality],
                         parentPathVar: Var[Seq[String]])
   extends VarDataStructure {
 
   def toData: DataStructure =
-    DataValue(identVar.value, structureType)
+    DataValue(varIdent.value, structureType)
 
 }
 

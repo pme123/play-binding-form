@@ -11,7 +11,7 @@ object DataStructureDragDrop {
 
   def allowDrop(moveToDataStructure: Var[_ <: VarDataStructure])(ev: DragEvent): Unit = {
     val dragObj = dragObject.value.map(_.dragObj.value)
-    val notItself = dragObj.exists(_.identVar != moveToDataStructure.value.identVar)
+    val notItself = dragObj.exists(_.varIdent != moveToDataStructure.value.varIdent)
     if (notItself)
       ev.preventDefault
   }
@@ -25,22 +25,22 @@ object DataStructureDragDrop {
     if (dragObject.value.nonEmpty) {
       ev.preventDefault
       moveToElemVar.value match {
-        case VarDataObject(identVar, _, content, parentPathVar) =>
+        case VarDataObject(varIdent, _, content, parentPathVar) =>
           val dataDragObj = dragObject.value.get
           val dragObj = dataDragObj.dragObj
-          val dragIdent = dragObj.value.identVar.value
+          val dragIdent = dragObj.value.varIdent.value
           val isChild = dragObj.value.isChild(parentPathVar.value)
-          if (identVar.value != dragIdent && !isChild) {
+          if (varIdent.value != dragIdent && !isChild) {
             dragObj.value.adjustPath(moveToElemVar.value.path)
             content.value += dragObj
             dataDragObj.parentContent.value -= dragObj
           }
-        case VarDataValue(identVar, _, _, parentPathVar) =>
+        case VarDataValue(varIdent, _, _, parentPathVar) =>
           val dataDragObj = dragObject.value.get
           val dragObjVar = dataDragObj.dragObj
-          val dragIdent = dragObjVar.value.identVar.value
+          val dragIdent = dragObjVar.value.varIdent.value
           val isChild = dragObjVar.value.isChild(parentPathVar.value)
-          if (identVar.value != dragIdent) {
+          if (varIdent.value != dragIdent) {
             if (parentPathVar.value == dragObjVar.value.parentPathVar.value) {
               val existIndex = parentContent.value.indexOf(dataDragObj.dragObj)
               val newIndex = parentContent.value.indexOf(moveToElemVar)

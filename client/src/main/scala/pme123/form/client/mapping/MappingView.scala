@@ -31,7 +31,7 @@ private[client] object MappingView
       {<div class="ui form">
       {persistMappingDiv.bind}{//
       header(
-        UIMappingStore.uiState.identVar,
+        UIMappingStore.uiState.varIdent,
         Some(UIMappingStore.changeMappingIdent),
         formDataIdent,
         createMappingButton,
@@ -52,13 +52,13 @@ private[client] object MappingView
     <div class="">
       <div class="compact vertical menu">
         <div class="">
-          <i class={s"icon ${FormPreviewView.icon}"}></i>{UIFormStore.uiState.identVar.bind}
+          <i class={s"icon ${FormPreviewView.icon}"}></i>{UIFormStore.uiState.varIdent.bind}
         </div>
         <div class="">
           &nbsp;
         </div>
         <div class="">
-          <i class={s"icon ${DataView.icon}"}></i>{UIDataStore.uiState.identVar.bind}
+          <i class={s"icon ${DataView.icon}"}></i>{UIDataStore.uiState.varIdent.bind}
         </div>
       </div>
     </div>
@@ -145,7 +145,7 @@ private[client] object MappingView
         elemEntries = ElementEntries(
           UIDataStore.dataValues()
             .map(dv =>
-              ElementEntry(dv.value.identVar.value, dv.value.pathString))
+              ElementEntry(dv.value.varIdent.value, dv.value.pathString))
         ),
         value = varDataValue.map(_.pathString),
         extras = ExtraProperties(DROPDOWN),

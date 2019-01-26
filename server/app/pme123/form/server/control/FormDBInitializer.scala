@@ -49,6 +49,18 @@ class FormDBInitializer @Inject()(val formConf: FormConfiguration)
         )"""
   )
 
+  val initMock: Int = initTable(
+    sql"""
+        DROP TABLE IF EXISTS mock
+      """,
+    sql"""
+        CREATE TABLE mock (
+          id   SERIAL,
+          ident VARCHAR NOT NULL UNIQUE,
+          content VARCHAR
+        )"""
+  )
+
   val initUser: Int = initTable(
     sql"""
         DROP TABLE IF EXISTS users

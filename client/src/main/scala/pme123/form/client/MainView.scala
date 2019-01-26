@@ -27,7 +27,7 @@ trait MainView
   def create(): Binding[HTMLElement]
 
   @dom
-  protected def header(identVar: Var[String], changeEvent: ChangeEvent, buttons: Binding[HTMLElement]*): Binding[HTMLElement] = {
+  protected def header(varIdent: Var[String], changeEvent: ChangeEvent, buttons: Binding[HTMLElement]*): Binding[HTMLElement] = {
     val activeLang = UIStore.activeLanguage.bind
     <div class="ui borderless datamenu menu">
       <div class="ui item">
@@ -37,7 +37,7 @@ trait MainView
         </h3>
       </div>
       <div class="ui right item">
-        {val ident = identVar.bind
+        {val ident = varIdent.bind
       if (ident.nonEmpty)
         BaseElementDiv(
           UIFormElem(

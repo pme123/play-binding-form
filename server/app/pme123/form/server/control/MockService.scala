@@ -9,7 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class JsonService @Inject()(val ws: WSClient,
+class MockService @Inject()(val ws: WSClient,
                             )(implicit val ec: ExecutionContext) {
 
   def callService(base64UrlStr: String): Future[JsValue] = {

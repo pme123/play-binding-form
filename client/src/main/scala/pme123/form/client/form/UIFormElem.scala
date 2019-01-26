@@ -8,7 +8,7 @@ import pme123.form.shared._
 
 
 case class UIFormElem(
-                       identVar: Var[String],
+                       varIdent: Var[String],
                        elementTypeVar: Var[ElementType],
                        textsVar: Var[UIElementTexts],
                        extrasVar: Var[UIExtraProperties],
@@ -25,7 +25,7 @@ case class UIFormElem(
   val hasTexts: Boolean = textsVar.value.hasTexts
 
   def toBaseElement: BaseElement = BaseElement(
-    identVar.value,
+    varIdent.value,
     elementTypeVar.value,
     textsVar.value.toTexts,
     extrasVar.value.toExtraProperties,
