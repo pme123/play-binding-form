@@ -15,7 +15,7 @@ import pme123.form.client.mock.UIMockStore.VarMockEntry
 import pme123.form.client.services.I18n
 import pme123.form.client.services.UIStore.supportedLangs
 import pme123.form.shared.ElementType.{TEXTAREA, TEXTFIELD}
-import pme123.form.shared.ExtraProp.{ROWS, SIZE}
+import pme123.form.shared.ExtraProp.{INPUT_TYPE, ROWS, SIZE}
 import pme123.form.shared._
 
 import scala.scalajs.js.timers.setTimeout
@@ -114,23 +114,42 @@ private[client] object MockView
   private def element(varMockEntry: VarMockEntry): Binding[HTMLElement] = {
     val selectedEntry = UIMockStore.uiState.varSelectedEntry.bind
     val url = varMockEntry.varUrl.bind
+    val id = varMockEntry.id
+
     <div class={s"ui ${selectedClass(varMockEntry, selectedEntry)} fluid card"}>
       <div class="extra content">
-        <div class="left floated">
-          {BaseElementDiv(
-          UIFormElem(BaseElement(
-            urlFieldId,
-            TEXTFIELD,
-            ElementTexts.placeholder(I18n("json.import")),
-            extras = ExtraProperties(Seq(ExtraPropValue(SIZE, "100"))),
-            value = Some(url),
-            required = true,
-          ), Some { str =>
-            varMockEntry.varUrl.value = str
-          }
-          )).bind}
-        </div>
-        <div class="right floated">
+        <div class="ui grid">
+          <div class="eleven wide column">
+            {BaseElementDiv(
+            UIFormElem(BaseElement(
+              s"url-$id",
+              TEXTFIELD,
+              ElementTexts.placeholder(I18n("json.import")),
+              extras = ExtraProperties(),
+              value = Some(url),
+              required = true,
+            ), Some { str =>
+              varMockEntry.varUrl.value = str
+            }
+            )).bind}
+          </div> <div class="two wide column">
+          {//
+          val status = varMockEntry.varStatus.bind
+          BaseElementDiv(
+            UIFormElem(BaseElement(
+              s"status-$id",
+              TEXTFIELD,
+              ElementTexts.placeholder(I18n("mock.entry.status")),
+              extras = ExtraProperties(Seq(ExtraPropValue(SIZE, "3"), ExtraPropValue(INPUT_TYPE, InputType.NUMBER.key))),
+              value = Some(status.toString),
+              required = true,
+              validations = Validations(Seq(ValidationRule(ValidationType.INTEGER, enabled = true,
+                ValidationParams(intParam1 = Some(100), intParam2 = Some(999))))),
+            ), Some { str =>
+              varMockEntry.varStatus.value = str.toInt
+            }
+            )).bind}
+        </div> <div class="three wide column">
 
           <button class="mini ui circular blue icon button"
                   data:data-tooltip="Edit Form Element"
@@ -151,14 +170,15 @@ private[client] object MockView
             <i class="trash icon"></i>
           </button>
         </div>
+        </div>
       </div>{//
       if (varMockEntry == UIMockStore.uiState.varSelectedEntry.value) {
         val content = varMockEntry.varContent.bind
-        val id = MockServices.urlAsBase64(url)
-        initCodeField(id)
+        val elemId = s"content-$id"
+        initCodeField(elemId)
         BaseElementDiv(
           UIFormElem(BaseElement(
-            id,
+            elemId,
             TEXTAREA,
             ElementTexts.placeholder(I18n("json.import")),
             extras = ExtraProperties(Seq(

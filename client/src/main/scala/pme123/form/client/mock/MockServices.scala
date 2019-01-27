@@ -5,7 +5,7 @@ import com.thoughtworks.binding.Binding
 import org.scalajs.dom.raw.HTMLElement
 import play.api.libs.json.{JsValue, Json}
 import pme123.form.client.services.HttpServices
-import pme123.form.shared.MockContainer
+import pme123.form.shared.{MockContainer, MockEntry}
 
 /**
   * Created by pascal.mengelt on 16.07.2017.
@@ -16,8 +16,8 @@ object MockServices
   def callService(url: String): Binding[HTMLElement] = {
     val path = s"$apiPath/mock/service/${urlAsBase64(url)}"
 
-    httpGet(path, (json: JsValue) => {
-      UIMockStore.uiState.varSelectedEntry.value.varContent.value = Json.prettyPrint(json)
+    httpGet(path, (mock: MockEntry) => {
+      UIMockStore.changeMockEntry(mock)
     })
   }
 

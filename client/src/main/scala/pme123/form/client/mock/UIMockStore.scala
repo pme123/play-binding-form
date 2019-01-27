@@ -28,6 +28,14 @@ object UIMockStore extends Logging {
     SemanticUI.initElements()
   }
 
+  def changeMockEntry(mock: MockEntry): Unit = {
+    info(s"MockVarStore: changeMockEntry ${mock.url}")
+    uiState.varSelectedEntry.value.varStatus.value = mock.status
+    uiState.varSelectedEntry.value.varUrl.value = mock.url
+    uiState.varSelectedEntry.value.varContent.value = mock.content
+    SemanticUI.initElements()
+  }
+
   def changeMockIdent(ident: String): Unit = {
     info(s"MockVarStore: changeMockIdent $ident")
     uiState.varIdent.value = ident
@@ -52,9 +60,6 @@ object UIMockStore extends Logging {
     info(s"MockUIStore: copySelectedEntry ${url(varMockEntry)}")
     val mock = varMockEntry.toMock
     val newVarEntry = VarMockEntry(mock.copy(url = mock.url + Random.nextInt(100)))
-    println(s"NEWVARENTRY: $newVarEntry")
-    println(s"VARMOCKENTRY: $varMockEntry")
-
     uiState.varSelectedEntry.value = newVarEntry
     uiState.varsMockEntries.value.insert(
       uiState.varsMockEntries.value.indexOf(varMockEntry) + 1,
@@ -92,7 +97,7 @@ object UIMockStore extends Logging {
   object UIState {
 
     def apply(varIdent: Var[String] = Var(MockContainer.defaultIdent)): UIState = {
-      val entry = VarMockEntry(MockEntry(testUrl, testJson))
+      val entry = VarMockEntry(MockEntry(url = testUrl, content = testJson))
       UIState(
         varIdent,
         Vars(entry),
@@ -139,11 +144,15 @@ object UIMockStore extends Logging {
       """.stripMargin
   }
 
-  case class VarMockEntry(varUrl: Var[String] = Var(""),
+  case class VarMockEntry(id: Int = Random.nextInt(1000),
+                          varUrl: Var[String] = Var(""),
+                          varStatus: Var[Int] = Var(200),
                           varContent: Var[String] = Var("")) {
     def toMock: MockEntry = {
       MockEntry(
+        id,
         varUrl.value,
+        varStatus.value,
         varContent.value,
       )
     }
@@ -152,7 +161,10 @@ object UIMockStore extends Logging {
   object VarMockEntry {
 
     def apply(mock: MockEntry): VarMockEntry =
-      VarMockEntry(Var(mock.url),
+      VarMockEntry(
+        mock.id,
+        Var(mock.url),
+        Var(mock.status),
         Var(mock.content)
       )
 

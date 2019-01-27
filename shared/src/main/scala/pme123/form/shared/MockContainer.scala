@@ -14,7 +14,7 @@ object MockContainer {
   implicit val jsonFormat: OFormat[MockContainer] = Json.format[MockContainer]
 }
 
-case class MockEntry(url: String, content: String) {
+case class MockEntry(id: Int = Random.nextInt(1000), url: String = "", status: Int = 200, content: String = "") {
 
 }
 

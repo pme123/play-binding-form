@@ -22,7 +22,7 @@ class MockApi @Inject()(jsonService: MockService,
 
   def callService(base64UrlStr: String): Action[AnyContent] = SecuredAction.async { implicit request: Request[AnyContent] =>
     jsonService.callService(base64UrlStr)
-      .map(Ok(_).as(JSON))
+      .map(entries => Ok(Json.toJson(entries)).as(JSON))
   }
 
   def persistMock(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
