@@ -23,8 +23,8 @@ class ImportWorkbookTest
 
   private val wb = workbook.wb
   workbook.printImport()
-  "The FormStore import" should "be imported and contain 4 sheets" in {
-    assert(wb.getNumberOfSheets === 4)
+  "The FormStore import" should "be imported and contain 5 sheets" in {
+    assert(wb.getNumberOfSheets === 5)
   }
 
   it should "contain a forms sheet" in {
@@ -32,6 +32,12 @@ class ImportWorkbookTest
   }
   it should "contain a data sheet" in {
     assert(wb.getSheet(sheetData) != null)
+  }
+  it should "contain a mapping sheet" in {
+    assert(wb.getSheet(sheetMappings) != null)
+  }
+  it should "contain a mock sheet" in {
+    assert(wb.getSheet(sheetMocks) != null)
   }
 
   "The forms sheet" should "have 2 forms" in {
@@ -52,6 +58,21 @@ class ImportWorkbookTest
     data.ident should be("address-data")
     data.children.size should be(4)
     data.child("street").get should be(DataValue("street",STRING))
+  }
+
+  "The first Mapping" should "be" in {
+    val mapping = workbook.mappings.get.head.get
+    mapping.ident should be("address-mapping")
+    mapping.mappings.size should be(4)
+    mapping.formIdent should be("address")
+    mapping.dataIdent should be("address-data")
+  }
+
+  "The first Mock" should "be" in {
+    val mock = workbook.mocks.get.head.get
+    mock.ident should be("swapi")
+    mock.mocks.size should be(3)
+
   }
 
 }

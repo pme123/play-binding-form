@@ -5,7 +5,7 @@ import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
 import pme123.form.server.boundary.services.{SPAComponents, SPAController}
 import pme123.form.server.control.{MockDBRepo, MockService}
-import pme123.form.shared.MockContainer
+import pme123.form.shared.{MockContainer, ServiceRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,9 +20,18 @@ class MockApi @Inject()(jsonService: MockService,
                        (implicit val ec: ExecutionContext)
   extends SPAController(spaComps) {
 
-  def callService(base64UrlStr: String): Action[AnyContent] = SecuredAction.async { implicit request: Request[AnyContent] =>
-    jsonService.callService(base64UrlStr)
-      .map(entries => Ok(Json.toJson(entries)).as(JSON))
+  def callService(): Action[AnyContent] = SecuredAction.async { implicit request: Request[AnyContent] =>
+
+    request.body.asText.map { body =>
+      Json.parse(body).validate[ServiceRequest] match {
+        case JsSuccess(serviceRequest, _) =>
+          jsonService.callService(serviceRequest)
+            .map(mock =>
+              Ok(Json.toJson(mock)).as(JSON))
+        case err: JsError =>
+          Future.successful(BadRequest(s"Problem parsing ServiceRequest: $err"))
+      }
+    }.getOrElse(Future.successful(BadRequest("No ServiceRequest in Body!")))
   }
 
   def persistMock(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>

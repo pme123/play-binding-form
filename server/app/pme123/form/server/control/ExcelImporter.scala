@@ -13,6 +13,7 @@ class ExcelImporter @Inject()(userDBRepo: UserDBRepo,
                               formDBRepo: FormDBRepo,
                               dataDBRepo: DataDBRepo,
                               mappingDBRepo: MappingDBRepo,
+                              mocksDBRepo: MockDBRepo,
                              ) // to make sure it is initialized
                              (implicit val ec: ExecutionContext)
   extends Logging {
@@ -21,6 +22,7 @@ class ExcelImporter @Inject()(userDBRepo: UserDBRepo,
   importObjects(workbook.forms, formDBRepo.insertForm)
   importObjects(workbook.data, dataDBRepo.insertData)
   importObjects(workbook.mappings, mappingDBRepo.insertMapping)
+  importObjects(workbook.mocks, mocksDBRepo.insertMock)
 
   private def importObjects[T](objects: Try[Seq[Try[T]]], insert: T => Future[_]) = {
     objects match {

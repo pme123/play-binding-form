@@ -16,8 +16,8 @@ object UIMappingStore extends Logging {
 
   def changeIdents(idents: Seq[String]): Unit = {
     info(s"MappingUIStore: changeIdents $idents")
-    uiState.idents.value.clear()
-    uiState.idents.value ++= idents
+    uiState.varsIdents.value.clear()
+    uiState.varsIdents.value ++= idents
     SemanticUI.initElements()
   }
 
@@ -80,7 +80,7 @@ object UIMappingStore extends Logging {
   case class UIState(
                       varIdent: Var[String],
                       mapping: Var[VarMappingContainer],
-                      idents: Vars[String]
+                      varsIdents: Vars[String]
                     )
 
   object UIState {

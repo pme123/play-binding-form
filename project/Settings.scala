@@ -77,6 +77,7 @@ object Settings {
     "org.apache.commons" % "commons-email" % "1.3.1",
     "biz.enef" %% "slogging-slf4j" % sloggingV,
     "org.apache.poi" % "poi-ooxml" % "3.17",
+    "com.github.kxbmap" %% "configs" % "0.4.4",
     // scalajs for server
     "com.vmunier" %% "scalajs-scripts" % "1.1.1",
     "org.julienrf" %% "play-jsmessages" % "3.0.0",
@@ -133,9 +134,9 @@ object Settings {
     "com.thoughtworks.binding" %%% "futurebinding" % bindingV,
     "fr.hmil" %%% "roshttp" % "2.0.2",
     "org.denigma" %%% "codemirror-facade" % "5.13.2-0.8",
-    // java.time support for ScalaJS, 
+    // java.time support for ScalaJS,
     "org.scala-js" %%% "scalajs-java-time" % "0.2.2",
-    // jquery support for ScalaJS, 
+    // jquery support for ScalaJS,
     "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
     "org.scalatest" %%% "scalatest" % scalaTestV % Test,
   ))

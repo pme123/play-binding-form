@@ -37,7 +37,8 @@ private[client] object MappingView
         createMappingButton,
         validateButton,
         exportButton,
-        persistButton).bind}{//
+        persistButton,
+      ).bind}{//
       mappingContent.bind}{//
       initFields.bind //
       }<div class="ui error message"></div>

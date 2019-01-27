@@ -3,9 +3,8 @@ package pme123.form.client.mock
 import com.github.marklister.base64.Base64._
 import com.thoughtworks.binding.Binding
 import org.scalajs.dom.raw.HTMLElement
-import play.api.libs.json.{JsValue, Json}
 import pme123.form.client.services.HttpServices
-import pme123.form.shared.{MockContainer, MockEntry}
+import pme123.form.shared.{MockContainer, MockEntry, ServiceRequest}
 
 /**
   * Created by pascal.mengelt on 16.07.2017.
@@ -13,10 +12,10 @@ import pme123.form.shared.{MockContainer, MockEntry}
 object MockServices
   extends HttpServices {
 
-  def callService(url: String): Binding[HTMLElement] = {
-    val path = s"$apiPath/mock/service/${urlAsBase64(url)}"
+  def callService(serviceRequest: ServiceRequest): Binding[HTMLElement] = {
+    val path = s"$apiPath/mock/callService"
 
-    httpGet(path, (mock: MockEntry) => {
+    httpPut(path, serviceRequest, (mock: MockEntry) => {
       UIMockStore.changeMockEntry(mock)
     })
   }

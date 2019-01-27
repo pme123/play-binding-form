@@ -6,7 +6,6 @@ import org.denigma.codemirror.CodeMirror
 import org.denigma.codemirror.extensions.EditorConfig
 import org.scalajs.dom._
 import org.scalajs.dom.raw.{Event, HTMLElement, HTMLTextAreaElement}
-import org.scalajs.jquery.jQuery
 import play.api.libs.json.Json
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore
@@ -23,13 +22,11 @@ import scala.scalajs.js.timers.setTimeout
 private[client] object MockView
   extends MainView {
 
-  val link = "json"
+  val link = "mock"
   val icon = "file outline"
-  val urlFieldId = "url-to-import"
-  val jsonFieldId = "json-to-import"
 
   val getJsonFlag = Var(false)
-  val submitMockEntryFlag = Var(false)
+  val persistMockFlag = Var(false)
 
   // 1. level of abstraction
   // **************************
@@ -41,12 +38,12 @@ private[client] object MockView
       header(
         UIMockStore.uiState.varIdent,
         Some(UIMockStore.changeMockIdent),
-        importButton,
-        createMockButton,
+        exportButton,
+        persistButton,
         addMockEntryButton,
       ).bind}{//
       getJsonDiv.bind}{//
-      submitMockEntryDiv.bind}{//
+      persistMockDiv.bind}{//
       content.bind}<div class="ui error message"></div>
     </div>}
 
@@ -56,33 +53,25 @@ private[client] object MockView
   // **************************
 
   @dom
-  private lazy val importButton: Binding[HTMLElement] = {
+  private lazy val exportButton: Binding[HTMLElement] = {
     <div class="item">
       <button class="ui circular icon button"
-              data:data-tooltip="Import JSON"
+              data:data-tooltip="Export Mock Konfiguration"
               onclick={_: Event =>
-                val url = jQuery(s"#$urlFieldId").value().toString
-
-                if (url.trim.nonEmpty) {
-                  getJsonFlag.value = true
-                } else {
-                  val jsonStr = jQuery(s"#$jsonFieldId").value().toString
-                  val structure = DataStructure.fromJson(DataStructure.defaultKey, Json.parse(jsonStr))
-                  UIDataStore.changeData(structure.asInstanceOf[DataObject])
-                }}>
-        <i class=" upload icon"></i>
+                MockUtils.exportMock()}>
+        <i class="sign-out icon"></i>
       </button>
     </div>
   }
 
   @dom
-  private lazy val createMockButton: Binding[HTMLElement] = {
+  private lazy val persistButton: Binding[HTMLElement] = {
     <div class="item">
       <button class="ui circular icon button"
-              data:data-tooltip="Submit Mock Entry"
+              data:data-tooltip="Persist Mock Konfigurations"
               onclick={_: Event =>
-                submitMockEntryFlag.value = true}>
-        <i class=" thumbtack icon"></i>
+                persistMockFlag.value = true}>
+        <i class="save outline icon"></i>
       </button>
     </div>
   }
@@ -113,14 +102,14 @@ private[client] object MockView
   @dom
   private def element(varMockEntry: VarMockEntry): Binding[HTMLElement] = {
     val selectedEntry = UIMockStore.uiState.varSelectedEntry.bind
-    val url = varMockEntry.varUrl.bind
     val id = varMockEntry.id
 
     <div class={s"ui ${selectedClass(varMockEntry, selectedEntry)} fluid card"}>
       <div class="extra content">
         <div class="ui grid">
           <div class="eleven wide column">
-            {BaseElementDiv(
+            {val url = varMockEntry.varUrl.bind
+          BaseElementDiv(
             UIFormElem(BaseElement(
               s"url-$id",
               TEXTFIELD,
@@ -150,7 +139,18 @@ private[client] object MockView
             }
             )).bind}
         </div> <div class="three wide column">
-
+          <button class="mini ui circular icon button"
+                  data:data-tooltip="Import JSON"
+                  onclick={_: Event =>
+                    val url = varMockEntry.varUrl.value
+                    if (url.trim.nonEmpty) {
+                      getJsonFlag.value = true
+                    } else {
+                      val structure = DataStructure.fromJson(DataStructure.defaultKey, Json.parse(varMockEntry.varContent.value))
+                      UIDataStore.changeData(structure.asInstanceOf[DataObject])
+                    }}>
+            <i class=" upload icon"></i>
+          </button>
           <button class="mini ui circular blue icon button"
                   data:data-tooltip="Edit Form Element"
                   onclick={_: Event =>
@@ -219,19 +219,20 @@ private[client] object MockView
     if (doCall)
       <div>
         {getJsonFlag.value = false
-      val url = UIMockStore.uiState.varSelectedEntry.value.varUrl.value
-      MockServices.callService(url).bind}
+      val mockEntry = UIMockStore.uiState.varSelectedEntry.value
+      val ident = UIMockStore.uiState.varIdent.value
+      MockServices.callService(ServiceRequest(ident, mockEntry.varUrl.value)).bind}
       </div>
     else
         <span/>
   }
 
   @dom
-  private lazy val submitMockEntryDiv: Binding[HTMLElement] = {
-    val doCall = submitMockEntryFlag.bind
+  private lazy val persistMockDiv: Binding[HTMLElement] = {
+    val doCall = persistMockFlag.bind
     if (doCall)
       <div>
-        {submitMockEntryFlag.value = false
+        {persistMockFlag.value = false
       MockServices.persistMock(UIMockStore.toMock).bind}
       </div>
     else

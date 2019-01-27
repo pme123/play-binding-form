@@ -1,9 +1,9 @@
 package pme123.form.server.entity
 
 import org.apache.poi.ss.usermodel._
-import play.api.libs.json.{JsError, JsSuccess, Json}
-import pme123.form.shared.{DataObject, FormContainer, MappingContainer}
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 import pme123.form.shared.services.{Identifiable, Logging, SPAException, User}
+import pme123.form.shared.{DataObject, FormContainer, MappingContainer, MockContainer}
 
 import scala.collection.JavaConverters._
 import scala.util._
@@ -42,44 +42,27 @@ case class ImportWorkbook(wb: Workbook)
     }
   }
 
-  lazy val forms: Try[Seq[Try[FormContainer]]] = {
-    getSheet(sheetForms) map { s =>
-      rows(s).map { row =>
-        Try(
-          Json.parse(cellAsString(row.getCell(col1)))
-            .validate[FormContainer] match {
-            case JsSuccess(value, _) =>
-              value
-            case err: JsError =>
-              throw JsonParseException(err)
-          }
-        ) recoverWith failure(sheetForms, row.getRowNum)
-      }
-    }
-  }
+  lazy val forms: Try[Seq[Try[FormContainer]]] =
+    extractValues[FormContainer](getSheet(sheetForms))
 
-  lazy val data: Try[Seq[Try[DataObject]]] = {
-    getSheet(sheetData) map { s =>
-      rows(s).map { row =>
-        Try(
-          Json.parse(cellAsString(row.getCell(col1)))
-            .validate[DataObject] match {
-            case JsSuccess(value, _) =>
-              value
-            case err: JsError =>
-              throw JsonParseException(err)
-          }
-        ) recoverWith failure(sheetData, row.getRowNum)
-      }
-    }
-  }
 
-  lazy val mappings: Try[Seq[Try[MappingContainer]]] = {
-    getSheet(sheetMappings) map { s =>
+  lazy val data: Try[Seq[Try[DataObject]]] =
+    extractValues[DataObject](getSheet(sheetData))
+
+  lazy val mappings: Try[Seq[Try[MappingContainer]]] =
+    extractValues[MappingContainer](getSheet(sheetMappings))
+
+
+  lazy val mocks: Try[Seq[Try[MockContainer]]] =
+    extractValues[MockContainer](getSheet(sheetMocks))
+
+
+  private def extractValues[T](sheet: Try[Sheet])(implicit reads: Reads[T]): Try[Seq[Try[T]]] = {
+    sheet map { s =>
       rows(s).map { row =>
         Try(
           Json.parse(cellAsString(row.getCell(col1)))
-            .validate[MappingContainer] match {
+            .validate[T] match {
             case JsSuccess(value, _) =>
               value
             case err: JsError =>
@@ -165,6 +148,7 @@ object ImportWorkbook {
   val sheetForms = "forms"
   val sheetData = "data"
   val sheetMappings = "mappings"
+  val sheetMocks = "mocks"
 
 
   val col0 = 0

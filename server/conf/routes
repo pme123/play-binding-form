@@ -40,7 +40,8 @@ GET         /api/mock/:ident              pme123.form.server.boundary.MockApi.mo
 + nocsrf
 POST        /api/mock                     pme123.form.server.boundary.MockApi.persistMock()
 
-GET         /api/mock/service/:url        pme123.form.server.boundary.MockApi.callService(url)
++ nocsrf
+PUT         /api/mock/callService             pme123.form.server.boundary.MockApi.callService()
 
 
 # API to get all the Client Configs that are registered for a jobConfig

@@ -2,6 +2,7 @@ package pme123.form.server.entity
 
 import java.time.{Instant, ZoneId}
 
+import configs.{Configs, Result}
 import play.api.Configuration
 import pme123.form.shared.services.{Logging, SettingsProp}
 
@@ -25,6 +26,7 @@ object FormConfSettings {
   val charEncodingProp = "char.encoding"
   val timezoneProp = "timezone"
   val wsocketHostsAllowedProp = "wsocket.hosts.allowed"
+  val servicesProp = "services"
 
   // security
   val authenticatorExpiryProp = "security.cookieAuthenticator.rememberMe.authenticatorExpiry"
@@ -52,7 +54,8 @@ abstract class FormConfSettings(config: Configuration)
   val timezone: String = baseConfig.get[String](timezoneProp)
   val timezoneID: ZoneId = ZoneId.of(timezone)
   val wsocketHostsAllowed: Seq[String] = baseConfig.get[Seq[String]](wsocketHostsAllowedProp)
-
+  // services
+  val services: Result[Seq[ServiceConfig]] = Configs[Seq[ServiceConfig]].get(baseConfig.underlying, servicesProp)
   // db
   val dbDriver: String = config.get[String]("db.default.driver")
   val dbUrl: String = config.get[String]("db.default.url")
@@ -67,6 +70,8 @@ abstract class FormConfSettings(config: Configuration)
   // other
   val httpContext: String = config.get[String](httpContextProp)
 
+  val serviceMap: Map[String, ServiceConfig] = services.value.map(s => s.ident -> s).toMap
+
   lazy val props: Seq[SettingsProp] = {
     Seq(
       //api
@@ -74,6 +79,7 @@ abstract class FormConfSettings(config: Configuration)
       , SettingsProp(timezoneProp, timezone)
       , SettingsProp(charEncodingProp, charEncoding)
       , SettingsProp(wsocketHostsAllowedProp, wsocketHostsAllowed.map(_.toString))
+      , SettingsProp(servicesProp, services.toString)
       // security
       , SettingsProp(authenticatorExpiryProp, authenticatorExpiry)
       , SettingsProp(authenticatorIdleTimeoutProp, authenticatorIdleTimeout)

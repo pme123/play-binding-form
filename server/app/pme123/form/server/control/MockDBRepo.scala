@@ -22,7 +22,7 @@ class MockDBRepo @Inject()(val formConf: FormConfiguration)
         case Some(_) =>
           updateMock(mock)
         case None =>
-          insertMock(mock, "mock")
+          insertMock(mock)
       }.map(_ => mock)
   }
 
@@ -31,10 +31,10 @@ class MockDBRepo @Inject()(val formConf: FormConfiguration)
       .map(_.map(_.ident))
   }
 
-  def insertMock(mockCont: MockContainer, db:String): Future[Int] = {
+  def insertMock(mockCont: MockContainer): Future[Int] = {
     val mockContent = Json.toJson(mockCont).toString()
     update(
-      sql"""insert into $db (ident, content)
+      sql"""insert into mock (ident, content)
              values (${mockCont.ident}, $mockContent)""")
   }
 

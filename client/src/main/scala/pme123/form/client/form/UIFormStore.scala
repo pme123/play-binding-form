@@ -106,8 +106,8 @@ object UIFormStore extends Logging {
 
   def changeIdents(idents: Seq[String]): Unit = {
     info(s"FormUIStore: changeIdents $idents")
-    uiState.idents.value.clear()
-    uiState.idents.value ++= idents
+    uiState.varsIdents.value.clear()
+    uiState.varsIdents.value ++= idents
     SemanticUI.initElements()
   }
 
@@ -122,7 +122,7 @@ object UIFormStore extends Logging {
                       formElements: Vars[Var[UIFormElem]],
                       selectedElement: Var[Var[UIFormElem]],
                       activePropTab: Var[PropTabType],
-                      idents: Vars[String]
+                      varsIdents: Vars[String]
                     ) {
 
   }
