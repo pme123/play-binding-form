@@ -22,8 +22,7 @@ class MockService @Inject()(val ws: WSClient,
   }
 
   def callService(serviceRequest: ServiceRequest): Future[MockEntry] = {
-    val conf = formConfiguration.serviceMap(serviceRequest.serviceConf)
-    val url = conf.url + serviceRequest.path
+    val url = serviceRequest.path
     // only GET supported
     ws.url(url)
       .get()

@@ -8,7 +8,7 @@ object UrlMatcher {
   private val engine = new TemplateEngine()
 
   private val groupRegex =
-    """(?<=\{\{).+?(?=\})""".r
+    """(?<=\{\{)[^/]+?(?=\})""".r
 
   def getResponse(mock: MockContainer, path: String): HttpResponse = {
     mock.mocks.find { me =>
@@ -31,7 +31,7 @@ object UrlMatcher {
   private def regexUrl(url: String) = {
     "^" + url
       .replace("{{", "(?<")
-      .replace("}}", ">.+)") + "$"
+      .replace("}}", ">[^/]+)") + "$"
   }
 
   private def createBody(path: String, me: MockEntry) = {
