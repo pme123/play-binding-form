@@ -2,10 +2,7 @@ package pme123.form.client.mock
 
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{Binding, dom}
-import org.denigma.codemirror.CodeMirror
-import org.denigma.codemirror.extensions.EditorConfig
-import org.scalajs.dom._
-import org.scalajs.dom.raw.{Event, HTMLElement, HTMLTextAreaElement}
+import org.scalajs.dom.raw.{Event, HTMLElement}
 import play.api.libs.json.Json
 import pme123.form.client._
 import pme123.form.client.data.UIDataStore
@@ -17,10 +14,8 @@ import pme123.form.shared.ElementType.{TEXTAREA, TEXTFIELD}
 import pme123.form.shared.ExtraProp.{INPUT_TYPE, ROWS, SIZE}
 import pme123.form.shared._
 
-import scala.scalajs.js.timers.setTimeout
-
 private[client] object MockView
-  extends MainView {
+  extends MockyView {
 
   val link = "mock"
   val icon = "file outline"
@@ -175,7 +170,8 @@ private[client] object MockView
       if (varMockEntry == UIMockStore.uiState.varSelectedEntry.value) {
         val content = varMockEntry.varContent.bind
         val elemId = s"content-$id"
-        initCodeField(elemId)
+        println(s"created: $content")
+        MockUtils.initCodeField(elemId, str => varMockEntry.varContent.value = str)
         BaseElementDiv(
           UIFormElem(BaseElement(
             elemId,
@@ -187,30 +183,12 @@ private[client] object MockView
               ))),
             value = Some(content),
             required = true,
-          ), Some { str =>
-            varMockEntry.varContent.value = str
-          }
+          )
           )).bind
       } else {
           <span/>
       }}
     </div>
-  }
-
-  private def initCodeField(elemId: String) = {
-    setTimeout(100) {
-      val params =
-        EditorConfig
-          .mode("javascript")
-      //.lineNumbers(true)
-      val element = document.getElementById(elemId)
-      element match {
-        case el: HTMLTextAreaElement =>
-          val m = CodeMirror.fromTextArea(el, params)
-          m.setSize("100%", "100%")
-        case _ => console.error("cannot find text area for the code!")
-      }
-    }
   }
 
   @dom

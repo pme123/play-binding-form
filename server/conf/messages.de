@@ -57,3 +57,5 @@ menu.view.mock=Mock View
 view.data.ident=Daten Identität
 view.mapping.ident=Mapping Identität
 view.mock.ident=Service Identität
+menu.view.mock-test=Mock Test
+view.mock-test.ident=Mock Konfiguration

@@ -1,4 +1,4 @@
-package pme123.adapters.server.e2e
+package pme123.form.server.e2e
 
 import java.net.URL
 

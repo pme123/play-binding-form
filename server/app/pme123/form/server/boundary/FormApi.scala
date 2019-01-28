@@ -9,10 +9,7 @@ import pme123.form.shared._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * This class creates the actions and the websocket needed.
-  * Original see here: https://github.com/playframework/play-scala-websocket-example
-  */
+
 @Singleton
 class FormApi @Inject()(formDBRepo: FormDBRepo,
                         val spaComps: SPAComponents)

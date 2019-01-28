@@ -1,6 +1,6 @@
-package pme123.adapters.server.control.services
+package pme123.form.server.control.services
 
-import pme123.adapters.server.control.GuiceAcceptanceSpec
+import pme123.form.server.control.GuiceAcceptanceSpec
 import pme123.form.server.control.services.UserDBRepo
 
 class UserDBSpec

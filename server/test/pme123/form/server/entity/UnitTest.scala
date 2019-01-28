@@ -1,10 +1,10 @@
-package pme123.adapters.server.entity
+package pme123.form.server.entity
 
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest._
 import pme123.form.shared.services.Logging
 
 trait UnitTest
-  extends FlatSpec
+  extends WordSpec
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterAll

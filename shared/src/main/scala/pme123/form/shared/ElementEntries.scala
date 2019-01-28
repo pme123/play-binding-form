@@ -1,5 +1,6 @@
 package pme123.form.shared
 
+import enumeratum.EnumEntry
 import play.api.libs.json.{Json, OFormat}
 import pme123.form.shared.services.Language
 
@@ -11,6 +12,8 @@ object ElementEntries {
 
   implicit val jsonFormat: OFormat[ElementEntries] = Json.format[ElementEntries]
 
+  def simple(enumEntries: Seq[EnumEntry] = Nil)(implicit supportedLangs: Seq[Language]): ElementEntries =
+    ElementEntries(enumEntries.map(e=>ElementEntry(e.entryName.toLowerCase)))
 }
 
 case class ElementEntry(key: String, label: ElementText, ident: String = ElementEntry.ident) {

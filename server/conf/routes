@@ -34,7 +34,7 @@ GET         /api/mapping/:ident           pme123.form.server.boundary.MappingApi
 + nocsrf
 POST        /api/mapping                  pme123.form.server.boundary.MappingApi.persistMapping()
 
-# Mapping API
+# Mock API
 GET         /api/mock/idents              pme123.form.server.boundary.MockApi.idents()
 GET         /api/mock/:ident              pme123.form.server.boundary.MockApi.mock(ident:String)
 + nocsrf
@@ -42,6 +42,8 @@ POST        /api/mock                     pme123.form.server.boundary.MockApi.pe
 
 + nocsrf
 PUT         /api/mock/callService             pme123.form.server.boundary.MockApi.callService()
+
+GET         /api/mock/test/:serviceConf/*path                pme123.form.server.boundary.MockTestApi.getCall(serviceConf, path)
 
 
 # API to get all the Client Configs that are registered for a jobConfig

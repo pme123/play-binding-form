@@ -1,4 +1,4 @@
-package pme123.adapters.server.e2e.pages
+package pme123.form.server.e2e.pages
 
 import org.openqa.selenium.WebDriver
 

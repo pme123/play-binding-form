@@ -1,4 +1,4 @@
-package pme123.adapters.client
+package pme123.form.client
 
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec, Matchers}
 import pme123.form.shared.services.Logging

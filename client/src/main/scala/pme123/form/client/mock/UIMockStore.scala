@@ -13,14 +13,14 @@ object UIMockStore extends Logging {
   val uiState = UIState()
 
   def changeIdents(idents: Seq[String]): Unit = {
-    info(s"MockVarStore: changeIdents $idents")
+    info(s"MockUIStore: changeIdents $idents")
     uiState.varsIdents.value.clear()
     uiState.varsIdents.value ++= idents
     SemanticUI.initElements()
   }
 
   def changeMock(mock: MockContainer): Unit = {
-    info(s"MockVarStore: changeMock ${mock.ident}")
+    info(s"MockUIStore: changeMock ${mock.ident}")
     changeMockIdent(mock.ident)
     uiState.varsMockEntries.value.clear()
     uiState.varsMockEntries.value ++=
@@ -30,7 +30,7 @@ object UIMockStore extends Logging {
   }
 
   def changeMockEntry(mock: MockEntry): Unit = {
-    info(s"MockVarStore: changeMockEntry ${mock.url}")
+    info(s"MockUIStore: changeMockEntry ${mock.url}")
     uiState.varSelectedEntry.value.varStatus.value = mock.status
     uiState.varSelectedEntry.value.varUrl.value = mock.url
     uiState.varSelectedEntry.value.varContent.value = mock.content
@@ -38,13 +38,13 @@ object UIMockStore extends Logging {
   }
 
   def changeMockIdent(ident: String): Unit = {
-    info(s"MockVarStore: changeMockIdent $ident")
+    info(s"MockUIStore: changeMockIdent $ident")
     uiState.varIdent.value = ident
     SemanticUI.initElements()
   }
 
   def addMockEntry(): VarMockEntry = {
-    info(s"MockVarStore: addMockEntry")
+    info(s"MockUIStore: addMockEntry")
     val entry = VarMockEntry()
     uiState.varsMockEntries.value += entry
     changeSelectedEntry(entry)
@@ -52,7 +52,7 @@ object UIMockStore extends Logging {
   }
 
   def changeSelectedEntry(varMockEntry: VarMockEntry): Unit = {
-    info(s"MockVarStore: changeSelectedEntry ${url(varMockEntry)}")
+    info(s"MockUIStore: changeSelectedEntry ${url(varMockEntry)}")
     uiState.varSelectedEntry.value = varMockEntry
     SemanticUI.initElements()
   }

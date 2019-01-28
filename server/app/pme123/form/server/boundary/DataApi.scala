@@ -13,10 +13,6 @@ import pme123.form.shared._
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * This class creates the actions and the websocket needed.
-  * Original see here: https://github.com/playframework/play-scala-websocket-example
-  */
 @Singleton
 class DataApi @Inject()(dataDBRepo: DataDBRepo,
                         val spaComps: SPAComponents)

@@ -1,7 +1,7 @@
-package pme123.adapters.server.e2e.tests
+package pme123.form.server.e2e.tests
 
 import org.openqa.selenium.By
-import pme123.adapters.server.e2e.pages.FormPreviewPage
+import pme123.form.server.e2e.pages.FormPreviewPage
 
 import scala.collection.JavaConverters._
 

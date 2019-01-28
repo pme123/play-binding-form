@@ -9,10 +9,6 @@ import pme123.form.shared.{MockContainer, ServiceRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * This class creates the actions and the websocket needed.
-  * Original see here: https://github.com/playframework/play-scala-websocket-example
-  */
 @Singleton
 class MockApi @Inject()(jsonService: MockService,
                         mockDBRepo: MockDBRepo,

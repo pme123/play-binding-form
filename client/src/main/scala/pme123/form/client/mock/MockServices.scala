@@ -1,8 +1,8 @@
 package pme123.form.client.mock
 
-import com.github.marklister.base64.Base64._
 import com.thoughtworks.binding.Binding
 import org.scalajs.dom.raw.HTMLElement
+import play.api.libs.json.{JsValue, Json}
 import pme123.form.client.services.HttpServices
 import pme123.form.shared.{MockContainer, MockEntry, ServiceRequest}
 
@@ -18,10 +18,6 @@ object MockServices
     httpPut(path, serviceRequest, (mock: MockEntry) => {
       UIMockStore.changeMockEntry(mock)
     })
-  }
-
-  def urlAsBase64(url: String) = {
-    url.getBytes("UTF-8").toBase64(base64Url)
   }
 
   def persistMock(mockContainer: MockContainer): Binding[HTMLElement] = {
@@ -42,6 +38,15 @@ object MockServices
 
     httpGet(path, (mock: MockContainer) => UIMockStore.changeMock(mock))
   }
+
+  def testService(serviceRequest: ServiceRequest): Binding[HTMLElement] = {
+    val path = s"$apiPath/mock/test/${serviceRequest.serviceConf}/${serviceRequest.path}"
+        .replace("//", "/")
+
+    httpGet(path, (body: JsValue) =>
+      UIMockTestStore.uiState.varServiceRequest.value.varPayload.value = Some(Json.prettyPrint(body)))
+  }
+
 
 
 }

@@ -1,7 +1,7 @@
-package pme123.adapters.server.e2e.pages
+package pme123.form.server.e2e.pages
 
 import org.scalatest.selenium.{Page, WebBrowser}
-import pme123.adapters.server.e2e.E2EConfig
+import pme123.form.server.e2e.E2EConfig
 
 abstract class BasePage
   extends Page

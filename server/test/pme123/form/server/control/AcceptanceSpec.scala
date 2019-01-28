@@ -1,4 +1,4 @@
-package pme123.adapters.server.control
+package pme123.form.server.control
 
 import org.scalatest._
 import org.scalatestplus.play.WsScalaTestClient

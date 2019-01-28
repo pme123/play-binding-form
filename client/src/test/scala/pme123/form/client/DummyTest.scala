@@ -1,4 +1,4 @@
-package pme123.adapters.client
+package pme123.form.client
 
 // test dummy to check testing is working
 // AT THE MOMENT IT IS NOT WORKING

@@ -5,7 +5,7 @@ import org.scalajs.dom.window
 import pme123.form.client.FormClient.info
 import pme123.form.client.data.DataView
 import pme123.form.client.form.{FormEditorView, FormPreviewView}
-import pme123.form.client.mock.MockView
+import pme123.form.client.mock.{MockTestView, MockView}
 import pme123.form.client.mapping.MappingView
 import pme123.form.client.services.SemanticUI
 
@@ -24,9 +24,11 @@ object UIRoute {
         MappingView
       case MockView.hashRegex() =>
         MockView
+      case MockTestView.hashRegex() =>
+        MockTestView
       case _ =>
         info(s"JsonView!!: $hashText")
-        MockView
+        MockTestView
     }
   }
 

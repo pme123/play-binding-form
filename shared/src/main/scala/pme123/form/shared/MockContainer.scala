@@ -38,7 +38,9 @@ object ServiceRequest {
   implicit val jsonFormat: OFormat[ServiceRequest] = Json.format[ServiceRequest]
 }
 
-sealed trait HttpMethod extends EnumEntry
+sealed trait HttpMethod
+  extends EnumEntry {
+}
 
 // see https://github.com/lloydmeta/enumeratum#usage
 object HttpMethod

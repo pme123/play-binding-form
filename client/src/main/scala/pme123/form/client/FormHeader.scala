@@ -8,7 +8,7 @@ import org.scalajs.jquery.jQuery
 import pme123.form.client.UIRoute.route
 import pme123.form.client.data.{DataServices, DataView, UIDataStore}
 import pme123.form.client.form.{FormEditorView, FormPreviewView, FormServices, UIFormStore}
-import pme123.form.client.mock.{MockServices, MockView, UIMockStore}
+import pme123.form.client.mock._
 import pme123.form.client.mapping.{MappingServices, MappingView, UIMappingStore}
 import pme123.form.client.services.{ClientUtils, I18n, UIStore}
 import pme123.form.shared.services.Language
@@ -93,28 +93,30 @@ private[client] object FormHeader
   private lazy val formsButton: Binding[HTMLElement] = {
     val mainView = UIRoute.route.state.bind
 
-      {mainView match {
-      case DataView =>
-        <div>{
-        DataServices.idents().bind}{//
-          identDropdown("Choose Data", UIDataStore.uiState.varsIdents, changeIdent).bind
-          }</div>
-      case MappingView =>
-        <div>{
-          MappingServices.idents().bind}{//
-        identDropdown("Choose Mapping", UIMappingStore.uiState.varsIdents, changeIdent).bind
-          }</div>
-      case MockView =>
-        <div>{
-          MockServices.idents().bind}{//
-          identDropdown("Choose Mock", UIMockStore.uiState.varsIdents, changeIdent).bind
-          }</div>
-      case _ =>
-        <div>{
-          FormServices.idents().bind}{//
-          identDropdown("Choose Form", UIFormStore.uiState.varsIdents, changeIdent).bind
-          }</div>
-      }}
+    {
+      mainView match {
+        case DataView =>
+          <div>
+            {DataServices.idents().bind}{//
+            identDropdown("Choose Data", UIDataStore.uiState.varsIdents, changeIdent).bind}
+          </div>
+        case MappingView =>
+          <div>
+            {MappingServices.idents().bind}{//
+            identDropdown("Choose Mapping", UIMappingStore.uiState.varsIdents, changeIdent).bind}
+          </div>
+        case _:MockyView =>
+          <div>
+            {MockServices.idents().bind}{//
+            identDropdown("Choose Mock", UIMockStore.uiState.varsIdents, changeIdent).bind}
+          </div>
+        case _ =>
+          <div>
+            {FormServices.idents().bind}{//
+            identDropdown("Choose Form", UIFormStore.uiState.varsIdents, changeIdent).bind}
+          </div>
+      }
+    }
   }
   val changeIdent: Var[Option[String]] = Var(None)
 
@@ -129,7 +131,7 @@ private[client] object FormHeader
           DataServices.getData(change.get).bind
         case MappingView =>
           MappingServices.getMapping(change.get).bind
-        case MockView =>
+        case _: MockyView =>
           MockServices.getMock(change.get).bind
         case _ =>
           FormServices.getForm(change.get).bind
@@ -199,7 +201,7 @@ private[client] object FormHeader
     <div class="ui pointing top left dropdown item">
       <i class="big bars icon"></i>
       <div class="menu">
-        {Constants(Seq(FormPreviewView, FormEditorView, DataView, MappingView, MockView).map(menuLink): _*).map(_.bind)}
+        {Constants(Seq(FormPreviewView, FormEditorView, DataView, MappingView, MockView, MockTestView).map(menuLink): _*).map(_.bind)}
       </div>
     </div>
   }
@@ -212,5 +214,4 @@ private[client] object FormHeader
       <i class={s"${view.icon} icon"}></i>{I18n(lang, s"menu.view.${view.link}")}
     </a>
   }
-
 }

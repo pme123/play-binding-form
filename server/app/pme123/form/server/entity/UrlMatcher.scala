@@ -1,27 +1,43 @@
 package pme123.form.server.entity
 
-object UrlMatcher extends App {
+import org.fusesource.scalate.{Template, TemplateEngine}
+import pme123.form.shared.{MockContainer, MockEntry}
 
-  val urlPattern = """http://sapi.co/{{firstname}}/{{lastname}}"""
-  val pattern = "^" + urlPattern
-    .replace("{{", "(?<")
-    .replace("}}", ">.+)") + "$"
+object UrlMatcher {
 
-  //val pattern = pattern2.r //"""^http://sapi.co/(?<firstname>.+)/(?<lastname>.+)+$""".r
-  val groupRegex =
+  private val engine = new TemplateEngine()
+
+  private val groupRegex =
     """(?<=\{\{).+?(?=\})""".r
 
-  println(groupRegex.findAllIn(urlPattern).toSeq)
+  def getResponse(mock: MockContainer, path: String): HttpResponse = {
+    mock.mocks.find { me =>
+      path.matches(regexUrl(me.url))
+    }.map { me =>
+      createBody(path, me)
+    }.getOrElse(HttpResponse(404, s"There is no matching Url in the Service '${mock.ident}'"))
+  }
 
-  val groups = groupRegex.findAllIn(urlPattern).toList
-  //.map(_.replace("{", "").replace("}", ""))
-  println(groups)
+  private def extractParams(mockUrl: String, path: String) = {
+    val groups: Seq[String] = groupRegex.findAllIn(mockUrl).toList
+    val matched: Map[String, String] = regexUrl(mockUrl).r
+      .findFirstMatchIn(path)
+      .map { matched =>
+        groups.map(name => name -> matched.group(name)).toMap
+      }.getOrElse(Map.empty)
+    matched
+  }
 
-  def matchAll(str: String): Option[Map[String, String]] = pattern.r
-    .findFirstMatchIn(str)
-    .map { matched =>
-      groups.map(name => name -> matched.group(name)).toMap
-    }
+  private def regexUrl(url: String) = {
+    "^" + url
+      .replace("{{", "(?<")
+      .replace("}}", ">.+)") + "$"
+  }
 
-  println(matchAll("http://sapi.co/peter/muller"))
+  private def createBody(path: String, me: MockEntry) = {
+    val matched = extractParams(me.url, path)
+    val templ: Template = engine.compileMoustache(me.content)
+    HttpResponse(200, engine.layout("notused", templ, matched))
+  }
+
 }

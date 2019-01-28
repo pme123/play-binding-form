@@ -3,14 +3,23 @@ package pme123.form.server.control
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
+import pme123.form.server.entity.{HttpResponse, UrlMatcher}
 import pme123.form.shared.{MockEntry, ServiceRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 class MockService @Inject()(val ws: WSClient,
+                            mockDBRepo: MockDBRepo,
                             formConfiguration: FormConfiguration,
                            )(implicit val ec: ExecutionContext) {
+
+  def getCall(serviceConf: String, path: String): Future[HttpResponse] = {
+    mockDBRepo.selectMaybeMock(serviceConf). map{
+      case Some(mock) => UrlMatcher.getResponse(mock, path)
+      case None => HttpResponse(404, s"No Mock Config found for $path")
+    }
+  }
 
   def callService(serviceRequest: ServiceRequest): Future[MockEntry] = {
     val conf = formConfiguration.serviceMap(serviceRequest.serviceConf)

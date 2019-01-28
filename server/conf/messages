@@ -57,3 +57,5 @@ view.form.ident=Form Identity
 view.data.ident=Data Identity
 view.mapping.ident=Mapping Identity
 view.mock.ident=Service Identity
+menu.view.mock-test=Mock Testing
+view.mock-test.ident=Mock Configuration 

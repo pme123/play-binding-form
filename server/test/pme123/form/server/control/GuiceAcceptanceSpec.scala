@@ -1,4 +1,4 @@
-package pme123.adapters.server.control
+package pme123.form.server.control
 
 import akka.util.Timeout
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite

@@ -1,4 +1,4 @@
-package pme123.adapters.server.e2e.tests
+package pme123.form.server.e2e.tests
 
 import java.net.URL
 
@@ -8,8 +8,8 @@ import org.openqa.selenium.remote.{LocalFileDetector, RemoteWebDriver}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.{BeforeAndAfterAll, Matchers, Suite, WordSpec}
-import pme123.adapters.server.e2e.E2EConfig
-import pme123.adapters.server.e2e.pages.LoginPage
+import pme123.form.server.e2e.E2EConfig
+import pme123.form.server.e2e.pages.LoginPage
 
 import scala.collection.JavaConverters._
 

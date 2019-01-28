@@ -78,6 +78,7 @@ object Settings {
     "biz.enef" %% "slogging-slf4j" % sloggingV,
     "org.apache.poi" % "poi-ooxml" % "3.17",
     "com.github.kxbmap" %% "configs" % "0.4.4",
+    "org.scalatra.scalate" %% "scalate-core" % "1.9.0",
     // scalajs for server
     "com.vmunier" %% "scalajs-scripts" % "1.1.1",
     "org.julienrf" %% "play-jsmessages" % "3.0.0",
@@ -145,7 +146,6 @@ object Settings {
     "org.julienrf" %%% "play-json-derived-codecs" % "4.0.0",
     "com.beachape" %%% "enumeratum-play-json" % "1.5.14",
     "com.softwaremill.quicklens" %%% "quicklens" % "1.4.11",
-    "com.github.marklister" %%% "base64" % "0.2.4",
     // logging lib that also works with ScalaJS
     "biz.enef" %%% "slogging" % sloggingV,
     "org.scalatest" %%% "scalatest" % scalaTestV % Test,
