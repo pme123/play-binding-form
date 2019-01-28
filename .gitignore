@@ -1,4 +1,7 @@
 .idea
+.metals/
+.bloop/
+_mac
 target
 logs
 project/project
