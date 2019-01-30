@@ -2,8 +2,6 @@ package pme123.form.server.entity
 
 import java.time.ZoneId
 
-import pme123.form.server.entity.ISODateTimeHelper
-
 class ISODateTimeHelperTest
   extends UnitTest
     with ISODateTimeHelper {

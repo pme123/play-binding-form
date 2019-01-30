@@ -1,9 +1,9 @@
 package pme123.form.shared.services
 
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest._
 
 trait UnitTest
-  extends FlatSpec
+  extends WordSpec
     with Matchers
     with BeforeAndAfter
     with BeforeAndAfterAll

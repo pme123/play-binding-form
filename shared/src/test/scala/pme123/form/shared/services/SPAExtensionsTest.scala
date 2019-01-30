@@ -4,34 +4,57 @@ import org.scalatest.DoNotDiscover
 
 @DoNotDiscover
 class SPAExtensionsTest extends UnitTest {
-import pme123.form.shared.services.SPAExtensions._
+
+  import pme123.form.shared.services.SPAExtensions._
 
   val nullStr: String = null
 
-  "null String" should "be blank" in {
-    assert(nullStr.isBlank)
+  "null String" should {
+    "be blank" in {
+      assert(nullStr.isBlank)
+    }
   }
-  "empty String" should "be blank" in {
-    assert("".isBlank)
-  }
-  "blank String" should "be blank" in {
-    assert(" \n".isBlank)
-  }
-  "String" should "not be blank" in {
-    assert(!"x".isBlank)
+  "empty String" should {
+    "be blank" in {
+      assert("".isBlank)
+    }
   }
 
-  "null String" should "not be non-blank" in {
-    assert(!nullStr.nonBlank)
+  "blank String" should {
+    "be blank" in {
+      assert(" \n".isBlank)
+    }
   }
-  "empty String" should "not be non-blank" in {
-    assert(!"".nonBlank)
+
+  "String" should {
+    "not be blank" in {
+      assert(!"x".isBlank)
+    }
   }
-  "blank String" should "not be non-blank" in {
-    assert(!" \n".nonBlank)
+
+
+  "null String" should {
+    "not be non-blank" in {
+      assert(!nullStr.nonBlank)
+    }
   }
-  "String" should "be non-blank" in {
-    assert("x".nonBlank)
+
+  "empty String" should {
+    "not be non-blank" in {
+      assert(!"".nonBlank)
+    }
+  }
+
+  "blank String" should {
+    "not be non-blank" in {
+      assert(!" \n".nonBlank)
+    }
+  }
+
+  "String" should {
+    "be non-blank" in {
+      assert("x".nonBlank)
+    }
   }
 
 }

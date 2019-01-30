@@ -25,7 +25,7 @@ object Settings {
   lazy val projectV = "0.0.2"
 
   // main versions
-  lazy val scalaV = "2.12.8"
+  lazy val scalaV = "2.12.6"
   lazy val bindingV = "11.5.0"
   lazy val jQueryV = "2.2.4"
   lazy val sloggingV = "0.6.1"

@@ -3,7 +3,7 @@ package pme123.form.server.control
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import pme123.form.server.entity.{HttpResponse, UrlMatcher}
+import pme123.form.server.entity.{HttpResponse, ServiceException, UrlMatcher}
 import pme123.form.shared.{MockEntry, ServiceRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,8 +22,8 @@ class MockService @Inject()(val ws: WSClient,
   }
 
   def callService(serviceRequest: ServiceRequest): Future[MockEntry] = {
-    val url = serviceRequest.path
-    // only GET supported
+    val conf = formConfiguration.serviceMap.getOrElse(serviceRequest.serviceConf, throw ServiceException(s"There is no ServiceConf for '${serviceRequest.serviceConf}'"))
+    val url = conf.url + s"/${serviceRequest.path}".replace("//", "/")
     ws.url(url)
       .get()
       .map { resp =>
