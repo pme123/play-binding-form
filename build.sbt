@@ -49,7 +49,6 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(sharedSettings())
   .settings(sharedDependencies)
-  .settings(noPublishSettings)
   .settings(noDockerPublishSettings)
   .jsSettings(jsSettings)
   .jsSettings(sharedJsDependencies) // defined in sbt-scalajs-crossproject
