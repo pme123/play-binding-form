@@ -170,14 +170,14 @@ object Settings {
     , name := s"$projectName${moduleName.map("-" + _).getOrElse("")}"
     , version := s"$projectV"
     , publishArtifact in packageDoc := false
-    , sources in(Compile, doc) := Seq.empty
+  //  , sources in(Compile, doc) := Seq.empty
   ) ++ organizationSettings
 
   private lazy val buildInfoSettings = Seq(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoOptions += BuildInfoOption.BuildTime,
+    buildInfoOptions ++= { if (coverageEnabled.value) Seq() else Seq(BuildInfoOption.BuildTime) }, // <-- this line was changed
     buildInfoOptions += BuildInfoOption.ToJson,
-    buildInfoPackage := "pme123.adapters.version"
+    buildInfoPackage := "pme123.form.version"
   )
 
   lazy val dockerSettings: Seq[Def.Setting[_]] = Seq(

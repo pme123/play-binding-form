@@ -1,6 +1,6 @@
 package pme123.form.shared
 
-import java.io.{File, InputStream}
+import java.io.InputStream
 
 import enumeratum.{Enum, EnumEntry, PlayInsensitiveJsonEnum}
 import julienrf.json.derived
@@ -35,12 +35,12 @@ object JsonSchema {
   /**
     * Convenience method for creating a schema from a simple type (e.g. { "type" : "string" }
     */
-  def schemaFromSimpleType(st: SimpleType) = SchemaRoot(`type` = Some(SimpleJsType(st)))
+  def schemaFromSimpleType(st: JsType) = SchemaRoot(`type` = Some(st))
 
   /**
     * Convenience method for creating schemas that represent an object (based on given fields)
     */
-  def schemaFromFields(fields: List[Field]) = SchemaRoot(`type` = Some(SimpleJsType(SimpleType.OBJECT)), properties = Some(fields))
+  def schemaFromFields(fields: List[Field]) = SchemaRoot(`type` = Some(JsType.OBJECT), properties = Some(fields))
 
   /**
     * Convenience method for creating schemas that reference another schema
@@ -59,7 +59,7 @@ object JsonSchema {
     *
     * @param schema A schema that defines the type of the array
     */
-  def schemaFromArray(schema: SchemaRoot) = SchemaRoot(`type` = Some(SimpleJsType(SimpleType.ARRAY)), items = Some(ItemsRoot(schema)))
+  def schemaFromArray(schema: SchemaRoot) = SchemaRoot(`type` = Some(JsType.ARRAY), items = Some(ItemsRoot(schema)))
 
   /**
     * Convenience method for creating schemas based on a union type of the listed schemas (aka oneOf)
@@ -116,37 +116,26 @@ object JsonSchema {
   }
 
   sealed trait JsType
-
-  case class SimpleJsType(x: SimpleType) extends JsType
-
-  case class ListSimpleJsType(x: List[SimpleType]) extends JsType
-
-  object JsType {
-    implicit val jsonFormat: OFormat[JsType] = derived.oformat[JsType]()
-
-  }
-
-  sealed trait SimpleType
     extends EnumEntry {
   }
 
-  object SimpleType
-    extends Enum[SimpleType]
-      with PlayInsensitiveJsonEnum[SimpleType] {
+  object JsType
+    extends Enum[JsType]
+      with PlayInsensitiveJsonEnum[JsType] {
 
-    def values: immutable.IndexedSeq[SimpleType] = findValues
+    def values: immutable.IndexedSeq[JsType] = findValues
 
-    case object STRING extends SimpleType
+    case object STRING extends JsType
 
-    case object NUMBER extends SimpleType
+    case object NUMBER extends JsType
 
-    case object BOOLEAN extends SimpleType
+    case object BOOLEAN extends JsType
 
-    case object ARRAY extends SimpleType
+    case object ARRAY extends JsType
 
-    case object OBJECT extends SimpleType
+    case object OBJECT extends JsType
 
-    case object NULL extends SimpleType
+    case object NULL extends JsType
 
   }
 

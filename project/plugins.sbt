@@ -25,7 +25,7 @@ addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.2.7")
 
 // see https://github.com/portable-scala/sbt-crossproject
 addSbtPlugin("org.scala-js"     % "sbt-scalajs"              % "0.6.23")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.4.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
 // version infos
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")
